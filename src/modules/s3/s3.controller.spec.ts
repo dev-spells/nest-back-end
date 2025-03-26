@@ -1,20 +1,37 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { S3Controller } from './s3.controller';
-import { S3Service } from './s3.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { S3Service } from "./s3.service";
+import { ConfigService } from "@nestjs/config";
 
-describe('S3Controller', () => {
-  let controller: S3Controller;
+// Mock AWS SDK
+jest.mock("@aws-sdk/client-s3", () => ({
+	S3Client: jest.fn().mockImplementation(() => ({
+		send: jest.fn().mockResolvedValue({}),
+	})),
+	PutObjectCommand: jest.fn(),
+	GetObjectCommand: jest.fn(),
+	DeleteObjectCommand: jest.fn(),
+}));
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [S3Controller],
-      providers: [S3Service],
-    }).compile();
+describe("S3Service", () => {
+	let service: S3Service;
 
-    controller = module.get<S3Controller>(S3Controller);
-  });
+	beforeEach(async () => {
+		const module: TestingModule = await Test.createTestingModule({
+			providers: [
+				S3Service,
+				{
+					provide: ConfigService,
+					useValue: {
+						get: jest.fn().mockReturnValue("mock-value"),
+					},
+				},
+			],
+		}).compile();
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+		service = module.get<S3Service>(S3Service);
+	});
+
+	it("should be defined", () => {
+		expect(service).toBeDefined();
+	});
 });
