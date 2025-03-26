@@ -1,20 +1,20 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { S3Controller } from './s3.controller';
-import { S3Service } from './s3.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { S3Service } from "./s3.service";
+import { ConfigModule } from "@nestjs/config";
 
-describe('S3Controller', () => {
-  let controller: S3Controller;
+describe("S3Service", () => {
+	let service: S3Service;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [S3Controller],
-      providers: [S3Service],
-    }).compile();
+	beforeEach(async () => {
+		const module: TestingModule = await Test.createTestingModule({
+			imports: [ConfigModule.forRoot()], // Import ConfigModule
+			providers: [S3Service],
+		}).compile();
 
-    controller = module.get<S3Controller>(S3Controller);
-  });
+		service = module.get<S3Service>(S3Service);
+	});
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+	it("should be defined", () => {
+		expect(service).toBeDefined();
+	});
 });
