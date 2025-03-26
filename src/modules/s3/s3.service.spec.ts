@@ -1,27 +1,21 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { ConfigService } from "@nestjs/config";
 import { S3Service } from "./s3.service";
+import { S3Client } from "@aws-sdk/client-s3";
+
+// Add mock for S3Client
+jest.mock("@aws-sdk/client-s3", () => ({
+	S3Client: jest.fn().mockImplementation(() => ({
+		send: jest.fn().mockResolvedValue({}),
+	})),
+	PutObjectCommand: jest.fn(),
+	GetObjectCommand: jest.fn(),
+	DeleteObjectCommand: jest.fn(),
+}));
 
 describe("S3Service", () => {
 	let service: S3Service;
 	let configService: ConfigService;
-
-	const mockConfigService = {
-		get: jest.fn((key: string) => {
-			switch (key) {
-				case "S3_REGION":
-					return "test-region";
-				case "S3_BUCKET_NAME":
-					return "test-bucket";
-				case "IAM_ACCESS_KEY":
-					return "test-access-key";
-				case "IAM_SECRET_KEY":
-					return "test-secret-key";
-				default:
-					return null;
-			}
-		}),
-	};
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
@@ -29,7 +23,9 @@ describe("S3Service", () => {
 				S3Service,
 				{
 					provide: ConfigService,
-					useValue: mockConfigService,
+					useValue: {
+						get: jest.fn().mockReturnValue("mock-value"), // This will return "mock-value" for any key
+					},
 				},
 			],
 		}).compile();
