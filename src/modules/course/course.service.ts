@@ -1,26 +1,60 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCourseDto } from './dto/create-course.dto';
-import { UpdateCourseDto } from './dto/update-course.dto';
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { CreateCourseDto } from "./dto/create-course.dto";
+import { UpdateCourseDto } from "./dto/update-course.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Course } from "src/entities/course.entity";
+import { Repository } from "typeorm";
+import { plainToInstance } from "class-transformer";
+import { ResponseCourseDto } from "./dto/response-course.dto";
+import { S3Service } from "../s3/s3.service";
 
 @Injectable()
 export class CourseService {
-  create(createCourseDto: CreateCourseDto) {
-    return 'This action adds a new course';
-  }
+	constructor(
+		@InjectRepository(Course)
+		private courseRepository: Repository<Course>,
+		private s3Service: S3Service,
+	) {}
 
-  findAll() {
-    return `This action returns all course`;
-  }
+	async create(createCourseDto: CreateCourseDto) {
+		const course = this.courseRepository.create(createCourseDto);
+		if (!course) {
+			throw new HttpException(
+				{ status: HttpStatus.BAD_REQUEST, message: "Error create course" },
+				HttpStatus.BAD_REQUEST,
+			);
+		}
+		return plainToInstance(
+			ResponseCourseDto,
+			await this.courseRepository.save(course),
+		);
+	}
 
-  findOne(id: number) {
-    return `This action returns a #${id} course`;
-  }
+	async findAll() {
+		return plainToInstance(
+			ResponseCourseDto,
+			await this.courseRepository.find(),
+		);
+	}
 
-  update(id: number, updateCourseDto: UpdateCourseDto) {
-    return `This action updates a #${id} course`;
-  }
+	async findOne(id: number) {
+		const course = await this.courseRepository.findOne({
+			where: { id },
+		});
+		if (!course) {
+			throw new HttpException(
+				{ status: HttpStatus.NOT_FOUND, message: "Course not found" },
+				HttpStatus.NOT_FOUND,
+			);
+		}
+		return plainToInstance(ResponseCourseDto, course);
+	}
 
-  remove(id: number) {
-    return `This action removes a #${id} course`;
-  }
+	update(id: number, updateCourseDto: UpdateCourseDto) {
+		return `This action updates a #${id} course`;
+	}
+
+	remove(id: number) {
+		return `This action removes a #${id} course`;
+	}
 }
