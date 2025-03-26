@@ -1,0 +1,89 @@
+name: Deploy Backend to VM
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+
+  push:
+    branches:
+      - dev
+      - main
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Install Dependencies
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
+      
+      - name: Run Build
+        run: pnpm build
+
+      - name: Run Tests
+        run: pnpm test
+
+  build-and-deploy-dev:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_IMAGE_NAME }}:dev .
+          docker push ${{ secrets.DOCKER_IMAGE_NAME }}:dev
+      
+      - name: Deploy to Dev VM via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_IPCONNECTION }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script: |
+            docker pull ${{ secrets.DOCKER_IMAGE_NAME }}:dev
+            docker stop ${{ secrets.DOCKER_CONTAINER_NAME_DEV }} || true
+            docker rm ${{ secrets.DOCKER_CONTAINER_NAME_DEV }} || true
+            docker run -d --env-file .env --name ${{ secrets.DOCKER_CONTAINER_NAME_DEV }} -p ${{ secrets.DOCKER_OUT_PORT_DEV }}:${{ secrets.DOCKER_PORT }} ${{ secrets.DOCKER_IMAGE_NAME }}:dev
+            docker images --filter "dangling=true" -q | xargs docker rmi || true
+
+  build-and-deploy-prod:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_IMAGE_NAME }}:latest .
+          docker push ${{ secrets.DOCKER_IMAGE_NAME }}:latest
+      
+      - name: Deploy to Prod VM via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_IPCONNECTION }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script: |
+            docker pull ${{ secrets.DOCKER_IMAGE_NAME }}:latest
+            docker stop ${{ secrets.DOCKER_CONTAINER_NAME_PROD }} || true
+            docker rm ${{ secrets.DOCKER_CONTAINER_NAME_PROD }} || true
+            docker run -d --env-file .env --name ${{ secrets.DOCKER_CONTAINER_NAME_PROD }} -p ${{ secrets.DOCKER_OUT_PORT_PROD }}:${{ secrets.DOCKER_PORT }} ${{ secrets.DOCKER_IMAGE_NAME }}:latest
+            docker images --filter "dangling=true" -q | xargs docker rmi || true
