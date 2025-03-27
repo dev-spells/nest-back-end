@@ -10,6 +10,7 @@ import { UserModule } from "./modules/user/user.module";
 import { RedisModule } from "./modules/cache/cache.module";
 import { S3Module } from './modules/s3/s3.module';
 import { CourseModule } from './modules/course/course.module';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
 	imports: [
@@ -31,6 +32,7 @@ import { CourseModule } from './modules/course/course.module';
 		UserModule,
 		S3Module,
 		CourseModule,
+		MailModule,
 	],
 	controllers: [AppController],
 	providers: [
