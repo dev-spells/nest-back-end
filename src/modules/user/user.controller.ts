@@ -19,7 +19,7 @@ export class UserController {
 	@Public()
 	@ApiOperation({ summary: "create new user" })
 	@Post()
-	async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-		return this.userService.createUser(createUserDto);
+	async create(@Body() createUserDto: CreateUserDto) {
+		return await this.userService.createUser(createUserDto);
 	}
 }

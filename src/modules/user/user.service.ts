@@ -1,3 +1,4 @@
+import { MailService } from "./../mail/mail.service";
 import {
 	BadRequestException,
 	forwardRef,
