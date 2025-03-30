@@ -1,5 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
 import { Exclude, Expose } from "class-transformer";
+
+import { ApiProperty } from "@nestjs/swagger";
 
 export class ResponseCourseDto {
 	@ApiProperty({ example: 1 })

@@ -1,16 +1,18 @@
-import { Inject, Module } from "@nestjs/common";
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { APP_GUARD } from "@nestjs/core";
+import { TypeOrmModule } from "@nestjs/typeorm";
+
+import { AuthModule } from "src/auth/auth.module";
+import { JwtAuthGuard } from "src/auth/passport/jwt-auth.guard";
+
+import { RedisModule } from "./modules/cache/cache.module";
+import { CourseModule } from "./modules/course/course.module";
+import { MailModule } from "./modules/mail/mail.module";
+import { S3Module } from "./modules/s3/s3.module";
+import { UserModule } from "./modules/user/user.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { AuthModule } from "src/auth/auth.module";
-import { APP_GUARD } from "@nestjs/core";
-import { JwtAuthGuard } from "src/auth/passport/jwt-auth.guard";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { UserModule } from "./modules/user/user.module";
-import { RedisModule } from "./modules/cache/cache.module";
-import { S3Module } from './modules/s3/s3.module';
-import { CourseModule } from './modules/course/course.module';
-import { MailModule } from './modules/mail/mail.module';
 
 @Module({
 	imports: [

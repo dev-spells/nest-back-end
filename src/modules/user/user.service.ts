@@ -1,18 +1,18 @@
-import { MailService } from "./../mail/mail.service";
 import {
 	BadRequestException,
-	forwardRef,
-	Inject,
 	Injectable,
-	InternalServerErrorException,
 	NotFoundException,
 } from "@nestjs/common";
-import { CreateUserDto } from "./dto/create-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { User, UserRole } from "../../entities/user.entity";
 import { Repository } from "typeorm";
+
 import { hashPassword } from "src/utils/handle-password.util";
+
+import { User, UserRole } from "../../entities/user.entity";
 import { RedisService } from "../cache/cache.service";
+
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 // import aqp from 'api-query-params';
 
 @Injectable()
@@ -31,7 +31,6 @@ export class UserService {
 			throw new BadRequestException("Email already in use");
 		}
 
-		console.log(dto.password);
 		const hashedPassword = await hashPassword(dto.password);
 		const user = this.userRepository.create({
 			...dto,
@@ -47,8 +46,46 @@ export class UserService {
 		return await this.userRepository.save(user);
 	}
 
+	async updatePassword(id: string, newPassword: string) {
+		const hashedPassword = await hashPassword(newPassword);
+		await this.userRepository.update(id, { password: hashedPassword });
+	}
+
+	async updateUser(id: string, updateUserDto: UpdateUserDto) {
+		const { username } = updateUserDto;
+		const user = await this.userRepository.findOne({ where: { id } });
+		if (!user) {
+			throw new NotFoundException("User not found");
+		}
+		if (username && (await this.isUsernameExists(username))) {
+			throw new BadRequestException("Username already in use");
+		}
+		await this.userRepository.update(id, updateUserDto);
+	}
+
 	async findByUsername(username: string) {
 		const existingUser = await this.userRepository.findOne({
+			where: { username },
+		});
+		return existingUser;
+	}
+
+	async findByEmail(email: string) {
+		const existingUser = await this.userRepository.findOne({
+			where: { email },
+		});
+		return existingUser;
+	}
+
+	async isEmailExists(email: string) {
+		const existingUser = await this.userRepository.exists({
+			where: { email },
+		});
+		return existingUser;
+	}
+
+	async isUsernameExists(username: string) {
+		const existingUser = await this.userRepository.exists({
 			where: { username },
 		});
 		return existingUser;

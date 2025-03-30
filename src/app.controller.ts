@@ -1,8 +1,7 @@
 import { Controller, Get } from "@nestjs/common";
-import { AppService } from "./app.service";
+
 import { Public } from "./decorators/public-route";
-import { RedisService } from "./modules/cache/cache.service";
-import { ApiBearerAuth } from "@nestjs/swagger";
+import { AppService } from "./app.service";
 
 @Controller()
 export class AppController {

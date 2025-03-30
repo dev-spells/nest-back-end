@@ -1,12 +1,15 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { CreateCourseDto } from "./dto/create-course.dto";
-import { UpdateCourseDto } from "./dto/update-course.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Course } from "src/entities/course.entity";
-import { Repository } from "typeorm";
 import { plainToInstance } from "class-transformer";
-import { ResponseCourseDto } from "./dto/response-course.dto";
+import { Repository } from "typeorm";
+
+import { Course } from "src/entities/course.entity";
+
 import { S3Service } from "../s3/s3.service";
+
+import { CreateCourseDto } from "./dto/create-course.dto";
+import { ResponseCourseDto } from "./dto/response-course.dto";
+import { UpdateCourseDto } from "./dto/update-course.dto";
 
 @Injectable()
 export class CourseService {

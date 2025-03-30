@@ -10,5 +10,6 @@
   "arrowParens": "avoid",
   "importOrder": ["^[./]"],
   "importOrderSortSpecifiers": true,
-  "importOrderSeparation": true
+  "importOrderSeparation": true,
+  "endOfLine": "auto"
 }

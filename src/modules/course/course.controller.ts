@@ -1,27 +1,21 @@
 import {
-	Controller,
-	Get,
-	Post,
 	Body,
-	Patch,
-	Param,
+	Controller,
 	Delete,
-	UploadedFile,
-	UseInterceptors,
+	Get,
+	Param,
+	Patch,
+	Post,
 } from "@nestjs/common";
-import { CourseService } from "./course.service";
-import { CreateCourseDto } from "./dto/create-course.dto";
-import { UpdateCourseDto } from "./dto/update-course.dto";
+
+import { ApiOperation, ApiResponse } from "@nestjs/swagger";
+
 import { Public } from "src/decorators/public-route";
-import {
-	ApiBody,
-	ApiConsumes,
-	ApiOperation,
-	ApiResponse,
-} from "@nestjs/swagger";
+
+import { CreateCourseDto } from "./dto/create-course.dto";
 import { ResponseCourseDto } from "./dto/response-course.dto";
-import { FileValidationPipe } from "src/pipe/file-validation.pipe";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { UpdateCourseDto } from "./dto/update-course.dto";
+import { CourseService } from "./course.service";
 
 @Controller("course")
 export class CourseController {

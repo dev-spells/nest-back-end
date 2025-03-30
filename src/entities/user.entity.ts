@@ -1,12 +1,6 @@
 import { Exclude } from "class-transformer";
-import { hashPassword } from "src/utils/handle-password.util";
-import {
-	Entity,
-	PrimaryGeneratedColumn,
-	Column,
-	BeforeInsert,
-	OneToMany,
-} from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+
 import { UserCourseCompletion } from "./user-course-completion";
 
 export enum UserRole {
@@ -56,4 +50,6 @@ export class User {
 		userCourseCompletion => userCourseCompletion.users,
 	)
 	userCourseCompletion: UserCourseCompletion[];
+	@Column({ default: false })
+	isActived: boolean;
 }

@@ -1,22 +1,42 @@
-import { MailerService } from "@nestjs-modules/mailer";
 import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { MailerService } from "@nestjs-modules/mailer";
+
 import { User } from "src/entities/user.entity";
+
+import { MailTemplates } from "./templates";
 
 @Injectable()
 export class MailService {
-	constructor(private mailerService: MailerService) {}
+	constructor(
+		private mailerService: MailerService,
+		private configService: ConfigService,
+	) {}
 
-	async sendUserConfirmation(user: User, token: string) {
-		const url = `${token}`;
-
+	private async sendMail(
+		to: string,
+		template: keyof typeof MailTemplates,
+		context: Record<string, any>,
+	) {
+		const mailTemplate = MailTemplates[template];
 		await this.mailerService.sendMail({
-			to: user.email,
-			subject: "Welcome to Nice App! Confirm your Email",
-			template: "./confirmation", // `.hbs` extension is appended automatically
-			context: {
-				name: user.username,
-				url,
-			},
+			to,
+			subject: mailTemplate.subject,
+			template: mailTemplate.templatePath,
+			context,
+		});
+	}
+
+	async sendUserConfirmation(user: User, otp: string) {
+		await this.sendMail(user.email, "USER_CONFIRMATION", {
+			name: user.username,
+			otp,
+		});
+	}
+
+	async sendForgotPassword(user: User, otp: string) {
+		await this.sendMail(user.email, "FORGOT_PASSWORD", {
+			otp,
 		});
 	}
 }

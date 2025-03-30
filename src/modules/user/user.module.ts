@@ -1,10 +1,12 @@
-import { forwardRef, Module } from "@nestjs/common";
-import { UserService } from "./user.service";
-import { UserController } from "./user.controller";
+import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+
 import { User } from "src/entities/user.entity";
+
 import { RedisModule } from "../cache/cache.module";
-import { MailModule } from "../mail/mail.module";
+
+import { UserController } from "./user.controller";
+import { UserService } from "./user.service";
 
 @Module({
 	imports: [TypeOrmModule.forFeature([User]), RedisModule],
