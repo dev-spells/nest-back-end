@@ -1,6 +1,7 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { S3Service } from "./s3.service";
 import { ConfigService } from "@nestjs/config";
+import { Test, TestingModule } from "@nestjs/testing";
+
+import { S3Service } from "./s3.service";
 
 // Mock AWS SDK
 jest.mock("@aws-sdk/client-s3", () => ({

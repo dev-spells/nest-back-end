@@ -1,13 +1,13 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity()
 export class PendingUser {
-  @PrimaryColumn()
-  walletAddress: string;
+	@PrimaryColumn()
+	walletAddress: string;
 
-  @Column()
-  isLedger: boolean;
+	@Column()
+	isLedger: boolean;
 
-  @Column()
-  nonce: string;
+	@Column()
+	nonce: string;
 }

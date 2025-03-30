@@ -1,7 +1,7 @@
-import { Test, TestingModule } from "@nestjs/testing";
 import { ConfigService } from "@nestjs/config";
+import { Test, TestingModule } from "@nestjs/testing";
+
 import { S3Service } from "./s3.service";
-import { S3Client } from "@aws-sdk/client-s3";
 
 // Add mock for S3Client
 jest.mock("@aws-sdk/client-s3", () => ({
@@ -15,8 +15,6 @@ jest.mock("@aws-sdk/client-s3", () => ({
 
 describe("S3Service", () => {
 	let service: S3Service;
-	let configService: ConfigService;
-
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			providers: [
@@ -31,7 +29,6 @@ describe("S3Service", () => {
 		}).compile();
 
 		service = module.get<S3Service>(S3Service);
-		configService = module.get<ConfigService>(ConfigService);
 	});
 
 	it("should be defined", () => {

@@ -11,18 +11,21 @@ import {
 	UploadedFile,
 	UseInterceptors,
 } from "@nestjs/common";
-import { S3Service } from "./s3.service";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { MAX_FILE_SIZE } from "src/constants/file-upload-validate";
+
 import {
-	ApiTags,
-	ApiOperation,
-	ApiResponse,
 	ApiBody,
 	ApiConsumes,
+	ApiOperation,
 	ApiParam,
+	ApiResponse,
+	ApiTags,
 } from "@nestjs/swagger";
+
+import { MAX_FILE_SIZE } from "src/constants/file-upload-validate";
 import { Public } from "src/decorators/public-route";
+
+import { S3Service } from "./s3.service";
 
 @ApiTags("S3") // Groups all endpoints under "S3" tag in Swagger UI
 @Controller("s3")
