@@ -1,6 +1,13 @@
 import { Exclude } from "class-transformer";
 import { hashPassword } from "src/utils/handle-password.util";
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from "typeorm";
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	BeforeInsert,
+	OneToMany,
+} from "typeorm";
+import { UserCourseCompletion } from "./user-course-completion";
 
 export enum UserRole {
 	USER = "user",
@@ -43,4 +50,10 @@ export class User {
 
 	@Column({ type: "varchar", length: 255, default: "UTC" })
 	timezone: string;
+
+	@OneToMany(
+		() => UserCourseCompletion,
+		userCourseCompletion => userCourseCompletion.users,
+	)
+	userCourseCompletion: UserCourseCompletion[];
 }
