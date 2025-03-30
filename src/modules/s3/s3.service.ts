@@ -1,13 +1,13 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import {
-	S3Client,
-	PutObjectCommand,
-	GetObjectCommand,
 	DeleteObjectCommand,
+	GetObjectCommand,
+	PutObjectCommand,
+	S3Client,
 } from "@aws-sdk/client-s3";
-import { v4 as uuidv4 } from "uuid";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { v4 as uuidv4 } from "uuid";
 
 @Injectable()
 export class S3Service {

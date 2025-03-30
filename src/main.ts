@@ -1,8 +1,11 @@
-import { NestFactory, Reflector } from "@nestjs/core";
-import { AppModule } from "./app.module";
-import { ConfigService } from "@nestjs/config";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ClassSerializerInterceptor, ValidationPipe } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { NestFactory, Reflector } from "@nestjs/core";
+import helmet from "helmet";
+
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+
+import { AppModule } from "./app.module";
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -16,6 +19,7 @@ async function bootstrap() {
 			forbidNonWhitelisted: true,
 		}),
 	);
+	app.use(helmet());
 
 	app.useGlobalInterceptors(
 		new ClassSerializerInterceptor(app.get(Reflector), {
