@@ -1,4 +1,5 @@
-import { Controller, Get, Req, UseGuards } from "@nestjs/common";
+import { Controller, Get, Req, Res, UseGuards } from "@nestjs/common";
+import { Response } from "express";
 
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 
@@ -25,11 +26,12 @@ export class GithubController {
 	@Get("callback")
 	@Public()
 	@UseGuards(GithubOauthGuard)
-	async authCallback(@Req() req) {
+	async authCallback(@Req() req, @Res() res: Response) {
 		return this.githubController.validateUser(
 			req.user.profile.username,
 			req.user.profile.emails[0].value,
 			req.user.accessToken,
+			res,
 		);
 	}
 }
