@@ -10,6 +10,7 @@ import {
 import { UserCourseCompletion } from "./user-course-completion";
 import { Exclude } from "class-transformer";
 import { ApiProperty } from "@nestjs/swagger";
+import { Chapter } from "./chapter.entity";
 
 @Entity()
 export class Course {
@@ -33,6 +34,9 @@ export class Course {
 
 	@Column({ type: "boolean" })
 	is_public: boolean;
+
+	@OneToMany(() => Chapter, chapter => chapter.course, { onDelete: "CASCADE" })
+	chapters: Chapter[];
 
 	@OneToMany(
 		() => UserCourseCompletion,

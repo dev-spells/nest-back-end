@@ -13,5 +13,6 @@ import { CourseService } from "./course.service";
 	imports: [TypeOrmModule.forFeature([Course, UserCourseCompletion]), S3Module],
 	controllers: [CourseController],
 	providers: [CourseService],
+	exports: [CourseService],
 })
 export class CourseModule {}
