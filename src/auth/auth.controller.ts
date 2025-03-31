@@ -5,6 +5,7 @@ import {
 	ApiBearerAuth,
 	ApiBody,
 	ApiNotFoundResponse,
+	ApiOkResponse,
 	ApiOperation,
 	ApiResponse,
 	ApiTags,
@@ -24,6 +25,10 @@ import {
 	UpdatePasswordDto,
 	VerifyOtpDto,
 } from "./dto/create-auth.dto";
+import {
+	ResponseLogin,
+	ResponseVerifyForgotPassword,
+} from "./dto/response-auth.dto";
 import { LocalAuthGuard } from "./passport/local-auth.guard";
 import { RefreshAuthGuard } from "./passport/refresh-auth.guard";
 import { AuthService } from "./auth.service";
@@ -39,6 +44,7 @@ export class AuthController {
 	@ApiNotFoundResponse({
 		description: "User not found",
 	})
+	@ApiOkResponse({ type: ResponseLogin })
 	@Public()
 	@Post("register")
 	async register(@Body() registerDto: RegisterDto) {
@@ -47,6 +53,7 @@ export class AuthController {
 
 	@Post("login")
 	@ApiBody({ type: LoginDto })
+	@ApiOkResponse({ type: ResponseLogin })
 	@Public()
 	@UseGuards(LocalAuthGuard)
 	handleLogin(@Request() req) {
@@ -121,6 +128,7 @@ export class AuthController {
 
 	@Public()
 	@ApiOperation({ summary: "Verify forgot password OTP" })
+	@ApiOkResponse({ type: ResponseVerifyForgotPassword })
 	@ApiResponse({ status: 200, description: "OTP verified successfully" })
 	@ApiBadRequestResponse({
 		description: "Invalid OTP or OTP expired",
