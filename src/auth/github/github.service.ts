@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
+import { Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 
 import { User } from "src/entities/user.entity";
@@ -15,14 +16,28 @@ export class GithubService {
 		private configService: ConfigService,
 	) {}
 
-	async validateUser(username: string, email: string, accessToken: string) {
+	async validateUser(
+		username: string,
+		email: string,
+		accessToken: string,
+		res: Response,
+	) {
 		const user = await this.userService.findByEmail(email);
 		if (user && !user.githubAccessToken) {
 			throw new ForbiddenException("User already exists with this email");
 		}
 		if (user && user.githubAccessToken) {
-			return this.createToken(user);
+			const { access_token, refresh_token } = this.createToken(user);
+			return res.redirect(
+				this.configService.get<string>("REDIRECT_URL") +
+					"?at=" +
+					access_token +
+					"&rt=" +
+					refresh_token,
+			);
 		}
+
+		// For new users
 		const uuid = uuidv4();
 		const newUser = await this.userService.createUser({
 			username: username + "_gh",
@@ -31,7 +46,14 @@ export class GithubService {
 			githubAccessToken: accessToken,
 			isActived: true,
 		});
-		return this.createToken(newUser);
+		const { access_token, refresh_token } = this.createToken(newUser);
+		return res.redirect(
+			this.configService.get<string>("REDIRECT_URL") +
+				"?at=" +
+				access_token +
+				"&rt=" +
+				refresh_token,
+		);
 	}
 
 	private createToken(user: User) {
