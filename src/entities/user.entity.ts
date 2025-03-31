@@ -45,6 +45,9 @@ export class User {
 	@Column({ type: "varchar", length: 255, default: "UTC" })
 	timezone: string;
 
+	@Column({ type: "text", nullable: true })
+	githubAccessToken: string;
+
 	@OneToMany(
 		() => UserCourseCompletion,
 		userCourseCompletion => userCourseCompletion.users,
