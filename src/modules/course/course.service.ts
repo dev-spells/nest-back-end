@@ -1,4 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { plainToInstance } from "class-transformer";
 import { Repository } from "typeorm";
@@ -22,10 +26,7 @@ export class CourseService {
 	async create(createCourseDto: CreateCourseDto) {
 		const course = this.courseRepository.create(createCourseDto);
 		if (!course) {
-			throw new HttpException(
-				{ status: HttpStatus.BAD_REQUEST, message: "Error create course" },
-				HttpStatus.BAD_REQUEST,
-			);
+			throw new BadRequestException("Error create course");
 		}
 		return plainToInstance(
 			ResponseCourseDto,
@@ -45,12 +46,17 @@ export class CourseService {
 			where: { id },
 		});
 		if (!course) {
-			throw new HttpException(
-				{ status: HttpStatus.NOT_FOUND, message: "Course not found" },
-				HttpStatus.NOT_FOUND,
-			);
+			throw new NotFoundException("Course not found");
 		}
 		return plainToInstance(ResponseCourseDto, course);
+	}
+
+	async isCourseExists(id: number) {
+		const course = await this.courseRepository.findOne({ where: { id } });
+		if (!course) {
+			throw new NotFoundException("Course not found");
+		}
+		return true;
 	}
 
 	update(id: number, updateCourseDto: UpdateCourseDto) {
