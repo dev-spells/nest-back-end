@@ -2,6 +2,7 @@ import { ClassSerializerInterceptor, ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory, Reflector } from "@nestjs/core";
 import helmet from "helmet";
+import * as morgan from "morgan";
 
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
@@ -20,6 +21,7 @@ async function bootstrap() {
 		}),
 	);
 	app.use(helmet());
+	app.use(morgan("tiny"));
 
 	app.useGlobalInterceptors(
 		new ClassSerializerInterceptor(app.get(Reflector), {

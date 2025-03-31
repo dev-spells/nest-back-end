@@ -20,4 +20,10 @@ export class CreateUserDto {
 
 	@ApiProperty({ nullable: true })
 	avatarUrl?: string;
+
+	@ApiProperty({ nullable: true })
+	githubAccessToken?: string;
+
+	@ApiProperty({ nullable: true })
+	isActived?: boolean;
 }
