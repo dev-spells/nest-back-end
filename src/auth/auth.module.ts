@@ -7,6 +7,9 @@ import { RedisModule } from "src/modules/cache/cache.module";
 import { MailModule } from "src/modules/mail/mail.module";
 import { UserModule } from "src/modules/user/user.module";
 
+import { GithubController } from "./github/github.controller";
+import { GithubService } from "./github/github.service";
+import { GithubStrategy } from "./passport/github.strategy";
 import { JwtStrategy } from "./passport/jwt.strategy";
 import { LocalStrategy } from "./passport/local.strategy";
 import { RefreshStrategy } from "./passport/refresh.strategy";
@@ -33,7 +36,14 @@ import { AuthService } from "./auth.service";
 		MailModule,
 		RedisModule,
 	],
-	controllers: [AuthController],
-	providers: [AuthService, JwtStrategy, RefreshStrategy, LocalStrategy],
+	controllers: [AuthController, GithubController],
+	providers: [
+		AuthService,
+		GithubService,
+		JwtStrategy,
+		RefreshStrategy,
+		LocalStrategy,
+		GithubStrategy,
+	],
 })
 export class AuthModule {}
