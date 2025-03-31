@@ -14,7 +14,7 @@ import { GithubService } from "./github.service";
 export class GithubController {
 	constructor(private readonly githubController: GithubService) {}
 
-	@ApiOperation({ description: "Login with Github, redirect to Github page" })
+	@ApiOperation({ summary: "Login with Github, redirect to Github page" })
 	@Get()
 	@Public()
 	@UseGuards(GithubOauthGuard)
@@ -22,7 +22,7 @@ export class GithubController {
 		//
 	}
 
-	@ApiOperation({ description: "Github callback, redirect to the app" })
+	@ApiOperation({ summary: "Github callback, redirect to the app" })
 	@Get("callback")
 	@Public()
 	@UseGuards(GithubOauthGuard)
