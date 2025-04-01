@@ -27,8 +27,9 @@ export class GithubService {
 			throw new ForbiddenException("User already exists with this email");
 		}
 		if (user && user.githubAccessToken) {
-			user.githubAccessToken = accessToken;
-			await this.userService.updateUser(user.id, user);
+			await this.userService.updateUser(user.id, {
+				githubAccessToken: accessToken,
+			});
 			const { access_token, refresh_token } = this.createToken(user);
 			return res.redirect(
 				this.configService.get<string>("REDIRECT_URL") +
