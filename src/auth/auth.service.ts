@@ -44,20 +44,25 @@ export class AuthService {
 	async register(registerDTO: RegisterDto) {
 		const { username, email, password } = registerDTO;
 
-		if (await this.userService.isUsernameExists(username))
-			throw new BadRequestException("Username is already taken");
-
-		if (await this.userService.isEmailExists(email))
-			throw new BadRequestException("Email is already taken");
+		const userByUsername = await this.userService.findByUsername(username);
+		const userByEmail = await this.userService.findByEmail(email);
+		if (
+			(userByUsername && !userByUsername.isActived) ||
+			(userByEmail && !userByEmail.isActived)
+		) {
+			await this.sendVerificationOtp(email);
+			return {
+				message:
+					"Please check your email for the OTP code to verify your account",
+			};
+		}
 
 		await this.userService.createUser({
 			username,
 			email,
 			password,
 		});
-
 		await this.sendVerificationOtp(email);
-
 		return {
 			message:
 				"Please check your email for the OTP code to verify your account",
