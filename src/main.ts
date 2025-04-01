@@ -20,7 +20,7 @@ async function bootstrap() {
 			forbidNonWhitelisted: true,
 		}),
 	);
-	app.use(helmet());
+	app.use(helmet({ crossOriginOpenerPolicy: false }));
 	app.use(morgan("tiny"));
 
 	app.useGlobalInterceptors(
