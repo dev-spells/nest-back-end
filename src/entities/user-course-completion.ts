@@ -6,6 +6,7 @@ import {
 	ManyToOne,
 	PrimaryColumn,
 } from "typeorm";
+
 import { Course } from "./course.entity";
 import { User } from "./user.entity";
 

@@ -9,6 +9,7 @@ import { JwtAuthGuard } from "src/auth/passport/jwt-auth.guard";
 import { RedisModule } from "./modules/cache/cache.module";
 import { ChapterModule } from "./modules/chapter/chapter.module";
 import { CourseModule } from "./modules/course/course.module";
+import { LessonModule } from "./modules/lesson/lesson.module";
 import { MailModule } from "./modules/mail/mail.module";
 import { S3Module } from "./modules/s3/s3.module";
 import { UserModule } from "./modules/user/user.module";
@@ -25,6 +26,7 @@ import { AppService } from "./app.service";
 				type: "postgres",
 				url: configService.get<string>("DATABASE_URL"),
 				autoLoadEntities: true,
+				entities: ["dist/**/*.entity{.ts,.js}"],
 				synchronize: true,
 				logging: false,
 			}),
@@ -37,6 +39,7 @@ import { AppService } from "./app.service";
 		CourseModule,
 		MailModule,
 		ChapterModule,
+		LessonModule,
 	],
 	controllers: [AppController],
 	providers: [

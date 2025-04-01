@@ -30,7 +30,7 @@ export class User {
 	level: number;
 
 	@Exclude()
-	@Column({ type: "enum", enum: UserRole })
+	@Column({ type: "enum", enum: UserRole, default: UserRole.USER })
 	role: UserRole;
 
 	@Column({ type: "bigint", default: 0 })
