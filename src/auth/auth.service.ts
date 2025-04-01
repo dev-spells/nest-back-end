@@ -83,13 +83,15 @@ export class AuthService {
 
 		if (user.isActived) throw new BadRequestException("Email already verified");
 
+		if (await this.redisService.get(`verification:${email}`)) {
+			return;
+		}
+
 		const otp = this.generateOtp();
 		const hashedOtp = await hashPassword(otp);
 
 		this.redisService.set(`verification:${email}`, { hashedOtp }, 60 * 5);
 		this.mailService.sendUserConfirmation(user, otp);
-
-		return { message: "Verification OTP has been sent to your email" };
 	}
 
 	async resendVerificationOtp(sendOtp: SendOtp) {
