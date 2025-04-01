@@ -132,7 +132,8 @@ export class AuthService {
 	async sendForgotPasswordOtp(forgotPasswordDto: ForgotPasswordDto) {
 		const { email } = forgotPasswordDto;
 		const user = await this.userService.findByEmail(email);
-		if (!user) throw new NotFoundException("User not found");
+		if (!user || user.githubAccessToken)
+			throw new NotFoundException("User not found");
 
 		const otp = this.generateOtp();
 		const hashedOtp = await hashPassword(otp);
@@ -146,7 +147,8 @@ export class AuthService {
 	async resendForgotPasswordOtp(forgotPasswordDto: ForgotPasswordDto) {
 		const { email } = forgotPasswordDto;
 		const user = await this.userService.findByEmail(email);
-		if (!user) throw new NotFoundException("User not found");
+		if (!user || user.githubAccessToken)
+			throw new NotFoundException("User not found");
 
 		const existingOtp = await this.redisService.get(`forgot-password:${email}`);
 		if (existingOtp)
