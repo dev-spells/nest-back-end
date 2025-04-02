@@ -7,6 +7,7 @@ import {
 import { Reflector } from "@nestjs/core";
 import { AuthGuard } from "@nestjs/passport";
 
+import { TOKEN_ERRORS } from "src/constants/errors";
 import { Role } from "src/constants/role.enum";
 import { IS_PUBLIC_KEY } from "src/decorators/public-route";
 import { ROLE } from "src/decorators/role-route";
@@ -47,7 +48,7 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
 			requiredRoles &&
 			!requiredRoles.some(role => user?.role?.includes(role))
 		) {
-			throw new ForbiddenException("You do not have the permission");
+			throw new ForbiddenException(TOKEN_ERRORS.PERMISSION_DENIED);
 		}
 
 		return true;
@@ -55,7 +56,7 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
 
 	handleRequest(err, user, info) {
 		if (err || !user) {
-			throw err || new UnauthorizedException("Invalid access token");
+			throw err || new UnauthorizedException(TOKEN_ERRORS.INVALID_ACCESS_TOKEN);
 		}
 		return user;
 	}

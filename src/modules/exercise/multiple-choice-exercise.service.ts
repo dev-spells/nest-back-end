@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
+import { EXERCISE_ERRORS } from "src/constants/errors";
 import { MultipleChoiceExercise } from "src/entities/multiple-choice-exercise.entity";
 
 import { CreateMultipleChoiceExerciseDto } from "./dto/create-exercise.dto";
@@ -18,6 +19,9 @@ export class MultipleChoiceExerciseService {
 		createMultipleChoiceExerciseDto: CreateMultipleChoiceExerciseDto,
 	) {
 		const { question, options, answer } = createMultipleChoiceExerciseDto;
+		if (!options.includes(answer)) {
+			throw new NotFoundException(EXERCISE_ERRORS.INVALID_ANSWER);
+		}
 		const exercise = this.multipleChoiceExerciseRepository.create({
 			question,
 			options,
@@ -35,7 +39,7 @@ export class MultipleChoiceExerciseService {
 			where: { id },
 		});
 		if (!exercise) {
-			throw new NotFoundException("Exercise not found");
+			throw new NotFoundException(EXERCISE_ERRORS.NOT_FOUND);
 		}
 		return await this.multipleChoiceExerciseRepository.update(id, {
 			question,
@@ -49,7 +53,7 @@ export class MultipleChoiceExerciseService {
 			where: { id },
 		});
 		if (!exercise) {
-			throw new NotFoundException("Exercise not found");
+			throw new NotFoundException(EXERCISE_ERRORS.NOT_FOUND);
 		}
 		return await this.multipleChoiceExerciseRepository.delete(id);
 	}

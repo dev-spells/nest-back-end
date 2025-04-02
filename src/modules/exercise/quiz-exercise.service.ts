@@ -1,7 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
+import { EXERCISE_ERRORS } from "src/constants/errors";
 import { QuizExercise } from "src/entities/quiz-exercise.entity";
 
 import { CreateQuizExerciseDto } from "./dto/create-exercise.dto";
@@ -29,7 +30,7 @@ export class QuizExerciseService {
 			where: { id },
 		});
 		if (!exercise) {
-			throw new Error("Exercise not found");
+			throw new NotFoundException(EXERCISE_ERRORS.NOT_FOUND);
 		}
 		return await this.quizExerciseRepository.update(id, {
 			question,
@@ -42,7 +43,7 @@ export class QuizExerciseService {
 			where: { id },
 		});
 		if (!exercise) {
-			throw new Error("Exercise not found");
+			throw new NotFoundException(EXERCISE_ERRORS.NOT_FOUND);
 		}
 		return await this.quizExerciseRepository.delete(id);
 	}

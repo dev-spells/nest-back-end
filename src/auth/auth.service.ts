@@ -8,6 +8,7 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 
+import { TOKEN_ERRORS, USER_ERRORS } from "src/constants/errors";
 import { User } from "src/entities/user.entity";
 import { UserService } from "src/modules/user/user.service";
 import { hashPassword, validatePassword } from "src/utils/handle-password.util";
@@ -35,7 +36,8 @@ export class AuthService {
 	async validateUser(username: string, pass: string): Promise<any> {
 		const user = await this.userService.findByUsername(username);
 		if (!user) return null;
-		if (!user.isActived) throw new ForbiddenException("Account not verified");
+		if (!user.isActived)
+			throw new ForbiddenException(USER_ERRORS.UNVERIFIED_ACCOUNT);
 		const isValidPassword = await validatePassword(pass, user.password);
 		if (!isValidPassword) return null;
 		return this.createToken(user);
@@ -72,16 +74,18 @@ export class AuthService {
 	async refreshAccessToken(refreshTokenPayload: { id: string }) {
 		const { id } = refreshTokenPayload;
 		const user = await this.userService.findById(id);
-		if (!user) throw new UnauthorizedException("Invalid refresh token");
+		if (!user)
+			throw new UnauthorizedException(TOKEN_ERRORS.INVALID_REFRESH_TOKEN);
 
 		return this.createToken(user);
 	}
 
 	private async sendVerificationOtp(email: string) {
 		const user = await this.userService.findByEmail(email);
-		if (!user) throw new NotFoundException("User not found");
+		if (!user) throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 
-		if (user.isActived) throw new BadRequestException("Email already verified");
+		if (user.isActived)
+			throw new BadRequestException(USER_ERRORS.EMAIL_VERIFIED);
 
 		if (await this.redisService.get(`verification:${email}`)) {
 			return;
@@ -97,13 +101,13 @@ export class AuthService {
 	async resendVerificationOtp(sendOtp: SendOtp) {
 		const { email } = sendOtp;
 		const user = await this.userService.findByEmail(email);
-		if (!user) throw new NotFoundException("User not found");
+		if (!user) throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 
-		if (user.isActived) throw new BadRequestException("Email already verified");
+		if (user.isActived)
+			throw new BadRequestException(USER_ERRORS.EMAIL_VERIFIED);
 
 		const existingOtp = await this.redisService.get(`verification:${email}`);
-		if (existingOtp)
-			throw new BadRequestException("Please wait before requesting a new OTP");
+		if (existingOtp) throw new BadRequestException(USER_ERRORS.SPAM_OTP);
 
 		return this.sendVerificationOtp(email);
 	}
@@ -115,10 +119,10 @@ export class AuthService {
 		);
 
 		if (!data || !(await validatePassword(otp, data.hashedOtp)))
-			throw new BadRequestException("OTP is invalid or expired");
+			throw new BadRequestException(USER_ERRORS.INVALID_OTP);
 
 		const user = await this.userService.findByEmail(email);
-		if (!user) throw new NotFoundException("User not found");
+		if (!user) throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 
 		await this.userService.updateUser(user.id, { isActived: true });
 		await this.redisService.del(`verification:${email}`);
@@ -133,7 +137,7 @@ export class AuthService {
 		const { email } = forgotPasswordDto;
 		const user = await this.userService.findByEmail(email);
 		if (!user || user.githubAccessToken)
-			throw new NotFoundException("User not found");
+			throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 
 		const otp = this.generateOtp();
 		const hashedOtp = await hashPassword(otp);
@@ -148,11 +152,10 @@ export class AuthService {
 		const { email } = forgotPasswordDto;
 		const user = await this.userService.findByEmail(email);
 		if (!user || user.githubAccessToken)
-			throw new NotFoundException("User not found");
+			throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 
 		const existingOtp = await this.redisService.get(`forgot-password:${email}`);
-		if (existingOtp)
-			throw new BadRequestException("Please wait before requesting a new OTP");
+		if (existingOtp) throw new BadRequestException(USER_ERRORS.SPAM_OTP);
 
 		return this.sendForgotPasswordOtp({ email });
 	}
@@ -164,7 +167,7 @@ export class AuthService {
 		);
 
 		if (!data || !(await validatePassword(otp, data.hashedOtp)))
-			throw new BadRequestException("OTP is invalid or expired");
+			throw new BadRequestException(USER_ERRORS.INVALID_OTP);
 
 		const resetToken = this.generateResetToken();
 		this.redisService.set(`password-reset:${email}`, { resetToken }, 60 * 15);
@@ -182,10 +185,10 @@ export class AuthService {
 		);
 
 		if (!data || data.resetToken !== resetToken)
-			throw new BadRequestException("Invalid or expired reset token");
+			throw new BadRequestException(TOKEN_ERRORS.INVALID_RESET_TOKEN);
 
 		const user = await this.userService.findByEmail(email);
-		if (!user) throw new NotFoundException("User not found");
+		if (!user) throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 
 		await this.userService.updatePassword(user.id, newPassword);
 		await this.redisService.del(`password-reset:${email}`);
@@ -199,11 +202,11 @@ export class AuthService {
 		const { oldPassword, newPassword } = updatePasswordDto;
 
 		const user = await this.userService.findById(userId);
-		if (!user) throw new NotFoundException("User not found");
+		if (!user) throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 
 		const isValidPassword = await validatePassword(oldPassword, user.password);
 		if (!isValidPassword)
-			throw new BadRequestException("Old password is incorrect");
+			throw new BadRequestException(USER_ERRORS.INVALID_OLD_PASSWORD);
 
 		await this.userService.updatePassword(user.id, newPassword);
 
