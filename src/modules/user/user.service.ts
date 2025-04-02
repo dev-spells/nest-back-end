@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
+import { USER_ERRORS } from "src/constants/errors";
 import { hashPassword } from "src/utils/handle-password.util";
 
 import { User, UserRole } from "../../entities/user.entity";
@@ -28,7 +29,7 @@ export class UserService {
 			where: { email: dto.email },
 		});
 		if (existingUser) {
-			throw new BadRequestException("Email already in use");
+			throw new BadRequestException(USER_ERRORS.EMAIL_IN_USE);
 		}
 
 		const hashedPassword = await hashPassword(dto.password);
@@ -55,10 +56,10 @@ export class UserService {
 		const { username } = updateUserDto;
 		const user = await this.userRepository.findOne({ where: { id } });
 		if (!user) {
-			throw new NotFoundException("User not found");
+			throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 		}
 		if (username && (await this.isUsernameExists(username))) {
-			throw new BadRequestException("Username already in use");
+			throw new BadRequestException(USER_ERRORS.USERNAME_IN_USE);
 		}
 		await this.userRepository.update(id, updateUserDto);
 	}
