@@ -1,3 +1,4 @@
+import { Expose } from "class-transformer";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 import { CodingExercise } from "./coding-exercise.entity";
