@@ -29,7 +29,7 @@ export class GithubController {
 	async authCallback(@Req() req, @Res() res: Response) {
 		return this.githubController.validateUser(
 			req.user.profile.username,
-			req.user.profile.emails[0].value,
+			req.user.email ? req.user.email[0].value : req.user.profile.username,
 			req.user.accessToken,
 			res,
 		);
