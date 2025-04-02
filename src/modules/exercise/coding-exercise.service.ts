@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { plainToInstance } from "class-transformer";
 import { Repository } from "typeorm";
 
+import { EXERCISE_ERRORS } from "src/constants/errors";
 import { CodingExercise } from "src/entities/coding-exercise.entity";
 import { CodingExerciseSnippet } from "src/entities/coding-exercise-snippet.entity";
 
@@ -45,7 +45,7 @@ export class CodingExerciseService {
 			},
 		});
 
-		return plainToInstance(CodingExerciseSnippet, snippets);
+		return snippets;
 	}
 
 	async update(id: number, updateCodingExerciseDto: UpdateCodingExerciseDto) {
@@ -54,7 +54,7 @@ export class CodingExerciseService {
 			where: { id },
 		});
 		if (!exercise) {
-			throw new Error("Exercise not found");
+			throw new NotFoundException(EXERCISE_ERRORS.NOT_FOUND);
 		}
 		return await this.codingExerciseRepository.update(id, {
 			correctAnswer: answer,
@@ -71,7 +71,7 @@ export class CodingExerciseService {
 			where: { id },
 		});
 		if (!codingSnippet) {
-			throw new Error("Snippet not found");
+			throw new Error(EXERCISE_ERRORS.SNIPPET_NOT_FOUND);
 		}
 		return await this.codingExerciseSnippetRepository.update(id, {
 			snippet,
@@ -85,7 +85,7 @@ export class CodingExerciseService {
 			where: { id },
 		});
 		if (!exercise) {
-			throw new Error("Exercise not found");
+			throw new Error(EXERCISE_ERRORS.NOT_FOUND);
 		}
 		return await this.codingExerciseRepository.delete(id);
 	}
@@ -95,7 +95,7 @@ export class CodingExerciseService {
 			where: { id },
 		});
 		if (!codingSnippet) {
-			throw new Error("Snippet not found");
+			throw new Error(EXERCISE_ERRORS.SNIPPET_NOT_FOUND);
 		}
 		return await this.codingExerciseSnippetRepository.delete(id);
 	}

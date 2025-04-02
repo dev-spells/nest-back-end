@@ -28,20 +28,23 @@ export class CreateQuizExerciseDto {
 	@ApiProperty({ required: false })
 	question?: string;
 
-	@IsOptional()
+	@IsNotEmpty()
 	@ApiProperty()
 	answer: string;
 }
 
 export class CodeSnippet {
+	@IsNotEmpty()
 	@IsString()
 	@ApiProperty()
 	snippet: string;
 
+	@IsNotEmpty()
 	@IsString()
 	@ApiProperty()
 	solutionSnippet: string;
 
+	@IsNotEmpty()
 	@IsString()
 	@ApiProperty()
 	fileName: string;
@@ -56,6 +59,7 @@ export class CreateCodingExerciseDto {
 	@ApiProperty()
 	language: string;
 
+	@IsNotEmpty()
 	@IsArray()
 	@ValidateNested({ each: true })
 	@Type(() => CodeSnippet)

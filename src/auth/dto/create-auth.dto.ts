@@ -7,6 +7,8 @@ import {
 	MinLength,
 } from "class-validator";
 
+import { PASSWORD_ERRORS } from "src/constants/errors";
+
 export class RegisterDto {
 	@IsString()
 	@IsNotEmpty()
@@ -19,9 +21,9 @@ export class RegisterDto {
 	email: string;
 
 	@IsString()
-	@MinLength(8, { message: "Password must be at least 8 characters long" })
+	@MinLength(8, { message: PASSWORD_ERRORS.MIN_LENGTH })
 	@Matches(/.*[!@#$%^&*(),.?":{}|<>].*/, {
-		message: "Password must contain at least one special character",
+		message: PASSWORD_ERRORS.SPECIAL_CHAR,
 	})
 	@IsNotEmpty()
 	@ApiProperty()
@@ -78,9 +80,9 @@ export class ResetPasswordDto {
 	resetToken: string;
 
 	@IsString()
-	@MinLength(8, { message: "Password must be at least 8 characters long" })
+	@MinLength(8, { message: PASSWORD_ERRORS.MIN_LENGTH })
 	@Matches(/.*[!@#$%^&*(),.?":{}|<>].*/, {
-		message: "Password must contain at least one special character",
+		message: PASSWORD_ERRORS.SPECIAL_CHAR,
 	})
 	@IsNotEmpty()
 	@ApiProperty()
@@ -94,9 +96,9 @@ export class UpdatePasswordDto {
 	oldPassword: string;
 
 	@IsString()
-	@MinLength(8, { message: "Password must be at least 8 characters long" })
+	@MinLength(8, { message: PASSWORD_ERRORS.MIN_LENGTH })
 	@Matches(/.*[!@#$%^&*(),.?":{}|<>].*/, {
-		message: "Password must contain at least one special character",
+		message: PASSWORD_ERRORS.SPECIAL_CHAR,
 	})
 	@IsNotEmpty()
 	@ApiProperty()
