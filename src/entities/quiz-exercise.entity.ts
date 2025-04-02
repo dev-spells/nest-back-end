@@ -7,7 +7,7 @@ export class QuizExercise {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@Column({ type: "text" })
+	@Column({ type: "text", nullable: true })
 	question: string;
 
 	@Column({ type: "text" })
