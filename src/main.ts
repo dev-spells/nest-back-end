@@ -21,11 +21,11 @@ async function bootstrap() {
 	);
 	app.use(morgan("tiny"));
 
-	app.useGlobalInterceptors(
-		new ClassSerializerInterceptor(app.get(Reflector), {
-			excludeExtraneousValues: true,
-		}),
-	);
+	// app.useGlobalInterceptors(
+	// 	new ClassSerializerInterceptor(app.get(Reflector), {
+	// 		excludeExtraneousValues: true,
+	// 	}),
+	// );
 
 	app.enableCors();
 

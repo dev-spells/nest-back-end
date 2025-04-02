@@ -9,6 +9,7 @@ import { JwtAuthGuard } from "src/auth/passport/jwt-auth.guard";
 import { RedisModule } from "./modules/cache/cache.module";
 import { ChapterModule } from "./modules/chapter/chapter.module";
 import { CourseModule } from "./modules/course/course.module";
+import { ExerciseModule } from "./modules/exercise/exercise.module";
 import { LessonModule } from "./modules/lesson/lesson.module";
 import { MailModule } from "./modules/mail/mail.module";
 import { S3Module } from "./modules/s3/s3.module";
@@ -40,6 +41,7 @@ import { AppService } from "./app.service";
 		MailModule,
 		ChapterModule,
 		LessonModule,
+		ExerciseModule,
 	],
 	controllers: [AppController],
 	providers: [

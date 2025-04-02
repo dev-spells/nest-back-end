@@ -17,6 +17,9 @@ export class CodingExercise {
 	@Column({ type: "text" })
 	correctAnswer: string;
 
+	@Column({ type: "varchar" })
+	language: string;
+
 	@OneToMany(() => CodingExerciseSnippet, snippet => snippet.codingExercise, {
 		onDelete: "CASCADE",
 	})
