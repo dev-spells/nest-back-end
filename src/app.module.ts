@@ -26,9 +26,9 @@ import { AppService } from "./app.service";
 			useFactory: (configService: ConfigService) => ({
 				type: "postgres",
 				url: configService.get<string>("DATABASE_URL"),
-				autoLoadEntities: true,
+				autoLoadEntities: configService.get<boolean>("AUTO_LOAD_ENTITIES"),
 				entities: ["dist/**/*.entity{.ts,.js}"],
-				synchronize: true,
+				synchronize: configService.get<boolean>("SYNCHRONIZE"),
 				logging: false,
 			}),
 			inject: [ConfigService],
