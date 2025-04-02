@@ -27,9 +27,10 @@ export class GithubController {
 	@Public()
 	@UseGuards(GithubOauthGuard)
 	async authCallback(@Req() req, @Res() res: Response) {
+		const email = req.user.profile.emails?.[0]?.value || `${req.user.username}`;
 		return this.githubController.validateUser(
 			req.user.profile.username,
-			req.user.email ? req.user.email[0].value : req.user.profile.username,
+			email,
 			req.user.accessToken,
 			res,
 		);
