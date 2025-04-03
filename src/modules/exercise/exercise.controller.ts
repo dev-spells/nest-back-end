@@ -1,12 +1,15 @@
-import { Body, Controller, Delete, Param, Patch } from "@nestjs/common";
+import { Body, Controller, Delete, Param, Patch, Post } from "@nestjs/common";
 
 import {
+	ApiBearerAuth,
+	ApiExcludeEndpoint,
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiOperation,
 } from "@nestjs/swagger";
 
 import { Role } from "src/constants/role.enum";
+import { Public } from "src/decorators/public-route";
 import { Roles } from "src/decorators/role-route";
 
 import {
@@ -26,9 +29,21 @@ export class ExerciseController {
 		private readonly quizExerciseService: QuizExerciseService,
 	) {}
 
+	@ApiExcludeEndpoint()
+	@Public()
+	@Post("test")
+	async test() {
+		const mockQuiz = {
+			question: "What is the capital of France?",
+			answer: "Paris",
+		};
+		return await this.quizExerciseService.create(mockQuiz);
+	}
+
 	@ApiOperation({ summary: "Update a multiple choice exercise" })
 	@ApiNotFoundResponse({ description: "Exercise not found" })
 	@ApiOkResponse({ description: "Exercise updated successfully" })
+	@ApiBearerAuth()
 	@Roles(Role.ADMIN)
 	@Patch("multiple-choices/:id")
 	async updateMultipleChoiceExercise(
@@ -44,6 +59,7 @@ export class ExerciseController {
 	@ApiOperation({ summary: "Update a quiz exercise" })
 	@ApiNotFoundResponse({ description: "Exercise not found" })
 	@ApiOkResponse({ description: "Exercise updated successfully" })
+	@ApiBearerAuth()
 	@Roles(Role.ADMIN)
 	@Patch("quiz/:id")
 	async updateQuizExercise(
@@ -56,6 +72,7 @@ export class ExerciseController {
 	@ApiOperation({ summary: "Update a coding exercise" })
 	@ApiNotFoundResponse({ description: "Exercise not found" })
 	@ApiOkResponse({ description: "Exercise updated successfully" })
+	@ApiBearerAuth()
 	@Roles(Role.ADMIN)
 	@Patch("coding/:id")
 	async updateCodingExercise(
@@ -68,6 +85,7 @@ export class ExerciseController {
 	@ApiOperation({ summary: "Update a coding snippet" })
 	@ApiNotFoundResponse({ description: "Exercise not found" })
 	@ApiOkResponse({ description: "Exercise updated successfully" })
+	@ApiBearerAuth()
 	@Roles(Role.ADMIN)
 	@Patch("coding-snippet/:id")
 	async updateCodingSnippet(
@@ -80,6 +98,7 @@ export class ExerciseController {
 	@ApiOperation({ summary: "Delete a coding snippet exercise" })
 	@ApiNotFoundResponse({ description: "Exercise not found" })
 	@ApiOkResponse({ description: "Exercise deleted successfully" })
+	@ApiBearerAuth()
 	@Roles(Role.ADMIN)
 	@Delete("coding-snippet/:id")
 	async deleteCodingSnippet(@Param("id") id: number) {
