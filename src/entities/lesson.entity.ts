@@ -4,14 +4,21 @@ import {
 	CreateDateColumn,
 	Entity,
 	JoinColumn,
+	ManyToOne,
 	OneToOne,
 	PrimaryGeneratedColumn,
 } from "typeorm";
 
+import { Chapter } from "./chapter.entity";
 import { CodingExercise } from "./coding-exercise.entity";
 import { MultipleChoiceExercise } from "./multiple-choice-exercise.entity";
 import { QuizExercise } from "./quiz-exercise.entity";
-import { SpellBook } from "./spellbook.entity";
+
+export enum LessonDifficulty {
+	EASY = "EASY",
+	MEDIUM = "MEDIUM",
+	HARD = "HARD",
+}
 
 @Entity()
 @Check(`
@@ -33,6 +40,16 @@ export class Lesson {
 	createdAt: Date;
 	@CreateDateColumn()
 	updatedAt: Date;
+
+	@Column({
+		type: "enum",
+		enum: LessonDifficulty,
+		default: LessonDifficulty.EASY,
+	})
+	difficulty: LessonDifficulty;
+
+	@ManyToOne(() => Chapter, { onDelete: "CASCADE" })
+	chapter: Chapter;
 
 	@OneToOne(() => CodingExercise, codingExercise => codingExercise.lesson, {
 		onDelete: "CASCADE",
@@ -62,9 +79,4 @@ export class Lesson {
 
 	@Column({ nullable: true })
 	quizExerciseId: number | null;
-
-	@OneToOne(() => SpellBook, spellBook => spellBook.Lesson, {
-		onDelete: "CASCADE",
-	})
-	spellBook: SpellBook;
 }

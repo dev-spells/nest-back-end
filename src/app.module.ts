@@ -13,6 +13,7 @@ import { ExerciseModule } from "./modules/exercise/exercise.module";
 import { LessonModule } from "./modules/lesson/lesson.module";
 import { MailModule } from "./modules/mail/mail.module";
 import { S3Module } from "./modules/s3/s3.module";
+import { SpellBookModule } from "./modules/spell-book/spell-book.module";
 import { UserModule } from "./modules/user/user.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -42,6 +43,7 @@ import { AppService } from "./app.service";
 		ChapterModule,
 		LessonModule,
 		ExerciseModule,
+		SpellBookModule,
 	],
 	controllers: [AppController],
 	providers: [

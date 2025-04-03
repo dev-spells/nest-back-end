@@ -20,7 +20,6 @@ export class CodingExerciseService {
 		@InjectRepository(CodingExerciseSnippet)
 		private codingExerciseSnippetRepository: Repository<CodingExerciseSnippet>,
 	) {}
-
 	async create(createCodingExerciseDto: CreateCodingExerciseDto) {
 		const { answer, codingSnippets, language } = createCodingExerciseDto;
 
