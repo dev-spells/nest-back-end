@@ -1,6 +1,7 @@
-import { ClassSerializerInterceptor, ValidationPipe } from "@nestjs/common";
+import { ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { NestFactory, Reflector } from "@nestjs/core";
+import { NestFactory } from "@nestjs/core";
+import * as basicAuth from "express-basic-auth";
 import * as morgan from "morgan";
 
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
@@ -11,6 +12,7 @@ async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 	const configServer = app.get(ConfigService);
 	const port = configServer.get("PORT") || 8080;
+	const password = configServer.get("AUTH_PASSWORD");
 
 	app.useGlobalPipes(
 		new ValidationPipe({
@@ -20,6 +22,14 @@ async function bootstrap() {
 		}),
 	);
 	app.use(morgan("tiny"));
+	app.use(
+		"/api", // Protect this route
+		basicAuth({
+			users: { admin: password }, // Set your username and password
+			challenge: true,
+			realm: "DevSpells API",
+		}),
+	);
 
 	// app.useGlobalInterceptors(
 	// 	new ClassSerializerInterceptor(app.get(Reflector), {
@@ -40,6 +50,9 @@ async function bootstrap() {
 	const document = SwaggerModule.createDocument(app, config);
 	SwaggerModule.setup("api", app, document, {
 		swaggerOptions: { persistAuthorization: true },
+		customSiteTitle: "DevSpells API docs",
+		customfavIcon:
+			"https://dev-spells.s3.amazonaws.com/bf3d2f8b-5346-4557-a71e-02c8317ad509",
 	});
 
 	await app.listen(port);
