@@ -139,7 +139,7 @@ export class AuthService {
 		if (!user || user.githubAccessToken)
 			throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 		if (await this.redisService.get(`forgot-password:${email}`)) {
-			return;
+			return { message: "Password reset OTP has been sent to your email" };
 		}
 		const otp = this.generateOtp();
 		const hashedOtp = await hashPassword(otp);
