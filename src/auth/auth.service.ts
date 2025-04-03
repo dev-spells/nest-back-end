@@ -138,7 +138,9 @@ export class AuthService {
 		const user = await this.userService.findByEmail(email);
 		if (!user || user.githubAccessToken)
 			throw new NotFoundException(USER_ERRORS.NOT_FOUND);
-
+		if (await this.redisService.get(`forgot-password:${email}`)) {
+			return;
+		}
 		const otp = this.generateOtp();
 		const hashedOtp = await hashPassword(otp);
 
