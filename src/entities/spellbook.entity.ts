@@ -19,7 +19,7 @@ export class SpellBook {
 	@Column({ type: "text" })
 	content: string;
 
-	@OneToOne(() => Lesson, lesson => lesson.spellBook, { onDelete: "CASCADE" })
+	@OneToOne(() => Lesson, { onDelete: "CASCADE" })
 	@JoinColumn({ name: "lessonId" })
 	Lesson: Lesson;
 
