@@ -14,7 +14,6 @@ import { MailService } from "./mail.service";
 			useFactory: async (config: ConfigService) => ({
 				transport: {
 					host: config.get<string>("MAIL_HOST"),
-					secure: false,
 					port: 587,
 					auth: {
 						user: config.get<string>("MAIL_USER"),
@@ -22,7 +21,7 @@ import { MailService } from "./mail.service";
 					},
 				},
 				defaults: {
-					from: `"DevSpells" <${config.get<string>("MAIL_USER")}>`,
+					from: `"DevSpells" <no-reply@gaumeodathanh.me>`,
 				},
 				template: {
 					dir: join(__dirname, "templates"),
