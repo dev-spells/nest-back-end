@@ -27,4 +27,15 @@ export const EXERCISE_ERRORS = {
 	NOT_FOUND: "Exercise not found",
 	SNIPPET_NOT_FOUND: "Snippet not found",
 	INVALID_ANSWER: "Answer must be one of the provided options",
-};
+} as const;
+
+export const LESSON_ERRORS = {
+	NOT_FOUND: "Lesson not found",
+	INVALID_EXERCISE: "Invalid exercise data",
+	MORE_THAN_ONE_EXERCISE: "Only one exercise type must be provided",
+} as const;
+
+export const COURSE_ERRORS = {
+	NOT_FOUND: "Course not found",
+	ALREADY_EXISTS: "Course with this title already exists",
+} as const;

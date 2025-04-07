@@ -9,9 +9,15 @@ import {
 	Query,
 } from "@nestjs/common";
 
-import { ApiBearerAuth, ApiOkResponse, ApiOperation } from "@nestjs/swagger";
+import {
+	ApiBearerAuth,
+	ApiOkResponse,
+	ApiOperation,
+	ApiQuery,
+} from "@nestjs/swagger";
 
 import { Role } from "src/constants/role.enum";
+import { Public } from "src/decorators/public-route";
 import { Roles } from "src/decorators/role-route";
 
 import {
@@ -25,9 +31,14 @@ import { SpellBookService } from "./spell-book.service";
 export class SpellBookController {
 	constructor(private readonly spellBookService: SpellBookService) {}
 
-	@ApiOperation({ summary: "Create a new spell book" })
+	@Public()
+	@ApiOperation({ summary: "Search spell book" })
 	@ApiBearerAuth()
 	@ApiOkResponse({ type: [ResponseSpellBook] })
+	@ApiQuery({
+		name: "search",
+		required: false,
+	})
 	@Get()
 	findAll(@Query("search") search: string) {
 		return this.spellBookService.findAll(search);

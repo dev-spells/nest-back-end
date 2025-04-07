@@ -40,7 +40,7 @@ export class ExerciseController {
 		return await this.quizExerciseService.create(mockQuiz);
 	}
 
-	@ApiOperation({ summary: "Update a multiple choice exercise" })
+	@ApiOperation({ summary: "Update a multiple choice exercise - ADMIN" })
 	@ApiNotFoundResponse({ description: "Exercise not found" })
 	@ApiOkResponse({ description: "Exercise updated successfully" })
 	@ApiBearerAuth()
@@ -56,7 +56,7 @@ export class ExerciseController {
 		);
 	}
 
-	@ApiOperation({ summary: "Update a quiz exercise" })
+	@ApiOperation({ summary: "Update a quiz exercise - ADMIN" })
 	@ApiNotFoundResponse({ description: "Exercise not found" })
 	@ApiOkResponse({ description: "Exercise updated successfully" })
 	@ApiBearerAuth()
@@ -69,7 +69,7 @@ export class ExerciseController {
 		return await this.quizExerciseService.update(id, updateQuizExerciseDto);
 	}
 
-	@ApiOperation({ summary: "Update a coding exercise" })
+	@ApiOperation({ summary: "Update a coding exercise - ADMIN" })
 	@ApiNotFoundResponse({ description: "Exercise not found" })
 	@ApiOkResponse({ description: "Exercise updated successfully" })
 	@ApiBearerAuth()
@@ -82,7 +82,7 @@ export class ExerciseController {
 		return await this.codingExerciseService.update(id, updateCodingExerciseDto);
 	}
 
-	@ApiOperation({ summary: "Update a coding snippet" })
+	@ApiOperation({ summary: "Update a coding snippet - ADMIN" })
 	@ApiNotFoundResponse({ description: "Exercise not found" })
 	@ApiOkResponse({ description: "Exercise updated successfully" })
 	@ApiBearerAuth()
@@ -95,7 +95,7 @@ export class ExerciseController {
 		return await this.codingExerciseService.update(id, updateCodingExerciseDto);
 	}
 
-	@ApiOperation({ summary: "Delete a coding snippet exercise" })
+	@ApiOperation({ summary: "Delete a coding snippet exercise - ADMIN" })
 	@ApiNotFoundResponse({ description: "Exercise not found" })
 	@ApiOkResponse({ description: "Exercise deleted successfully" })
 	@ApiBearerAuth()

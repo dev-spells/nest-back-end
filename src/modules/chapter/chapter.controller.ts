@@ -1,15 +1,13 @@
 import {
-	Controller,
-	Get,
-	Post,
 	Body,
-	Patch,
-	Param,
+	Controller,
 	Delete,
+	Get,
+	Param,
+	Patch,
+	Post,
 } from "@nestjs/common";
-import { ChapterService } from "./chapter.service";
-import { CreateChapterDto } from "./dto/create-chapter.dto";
-import { UpdateChapterDto } from "./dto/update-chapter.dto";
+
 import {
 	ApiBearerAuth,
 	ApiNotFoundResponse,
@@ -17,9 +15,14 @@ import {
 	ApiOperation,
 	ApiTags,
 } from "@nestjs/swagger";
-import { Roles } from "src/decorators/role-route";
+
 import { Role } from "src/constants/role.enum";
+import { Roles } from "src/decorators/role-route";
+
+import { CreateChapterDto } from "./dto/create-chapter.dto";
 import { ResponseChapter } from "./dto/response-chapter.dto";
+import { UpdateChapterDto } from "./dto/update-chapter.dto";
+import { ChapterService } from "./chapter.service";
 
 @ApiTags("Chapter")
 @Controller("chapter")
@@ -27,7 +30,7 @@ export class ChapterController {
 	constructor(private readonly chapterService: ChapterService) {}
 
 	@Roles(Role.ADMIN)
-	@ApiOperation({ summary: "Create a new chapter" })
+	@ApiOperation({ summary: "Create a new chapter - ADMIN" })
 	@ApiBearerAuth()
 	@ApiOkResponse()
 	@ApiNotFoundResponse({ description: "Course not found" })
@@ -37,21 +40,13 @@ export class ChapterController {
 	}
 
 	@Roles(Role.ADMIN)
-	@ApiOperation({ summary: "Update a chapter" })
+	@ApiOperation({ summary: "Update a chapter - ADMIN" })
 	@ApiBearerAuth()
 	@ApiOkResponse()
 	@ApiNotFoundResponse({ description: "Chapter not found" })
 	@Patch(":id")
 	update(@Param("id") id: string, @Body() updateChapterDto: UpdateChapterDto) {
 		return this.chapterService.update(+id, updateChapterDto);
-	}
-
-	@ApiBearerAuth()
-	@ApiOperation({ summary: "Get all chapters" })
-	@ApiOkResponse({ type: [ResponseChapter] })
-	@Get()
-	findAll() {
-		return this.chapterService.findAll();
 	}
 
 	@ApiBearerAuth()
@@ -64,7 +59,7 @@ export class ChapterController {
 	}
 
 	@Roles(Role.ADMIN)
-	@ApiOperation({ summary: "Delete a chapter" })
+	@ApiOperation({ summary: "Delete a chapter - ADMIN" })
 	@ApiBearerAuth()
 	@ApiNotFoundResponse({ description: "Chapter not found" })
 	@ApiOkResponse({ description: "Chapter deleted successfully" })

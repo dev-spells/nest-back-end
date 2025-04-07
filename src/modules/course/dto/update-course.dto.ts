@@ -1,5 +1,20 @@
-import { PartialType } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsOptional } from "class-validator";
 
-import { CreateCourseDto } from "./create-course.dto";
+export class UpdateCourseDto {
+	@IsOptional()
+	@ApiProperty({ required: false })
+	title?: string;
 
-export class UpdateCourseDto extends PartialType(CreateCourseDto) {}
+	@IsOptional()
+	@ApiProperty({ required: false })
+	description?: string;
+
+	@IsOptional()
+	@ApiProperty({ required: false })
+	icon_url?: string;
+
+	@IsOptional()
+	@ApiProperty({ required: false })
+	is_public?: boolean;
+}

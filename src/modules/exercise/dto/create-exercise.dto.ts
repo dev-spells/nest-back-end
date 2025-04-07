@@ -6,8 +6,11 @@ import {
 	IsNotEmpty,
 	IsOptional,
 	IsString,
+	Validate,
 	ValidateNested,
 } from "class-validator";
+
+import { UniqueFileNamesConstraint } from "src/decorators/validator-file-name";
 
 export class CreateMultipleChoiceExerciseDto {
 	@IsNotEmpty()
@@ -63,6 +66,7 @@ export class CreateCodingExerciseDto {
 	@IsArray()
 	@ValidateNested({ each: true })
 	@Type(() => CodeSnippet)
+	@Validate(UniqueFileNamesConstraint)
 	@ApiProperty({ type: [CodeSnippet] })
 	codingSnippets: CodeSnippet[];
 }
