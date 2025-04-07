@@ -110,4 +110,66 @@ export class S3Controller {
 	async deleteFile(@Param("key") key: string) {
 		return this.s3Service.deleteFile(key);
 	}
+
+	@Public()
+	@Post("/presigned-upload")
+	@ApiOperation({ summary: "Get presigned URL for uploading to S3" })
+	@ApiBody({
+		schema: {
+			type: "object",
+			properties: {
+				contentType: {
+					type: "string",
+					description: "MIME type of the file to be uploaded",
+					example: "image/jpeg",
+				},
+				folder: {
+					type: "string",
+					description: "Optional folder path in S3 bucket",
+					example: "users/avatars",
+				},
+				fileName: {
+					type: "string",
+					description:
+						"Optional custom file name (UUID will be used if not provided)",
+					example: "profile-picture.jpg",
+				},
+			},
+			required: ["contentType"],
+		},
+	})
+	@ApiResponse({
+		status: 201,
+		description:
+			"Returns presigned URL for upload and public URL for future access",
+		schema: {
+			type: "object",
+			properties: {
+				url: {
+					type: "string",
+					description: "Presigned URL to upload the file",
+				},
+				key: {
+					type: "string",
+					description: "S3 object key/path",
+				},
+				publicUrl: {
+					type: "string",
+					description:
+						"Public URL where the file will be accessible after upload",
+				},
+			},
+		},
+	})
+	@ApiResponse({ status: 400, description: "Invalid request parameters" })
+	async getPresignedUploadUrl(
+		@Body()
+		options: {
+			contentType: string;
+			folder?: string;
+			fileName?: string;
+		},
+	) {
+		return this.s3Service.getPresignedUploadUrl(options);
+	}
 }

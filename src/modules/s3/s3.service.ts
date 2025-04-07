@@ -92,6 +92,37 @@ export class S3Service {
 		return { url: `https://${this.bucketName}.s3.amazonaws.com/${key}` };
 	}
 
+	async getPresignedUploadUrl(options: {
+		contentType: string;
+		folder?: string;
+		fileName?: string;
+	}) {
+		try {
+			const { contentType, folder = "", fileName = uuidv4() } = options;
+			const sanitizedFolder = folder.replace(/\/$/, "");
+			const key = sanitizedFolder ? `${sanitizedFolder}/${fileName}` : fileName;
+
+			const command = new PutObjectCommand({
+				Bucket: this.bucketName,
+				Key: key,
+				ContentType: contentType,
+				ACL: "public-read",
+			});
+
+			const url = await getSignedUrl(this.client, command, {
+				expiresIn: 60 * 5, // URL expires in 5 minutes
+			});
+
+			return {
+				url,
+				key,
+				publicUrl: `https://${this.bucketName}.s3.amazonaws.com/${key}`,
+			};
+		} catch (error) {
+			throw new InternalServerErrorException(error);
+		}
+	}
+
 	async getPresignedSignedUrl(key: string, options?: { contentType: string }) {
 		try {
 			const command = new GetObjectCommand({
