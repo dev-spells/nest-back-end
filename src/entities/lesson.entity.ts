@@ -7,6 +7,7 @@ import {
 	ManyToOne,
 	OneToOne,
 	PrimaryGeneratedColumn,
+	UpdateDateColumn,
 } from "typeorm";
 
 import { Chapter } from "./chapter.entity";
@@ -38,7 +39,7 @@ export class Lesson {
 
 	@CreateDateColumn()
 	createdAt: Date;
-	@CreateDateColumn()
+	@UpdateDateColumn()
 	updatedAt: Date;
 
 	@Column({

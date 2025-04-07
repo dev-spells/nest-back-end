@@ -1,3 +1,4 @@
+import { Exclude } from "class-transformer";
 import {
 	Column,
 	CreateDateColumn,
@@ -7,10 +8,13 @@ import {
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from "typeorm";
-import { UserCourseCompletion } from "./user-course-completion";
-import { Exclude } from "class-transformer";
+
 import { ApiProperty } from "@nestjs/swagger";
+
+import { IS_PUBLIC_KEY } from "src/decorators/public-route";
+
 import { Chapter } from "./chapter.entity";
+import { UserCourseCompletion } from "./user-course-completion";
 
 @Entity()
 export class Course {
@@ -30,10 +34,13 @@ export class Course {
 	description: string;
 
 	@Column({ type: "text", nullable: true })
-	icon_url: string;
+	iconUrl: string;
 
-	@Column({ type: "boolean" })
-	is_public: boolean;
+	@Column({ type: "boolean", default: true })
+	isPublic: boolean;
+
+	@Column({ type: "boolean", default: false })
+	isDeleted: boolean;
 
 	@OneToMany(() => Chapter, chapter => chapter.course, { onDelete: "CASCADE" })
 	chapters: Chapter[];
@@ -43,4 +50,8 @@ export class Course {
 		userCourseCompletion => userCourseCompletion.courses,
 	)
 	userCourseCompletion: UserCourseCompletion[];
+
+	chaptersCount?: number;
+	lessonsCount?: number;
+	chaptersList?: { id: number; name: string }[];
 }

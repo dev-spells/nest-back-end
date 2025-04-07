@@ -34,7 +34,7 @@ export class CodingExerciseService {
 				codingExercise: savedCodingExercise,
 			})),
 		);
-		return snippets;
+		return savedCodingExercise;
 	}
 
 	async findAll(exerciseId: number) {

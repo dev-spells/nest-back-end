@@ -1,16 +1,22 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { CreateChapterDto } from "./dto/create-chapter.dto";
-import { UpdateChapterDto } from "./dto/update-chapter.dto";
-import { Chapter } from "src/entities/chapter.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+
+import { Chapter } from "src/entities/chapter.entity";
+import { Lesson } from "src/entities/lesson.entity";
+
 import { CourseService } from "../course/course.service";
+
+import { CreateChapterDto } from "./dto/create-chapter.dto";
+import { UpdateChapterDto } from "./dto/update-chapter.dto";
 
 @Injectable()
 export class ChapterService {
 	constructor(
 		@InjectRepository(Chapter)
 		private chapterRepository: Repository<Chapter>,
+		@InjectRepository(Lesson)
+		private lessonRepository: Repository<Lesson>,
 		private courseService: CourseService,
 	) {}
 
@@ -23,11 +29,13 @@ export class ChapterService {
 	}
 
 	async update(id: number, updateChapterDto: UpdateChapterDto) {
-		const chapter = await this.findOne(id);
+		const chapter = await this.chapterRepository.findOneBy({ id });
 		if (!chapter) {
 			throw new NotFoundException(`Chapter with id ${id} not found`);
 		}
-		return this.chapterRepository.update(chapter.id, { ...updateChapterDto });
+		return this.chapterRepository.update(chapter.id, {
+			...updateChapterDto,
+		});
 	}
 
 	async findAll() {
@@ -40,11 +48,21 @@ export class ChapterService {
 		if (!chapter) {
 			throw new NotFoundException(`Chapter with id ${id} not found`);
 		}
-		return chapter;
+		const lessons = await this.lessonRepository.find({
+			select: { id: true, name: true, difficulty: true },
+			where: { chapter: { id: chapter.id } },
+		});
+
+		return {
+			chapter: {
+				...chapter,
+				lessons,
+			},
+		};
 	}
 
 	async remove(id: number) {
-		const chapter = this.chapterRepository.findOneBy({ id });
+		const chapter = await this.chapterRepository.findOneBy({ id });
 		if (!chapter) {
 			throw new NotFoundException(`Chapter with id ${id} not found`);
 		}

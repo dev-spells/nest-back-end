@@ -5,6 +5,7 @@ import * as basicAuth from "express-basic-auth";
 import * as morgan from "morgan";
 
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { useContainer } from "class-validator";
 
 import { AppModule } from "./app.module";
 
@@ -30,7 +31,7 @@ async function bootstrap() {
 			realm: "DevSpells API",
 		}),
 	);
-
+	useContainer(app.select(AppModule), { fallbackOnErrors: true });
 	// app.useGlobalInterceptors(
 	// 	new ClassSerializerInterceptor(app.get(Reflector), {
 	// 		excludeExtraneousValues: true,
