@@ -98,7 +98,11 @@ export class S3Service {
 		fileName?: string;
 	}) {
 		try {
-			const { contentType, folder = "", fileName = uuidv4() } = options;
+			const {
+				contentType = "image/*",
+				folder = "",
+				fileName = uuidv4(),
+			} = options;
 			const sanitizedFolder = folder.replace(/\/$/, "");
 			const key = sanitizedFolder ? `${sanitizedFolder}/${fileName}` : fileName;
 
