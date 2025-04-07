@@ -7,7 +7,7 @@ import { Lesson } from "src/entities/lesson.entity";
 
 import { CourseService } from "../course/course.service";
 
-import { CreateChapterDto } from "./dto/create-chapter.dto";
+import { CreateBatchChaptersDto } from "./dto/create-chapter.dto";
 import { UpdateChapterDto } from "./dto/update-chapter.dto";
 
 @Injectable()
@@ -20,13 +20,27 @@ export class ChapterService {
 		private courseService: CourseService,
 	) {}
 
-	async create(createChapterDto: CreateChapterDto) {
-		const { courseId, name } = createChapterDto;
+	async createBatchChapters(createBatchChaptersDto: CreateBatchChaptersDto) {
+		const { courseId, chapters } = createBatchChaptersDto;
 		await this.courseService.isCourseExists(courseId);
 
-		const chapter = this.chapterRepository.create(createChapterDto);
-		return this.chapterRepository.save(chapter);
+		const chapterEntities = chapters.map(chapterDto =>
+			this.chapterRepository.create({
+				name: chapterDto.name,
+				course: { id: courseId },
+			}),
+		);
+
+		return await this.chapterRepository.save(chapterEntities);
 	}
+
+	// async create(createChapterDto: CreateChapterDto) {
+	// 	const { courseId, name } = createChapterDto;
+	// 	await this.courseService.isCourseExists(courseId);
+
+	// 	const chapter = this.chapterRepository.create(createChapterDto);
+	// 	return this.chapterRepository.save(chapter);
+	// }
 
 	async update(id: number, updateChapterDto: UpdateChapterDto) {
 		const chapter = await this.chapterRepository.findOneBy({ id });
