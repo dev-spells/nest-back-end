@@ -1,17 +1,11 @@
-import { Exclude } from "class-transformer";
 import {
 	Column,
 	CreateDateColumn,
 	Entity,
 	OneToMany,
-	PrimaryColumn,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from "typeorm";
-
-import { ApiProperty } from "@nestjs/swagger";
-
-import { IS_PUBLIC_KEY } from "src/decorators/public-route";
 
 import { Chapter } from "./chapter.entity";
 import { UserCourseCompletion } from "./user-course-completion";

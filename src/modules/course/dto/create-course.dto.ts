@@ -19,9 +19,9 @@ export class CreateCourseDto {
 	description: string;
 
 	@ApiProperty({ nullable: true })
-	icon_url: string;
+	iconUrl: string;
 
 	@ApiProperty()
 	@IsNotEmpty()
-	is_public: boolean;
+	isPublic: boolean;
 }
