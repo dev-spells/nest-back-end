@@ -1,17 +1,16 @@
-import { ApiProperty, PartialType } from "@nestjs/swagger";
-import { CreateChapterDto } from "./create-chapter.dto";
+import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, Matches } from "class-validator";
 
 export class UpdateChapterDto {
 	@ApiProperty({
 		description:
-			'Chapter name must start with a number followed by text (e.g. "1.Introduction")',
-		example: "1.Introduction",
+			'Chapter name must be in format "Cnumber: chaptername" (e.g. "C1: Introduction")',
+		example: "C1: Introduction",
 	})
 	@IsNotEmpty()
-	@Matches(/^[0-9]+\.[a-zA-Z0-9]+$/, {
+	@Matches(/^C[0-9]+:\s[a-zA-Z0-9\s]+$/, {
 		message:
-			'Name must start with a number followed by a dot and text (e.g. "1.Introduction")',
+			'Name must be in format "Cnumber: chaptername" (e.g. "C1: Introduction")',
 	})
 	name: string;
 }
