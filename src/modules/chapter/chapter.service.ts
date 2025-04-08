@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 
 import { Chapter } from "src/entities/chapter.entity";
 import { Lesson } from "src/entities/lesson.entity";
@@ -50,6 +50,18 @@ export class ChapterService {
 		return this.chapterRepository.update(chapter.id, {
 			...updateChapterDto,
 		});
+	}
+
+	async updateBatchChapters(updateBatchChaptersDto: UpdateChapterDto[]) {
+		const snippets = await this.chapterRepository.find({
+			where: {
+				id: In(updateBatchChaptersDto.map(chapter => chapter.id)),
+			},
+		});
+		if (snippets.length !== updateBatchChaptersDto.length) {
+			throw new NotFoundException("Some chapters not found");
+		}
+		return await this.chapterRepository.save(updateBatchChaptersDto);
 	}
 
 	async findAll() {

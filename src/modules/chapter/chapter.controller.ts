@@ -10,6 +10,7 @@ import {
 
 import {
 	ApiBearerAuth,
+	ApiBody,
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiOperation,
@@ -47,6 +48,17 @@ export class ChapterController {
 	// create(@Body() createChapterDto: CreateChapterDto) {
 	// 	return this.chapterService.create(createChapterDto);
 	// }
+
+	@Roles(Role.ADMIN)
+	@ApiOperation({ summary: "Update batch chapters - ADMIN" })
+	@ApiBearerAuth()
+	@ApiOkResponse()
+	@ApiBody({ type: [UpdateChapterDto] })
+	@ApiNotFoundResponse({ description: "Chapter not found" })
+	@Patch("batch")
+	updateBatch(@Body() updateBatchChaptersDto: UpdateChapterDto[]) {
+		return this.chapterService.updateBatchChapters(updateBatchChaptersDto);
+	}
 
 	@Roles(Role.ADMIN)
 	@ApiOperation({ summary: "Update a chapter - ADMIN" })

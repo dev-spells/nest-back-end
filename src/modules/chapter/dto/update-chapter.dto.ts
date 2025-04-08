@@ -1,5 +1,12 @@
+import { Type } from "class-transformer";
+
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, Matches } from "class-validator";
+import {
+	IsNotEmpty,
+	IsOptional,
+	Matches,
+	ValidateNested,
+} from "class-validator";
 
 export class UpdateChapterDto {
 	@ApiProperty({
@@ -13,4 +20,8 @@ export class UpdateChapterDto {
 			'Name must be in format "Cnumber: chaptername" (e.g. "C1: Introduction")',
 	})
 	name: string;
+
+	@IsOptional()
+	@ApiProperty({ required: false })
+	id: number;
 }
