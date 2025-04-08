@@ -135,7 +135,7 @@ export class S3Controller {
 					example: "profile-picture.jpg",
 				},
 			},
-			required: ["contentType"],
+			required: ["contentType, fileName"],
 		},
 	})
 	@ApiResponse({

@@ -103,8 +103,13 @@ export class S3Service {
 				folder = "",
 				fileName = uuidv4(),
 			} = options;
+			const extension = fileName.split(".").pop();
+			const uuidFileName = `${uuidv4()}.${extension}`;
+
 			const sanitizedFolder = folder.replace(/\/$/, "");
-			const key = sanitizedFolder ? `${sanitizedFolder}/${fileName}` : fileName;
+			const key = sanitizedFolder
+				? `${sanitizedFolder}/${uuidFileName}`
+				: uuidFileName;
 
 			const command = new PutObjectCommand({
 				Bucket: this.bucketName,
