@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 
 import { EXERCISE_ERRORS } from "src/constants/errors";
 import { CodingExercise } from "src/entities/coding-exercise.entity";
@@ -77,6 +77,22 @@ export class CodingExerciseService {
 			solutionSnippet,
 			fileName,
 		});
+	}
+
+	async updateBatchSnippets(
+		updateBatchCodingSnippetsDto: UpdateCodingSnippetDto[],
+	) {
+		const snippets = await this.codingExerciseSnippetRepository.find({
+			where: {
+				id: In(updateBatchCodingSnippetsDto.map(snippet => snippet.id)),
+			},
+		});
+		if (snippets.length !== updateBatchCodingSnippetsDto.length) {
+			throw new Error(EXERCISE_ERRORS.SNIPPET_NOT_FOUND);
+		}
+		return await this.codingExerciseSnippetRepository.save(
+			updateBatchCodingSnippetsDto,
+		);
 	}
 
 	async deleteExercise(id: number) {
