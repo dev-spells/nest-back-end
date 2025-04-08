@@ -36,9 +36,9 @@ export class CreateBatchChaptersDto {
 	@ApiProperty({
 		description: "List of chapters to be created",
 		example: [
-			{ name: "1.Introduction" },
-			{ name: "2.Fundamentals" },
-			{ name: "3.Advanced" },
+			{ name: "C1: Introduction" },
+			{ name: "C2: Fundamentals" },
+			{ name: "C3: Advanced" },
 		],
 	})
 	@IsArray()
