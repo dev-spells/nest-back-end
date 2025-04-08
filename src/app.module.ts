@@ -15,6 +15,7 @@ import { MailModule } from "./modules/mail/mail.module";
 import { S3Module } from "./modules/s3/s3.module";
 import { SpellBookModule } from "./modules/spell-book/spell-book.module";
 import { UserModule } from "./modules/user/user.module";
+import { UserSubmissionModule } from "./modules/user-submission/user-submission.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 
@@ -44,6 +45,7 @@ import { AppService } from "./app.service";
 		LessonModule,
 		ExerciseModule,
 		SpellBookModule,
+		UserSubmissionModule,
 	],
 	controllers: [AppController],
 	providers: [
