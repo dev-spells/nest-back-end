@@ -1,6 +1,8 @@
 import { Exclude } from "class-transformer";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
+import { LEVELS } from "src/constants/level";
+
 import { UserCourseCompletion } from "./user-course-completion";
 
 export enum UserRole {
@@ -26,6 +28,9 @@ export class User {
 	@Column({ type: "varchar", length: 255, nullable: true })
 	avatarUrl: string;
 
+	@Column({ type: "varchar", length: 255, nullable: true })
+	borderUrl: string;
+
 	@Column({ type: "int", default: 1 })
 	level: number;
 
@@ -35,6 +40,9 @@ export class User {
 
 	@Column({ type: "bigint", default: 0 })
 	currentExp: number;
+
+	@Column({ type: "bigint", default: LEVELS[0].expToLevelUp })
+	expToLevelUp: number;
 
 	@Column({ type: "varchar", length: 255 })
 	rankTitle: string;
