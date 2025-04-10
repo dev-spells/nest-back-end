@@ -24,10 +24,12 @@ export class ChapterService {
 		const { courseId, chapters } = createBatchChaptersDto;
 		await this.courseService.isCourseExists(courseId);
 
+		let position = 1;
 		const chapterEntities = chapters.map(chapterDto =>
 			this.chapterRepository.create({
 				name: chapterDto.name,
 				course: { id: courseId },
+				pos: position++,
 			}),
 		);
 

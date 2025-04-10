@@ -17,4 +17,8 @@ export class UpdateChapterDto {
 	@IsOptional()
 	@ApiProperty({ required: false })
 	id: number;
+
+	@IsNotEmpty()
+	@ApiProperty({ required: true })
+	pos: number;
 }

@@ -6,6 +6,7 @@ import {
 	IsArray,
 	IsNotEmpty,
 	IsNumber,
+	IsOptional,
 	Matches,
 	ValidateNested,
 } from "class-validator";
@@ -22,6 +23,13 @@ export class CreateChapterDto {
 			'Name must be in format "Cnumber: chaptername" (e.g. "C1: Introduction")',
 	})
 	name: string;
+
+	@IsOptional()
+	@ApiProperty({
+		description: "ID of the course to which the chapter belongs",
+		example: 1,
+	})
+	pos: number;
 }
 
 export class CreateBatchChaptersDto {
