@@ -15,7 +15,7 @@ export class CodingExercise {
 	id: number;
 
 	@Column({ type: "text" })
-	correctAnswer: string;
+	answer: string;
 
 	@Column({ type: "varchar" })
 	language: string;

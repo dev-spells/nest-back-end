@@ -38,16 +38,16 @@ export class User {
 	@Column({ type: "enum", enum: UserRole, default: UserRole.USER })
 	role: UserRole;
 
-	@Column({ type: "bigint", default: 0 })
+	@Column({ type: "int", default: 0 })
 	currentExp: number;
 
-	@Column({ type: "bigint", default: LEVELS[0].expToLevelUp })
+	@Column({ type: "int", default: LEVELS[0].expToLevelUp })
 	expToLevelUp: number;
 
 	@Column({ type: "varchar", length: 255 })
 	rankTitle: string;
 
-	@Column({ type: "bigint", default: 0 })
+	@Column({ type: "int", default: 0 })
 	gems: number;
 
 	@Column({ type: "varchar", length: 255, default: "UTC" })

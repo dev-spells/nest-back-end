@@ -17,6 +17,9 @@ export class Chapter {
 	@Column({ type: "varchar" })
 	name: string;
 
+	@Column({ type: "float", nullable: true })
+	pos: number;
+
 	@CreateDateColumn()
 	created_at: Date;
 

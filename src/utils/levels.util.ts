@@ -1,4 +1,4 @@
-import { DIFFICULTY_EXP_RANGES, LEVELS, RANKS } from "src/constants/level";
+import { DIFFICULTY_REWARDS, LEVELS, RANKS } from "src/constants/level";
 
 export function getRankForLevel(level: number) {
 	const rank = RANKS.find(r => level >= r.levels[0] && level <= r.levels[1]);
@@ -15,11 +15,16 @@ export function getBorderForLevel(level: number) {
 	return rank?.border ?? "";
 }
 
-export function generateRandomExp(
-	difficulty: "EASY" | "MEDIUM" | "HARD",
-): number {
-	const { min, max } = DIFFICULTY_EXP_RANGES[difficulty];
-	return Math.floor(Math.random() * (max - min + 1)) + min;
+export function generateRandomRewards(difficulty: "EASY" | "MEDIUM" | "HARD") {
+	const { exp, gems } = DIFFICULTY_REWARDS[difficulty];
+
+	const getRandomValue = (min: number, max: number) =>
+		Math.floor(Math.random() * (max - min + 1)) + min;
+
+	return {
+		expGained: getRandomValue(exp.min, exp.max),
+		gemsGained: getRandomValue(gems.min, gems.max),
+	};
 }
 
 export function calculateLevel(
@@ -30,22 +35,17 @@ export function calculateLevel(
 	let totalExp = curExp + expGained;
 	let newLevel = curLevel;
 
-	// Loop to calculate the new level based on the experience thresholds
-	while (newLevel < LEVELS.length) {
+	while (totalExp >= LEVELS[newLevel - 1]?.expToLevelUp) {
 		const expToLevelUp = LEVELS[newLevel - 1]?.expToLevelUp;
-
-		if (totalExp >= expToLevelUp) {
-			totalExp -= expToLevelUp;
-			newLevel++;
-		} else {
-			break;
-		}
+		totalExp -= expToLevelUp;
+		newLevel++;
 	}
 
 	const RankName = getRankNameForLevel(newLevel);
 	const Border = getBorderForLevel(newLevel);
 
 	return {
+		levelUp: newLevel > curLevel ? true : false,
 		curLevel: newLevel,
 		expToLevelUp: LEVELS[newLevel - 1]?.expToLevelUp,
 		curExp: totalExp,
