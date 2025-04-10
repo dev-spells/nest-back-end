@@ -70,8 +70,8 @@ export const LEVELS = [
 	{ level: 60, expToLevelUp: 91500 },
 ];
 
-export const DIFFICULTY_EXP_RANGES = {
-	easy: { min: 100, max: 250 },
-	medium: { min: 200, max: 350 },
-	hard: { min: 375, max: 600 },
+export const DIFFICULTY_REWARDS = {
+	EASY: { exp: { min: 100, max: 250 }, gems: { min: 1, max: 2 } },
+	MEDIUM: { exp: { min: 200, max: 350 }, gems: { min: 3, max: 6 } },
+	HARD: { exp: { min: 375, max: 600 }, gems: { min: 5, max: 10 } },
 };

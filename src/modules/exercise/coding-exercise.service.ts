@@ -56,7 +56,7 @@ export class CodingExerciseService {
 			throw new NotFoundException(EXERCISE_ERRORS.NOT_FOUND);
 		}
 		return await this.codingExerciseRepository.update(id, {
-			correctAnswer: answer,
+			answer: answer,
 			language,
 		});
 	}

@@ -33,6 +33,7 @@ export const LESSON_ERRORS = {
 	NOT_FOUND: "Lesson not found",
 	INVALID_EXERCISE: "Invalid exercise data",
 	MORE_THAN_ONE_EXERCISE: "Only one exercise type must be provided",
+	ALREADY_SUBMITTED: "User has already submitted this lesson",
 } as const;
 
 export const COURSE_ERRORS = {

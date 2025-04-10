@@ -13,26 +13,26 @@ import { User } from "./user.entity";
 @Entity()
 export class UserCourseCompletion {
 	@PrimaryColumn({ type: "uuid" })
-	user_id: string;
+	userId: string;
 
 	@PrimaryColumn({ type: "int" })
-	course_id: number;
+	courseId: number;
 
 	@CreateDateColumn()
-	created_at: Date;
+	createdAt: Date;
 
 	@Column({ type: "text" })
-	certificate_url: string;
+	certificateUrl: string;
 
 	@ManyToOne(() => Course, course => course.userCourseCompletion, {
 		onDelete: "CASCADE",
 	})
-	@JoinColumn({ name: "course_id" })
+	@JoinColumn({ name: "courseId" })
 	courses: Course;
 
 	@ManyToOne(() => User, user => user.userCourseCompletion, {
 		onDelete: "CASCADE",
 	})
-	@JoinColumn({ name: "user_id" })
+	@JoinColumn({ name: "userId" })
 	users: User;
 }
