@@ -22,7 +22,7 @@ export class UserSubmissionController {
 
 	@ApiOperation({ summary: "Handle user submission" })
 	@ApiBearerAuth()
-	@ApiCreatedResponse()
+	@ApiCreatedResponse({ type: SubmitLessonResponseDto })
 	@ApiNotFoundResponse({ description: "User/Lesson/Exercise not found" })
 	@Post()
 	async handleUserSubmission(
@@ -37,7 +37,7 @@ export class UserSubmissionController {
 
 	@ApiOperation({ summary: "Check if course is complete" })
 	@ApiBearerAuth()
-	@ApiOkResponse({ type: SubmitLessonResponseDto })
+	@ApiOkResponse()
 	@Post("course/:courseId")
 	async isCourseComplete(
 		@User() user: any,
