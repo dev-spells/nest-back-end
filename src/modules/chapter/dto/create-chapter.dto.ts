@@ -26,7 +26,7 @@ export class CreateChapterDto {
 
 	@IsOptional()
 	@ApiProperty({
-		description: "ID of the course to which the chapter belongs",
+		description: "ID of the course to which the chapter belongs - optional",
 		example: 1,
 	})
 	pos: number;
