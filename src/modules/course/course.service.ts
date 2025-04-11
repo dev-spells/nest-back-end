@@ -78,7 +78,7 @@ export class CourseService {
 			.addSelect("chapter.id", "chapterId")
 			.addSelect("chapter.name", "chapterName")
 			.where("course.id IN (:...courseIds)", { courseIds })
-			.orderBy("chapter.createdAt", "ASC")
+			.orderBy("chapter.pos", "ASC")
 			.getRawMany();
 		const chaptersByCoursesMap = new Map();
 		for (const item of chapterNamesQuery) {
@@ -104,26 +104,45 @@ export class CourseService {
 		if (!course) {
 			throw new NotFoundException(COURSE_ERRORS.NOT_FOUND);
 		}
-		const chapterNamesQuery = await this.courseRepository
+
+		const rawChaptersAndLessons = await this.courseRepository
 			.createQueryBuilder("course")
 			.innerJoin("course.chapters", "chapter")
+			.leftJoin("chapter.lessons", "lesson")
 			.select("course.id", "courseId")
 			.addSelect("chapter.id", "chapterId")
 			.addSelect("chapter.name", "chapterName")
+			.addSelect("chapter.pos", "chapterPos")
+			.addSelect("lesson.id", "lessonId")
+			.addSelect("lesson.name", "lessonName")
+			.addSelect("lesson.difficulty", "lessonDifficulty")
 			.where("course.id = :courseId", { courseId: id })
-			.orderBy("chapter.createdAt", "ASC")
+			.orderBy("chapter.pos", "ASC")
+			.addOrderBy("lesson.createdAt", "ASC")
 			.getRawMany();
-		const chaptersByCoursesMap = new Map();
-		for (const item of chapterNamesQuery) {
-			if (!chaptersByCoursesMap.has(item.courseId)) {
-				chaptersByCoursesMap.set(item.courseId, []);
+
+		const chaptersMap = new Map();
+
+		for (const row of rawChaptersAndLessons) {
+			if (!chaptersMap.has(row.chapterId)) {
+				chaptersMap.set(row.chapterId, {
+					id: row.chapterId,
+					name: row.chapterName,
+					pos: row.chapterPos,
+					lessons: [],
+				});
 			}
-			chaptersByCoursesMap.get(item.courseId).push({
-				id: item.chapterId,
-				name: item.chapterName,
-			});
+
+			if (row.lessonId) {
+				chaptersMap.get(row.chapterId).lessons.push({
+					id: row.lessonId,
+					name: row.lessonName,
+					difficulty: row.lessonDifficulty,
+				});
+			}
 		}
-		course.chaptersList = chaptersByCoursesMap.get(course.id) || [];
+
+		course.chapters = Array.from(chaptersMap.values());
 		return course;
 	}
 

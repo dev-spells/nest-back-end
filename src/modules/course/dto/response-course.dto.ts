@@ -1,97 +1,110 @@
-import { Exclude, Expose, Type } from "class-transformer";
+import { Type } from "class-transformer";
 
 import { ApiProperty } from "@nestjs/swagger";
 
+export class LessonInfo {
+	@ApiProperty()
+	id: number;
+	@ApiProperty()
+	name: string;
+	@ApiProperty({ example: "EASY" })
+	difficulty: string;
+}
+
 class ChapterInfo {
 	@ApiProperty({ example: 1 })
-	@Expose()
 	id: number;
 
 	@ApiProperty({ example: "1. Test chapter" })
-	@Expose()
 	name: string;
+
+	@ApiProperty({ example: 1 })
+	pos: number;
+
+	@ApiProperty({
+		type: [LessonInfo],
+		example: [{ id: 1, name: "Test lesson", difficulty: "EASY" }],
+	})
+	@Type(() => LessonInfo)
+	lessons: LessonInfo[];
 }
 
 export class ResponseCourseDto {
 	@ApiProperty({ example: 1 })
-	@Expose()
 	id: number;
 
 	@ApiProperty({ example: "Course Title" })
-	@Expose()
 	title: string;
 
 	@ApiProperty({ example: new Date() })
-	@Expose()
 	createdAt: Date;
 
 	@ApiProperty({ example: new Date() })
-	@Expose()
 	updatedAt: Date;
 
 	@ApiProperty({ example: "Course Description" })
-	@Expose()
 	description: string;
 
 	@ApiProperty({ example: "https://www.example.com" })
-	@Expose()
 	iconUrl: string;
 
 	@ApiProperty({ example: true })
-	@Expose()
 	isPublic: boolean;
 
 	@ApiProperty({ example: 1 })
-	@Expose()
 	chaptersCount: number;
 
 	@ApiProperty({ example: 2 })
-	@Expose()
 	lessonsCount: number;
 
 	@ApiProperty({
 		type: [ChapterInfo],
-		example: [{ id: 1, name: "1. Test chapter" }],
+		example: [
+			{
+				id: 1,
+				name: "1. Test chapter",
+				pos: 1,
+				lessons: [{ id: 1, name: "Test lesson", difficulty: "EASY" }],
+			},
+		],
 	})
-	@Expose()
 	@Type(() => ChapterInfo)
-	chaptersList: ChapterInfo[];
+	chapters: ChapterInfo[];
 }
 
 export class ResponseCourseDetailDto {
 	@ApiProperty({ example: 1 })
-	@Expose()
 	id: number;
 
 	@ApiProperty({ example: "Course Title" })
-	@Expose()
 	title: string;
 
 	@ApiProperty({ example: new Date() })
-	@Expose()
 	createdAt: Date;
 
 	@ApiProperty({ example: new Date() })
-	@Expose()
 	updatedAt: Date;
 
 	@ApiProperty({ example: "Course Description" })
-	@Expose()
 	description: string;
 
 	@ApiProperty({ example: "https://www.example.com" })
-	@Expose()
 	iconUrl: string;
 
 	@ApiProperty({ example: true })
-	@Expose()
 	isPublic: boolean;
 
 	@ApiProperty({
 		type: [ChapterInfo],
-		example: [{ id: 1, name: "1. Test chapter" }],
+		example: [
+			{
+				id: 1,
+				name: "1. Test chapter",
+				pos: 1,
+				lessons: [{ id: 1, name: "Test lesson", difficulty: "EASY" }],
+			},
+		],
 	})
-	@Expose()
 	@Type(() => ChapterInfo)
-	chaptersList: ChapterInfo[];
+	chapters: ChapterInfo[];
 }

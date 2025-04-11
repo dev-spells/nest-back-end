@@ -3,11 +3,13 @@ import {
 	CreateDateColumn,
 	Entity,
 	ManyToOne,
+	OneToMany,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from "typeorm";
 
 import { Course } from "./course.entity";
+import { Lesson } from "./lesson.entity";
 
 @Entity()
 export class Chapter {
@@ -28,4 +30,7 @@ export class Chapter {
 
 	@ManyToOne(() => Course, course => course.chapters, { onDelete: "CASCADE" })
 	course: Course;
+
+	@OneToMany(() => Lesson, lesson => lesson.chapter)
+	lessons: Lesson[];
 }
