@@ -19,6 +19,8 @@ export class ResponseChapter {
 	updated_at: Date;
 	@ApiProperty()
 	courseId: number;
+	@ApiProperty()
+	pos: number;
 	@ApiProperty({ type: [Lesson] })
 	lessons: Lesson[];
 }
