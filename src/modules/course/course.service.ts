@@ -31,7 +31,7 @@ export class CourseService {
 
 	async findAll() {
 		const courses = await this.courseRepository.find({
-			order: { created_at: "ASC" },
+			order: { createdAt: "ASC" },
 		});
 
 		const courseIds = courses.map(course => course.id);
@@ -78,7 +78,7 @@ export class CourseService {
 			.addSelect("chapter.id", "chapterId")
 			.addSelect("chapter.name", "chapterName")
 			.where("course.id IN (:...courseIds)", { courseIds })
-			.orderBy("chapter.created_at", "ASC")
+			.orderBy("chapter.createdAt", "ASC")
 			.getRawMany();
 		const chaptersByCoursesMap = new Map();
 		for (const item of chapterNamesQuery) {
@@ -111,7 +111,7 @@ export class CourseService {
 			.addSelect("chapter.id", "chapterId")
 			.addSelect("chapter.name", "chapterName")
 			.where("course.id = :courseId", { courseId: id })
-			.orderBy("chapter.created_at", "ASC")
+			.orderBy("chapter.createdAt", "ASC")
 			.getRawMany();
 		const chaptersByCoursesMap = new Map();
 		for (const item of chapterNamesQuery) {

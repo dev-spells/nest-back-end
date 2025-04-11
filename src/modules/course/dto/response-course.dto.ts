@@ -23,11 +23,11 @@ export class ResponseCourseDto {
 
 	@ApiProperty({ example: new Date() })
 	@Expose()
-	created_at: Date;
+	createdAt: Date;
 
 	@ApiProperty({ example: new Date() })
 	@Expose()
-	updated_at: Date;
+	updatedAt: Date;
 
 	@ApiProperty({ example: "Course Description" })
 	@Expose()
@@ -35,11 +35,11 @@ export class ResponseCourseDto {
 
 	@ApiProperty({ example: "https://www.example.com" })
 	@Expose()
-	icon_url: string;
+	iconUrl: string;
 
 	@ApiProperty({ example: true })
 	@Expose()
-	is_public: boolean;
+	isPublic: boolean;
 
 	@ApiProperty({ example: 1 })
 	@Expose()
@@ -69,11 +69,11 @@ export class ResponseCourseDetailDto {
 
 	@ApiProperty({ example: new Date() })
 	@Expose()
-	created_at: Date;
+	createdAt: Date;
 
 	@ApiProperty({ example: new Date() })
 	@Expose()
-	updated_at: Date;
+	updatedAt: Date;
 
 	@ApiProperty({ example: "Course Description" })
 	@Expose()
@@ -81,11 +81,11 @@ export class ResponseCourseDetailDto {
 
 	@ApiProperty({ example: "https://www.example.com" })
 	@Expose()
-	icon_url: string;
+	iconUrl: string;
 
 	@ApiProperty({ example: true })
 	@Expose()
-	is_public: boolean;
+	isPublic: boolean;
 
 	@ApiProperty({
 		type: [ChapterInfo],

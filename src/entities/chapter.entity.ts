@@ -21,10 +21,10 @@ export class Chapter {
 	pos: number;
 
 	@CreateDateColumn()
-	created_at: Date;
+	createdAt: Date;
 
 	@UpdateDateColumn()
-	updated_at: Date;
+	updatedAt: Date;
 
 	@ManyToOne(() => Course, course => course.chapters, { onDelete: "CASCADE" })
 	course: Course;
