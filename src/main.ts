@@ -14,6 +14,7 @@ async function bootstrap() {
 	const configServer = app.get(ConfigService);
 	const port = configServer.get("PORT") || 8080;
 	const password = configServer.get("AUTH_PASSWORD");
+	const websiteUrl = configServer.get("WEBSITE_URL");
 
 	app.useGlobalPipes(
 		new ValidationPipe({
@@ -38,14 +39,17 @@ async function bootstrap() {
 	// 	}),
 	// );
 
-	app.enableCors();
+	app.enableCors({
+		origin: websiteUrl,
+		credentials: true,
+		methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
+	});
 
 	const config = new DocumentBuilder()
 		.addBearerAuth()
 		.setTitle("DevSpells API docs")
 		.setDescription("Where all the magic comefrom")
 		.setVersion("1.0")
-		.addTag("DevSpells")
 		.build();
 
 	const document = SwaggerModule.createDocument(app, config);
