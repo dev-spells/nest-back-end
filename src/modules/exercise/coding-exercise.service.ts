@@ -25,7 +25,7 @@ export class CodingExerciseService {
 
 		const savedCodingExercise = await this.codingExerciseRepository.save({
 			language,
-			correctAnswer: answer,
+			answer,
 		});
 
 		const snippets = await this.codingExerciseSnippetRepository.save(

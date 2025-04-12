@@ -78,6 +78,7 @@ export class LessonService {
 			};
 		} catch (error) {
 			if (error instanceof QueryFailedError) {
+				console.log(error);
 				throw new BadRequestException(
 					"Invalid chapter ID or exercise data or spellbook data",
 				);
