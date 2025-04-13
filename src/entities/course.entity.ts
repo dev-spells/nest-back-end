@@ -33,9 +33,6 @@ export class Course {
 	@Column({ type: "boolean", default: true })
 	isPublic: boolean;
 
-	@Column({ type: "boolean", default: false })
-	isDeleted: boolean;
-
 	@OneToMany(() => Chapter, chapter => chapter.course, { onDelete: "CASCADE" })
 	chapters: Chapter[];
 

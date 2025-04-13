@@ -8,7 +8,9 @@ import { Repository } from "typeorm";
 
 import { COURSE_ERRORS } from "src/constants/errors";
 import { Course } from "src/entities/course.entity";
+import { extractS3Key } from "src/utils/extract-s3-key.util";
 
+import { S3Service } from "./../s3/s3.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
 
@@ -17,6 +19,7 @@ export class CourseService {
 	constructor(
 		@InjectRepository(Course)
 		private courseRepository: Repository<Course>,
+		private s3Service: S3Service,
 	) {}
 
 	async create(createCourseDto: CreateCourseDto) {
@@ -159,6 +162,12 @@ export class CourseService {
 		if (!course) {
 			throw new NotFoundException(COURSE_ERRORS.NOT_FOUND);
 		}
+		if (updateCourseDto.iconUrl !== course.iconUrl) {
+			const s3Key = extractS3Key(course.iconUrl);
+			if (s3Key) {
+				this.s3Service.deleteFile(s3Key);
+			}
+		}
 		return await this.courseRepository.update(id, {
 			...updateCourseDto,
 		});
@@ -169,6 +178,11 @@ export class CourseService {
 		if (!course) {
 			throw new NotFoundException(COURSE_ERRORS.NOT_FOUND);
 		}
-		return await this.courseRepository.update(id, { isDeleted: true });
+		const s3Key = extractS3Key(course.iconUrl);
+		if (s3Key) {
+			this.s3Service.deleteFile(s3Key);
+		}
+		// return await this.courseRepository.update(id, { isDeleted: true });
+		return await this.courseRepository.delete(id);
 	}
 }
