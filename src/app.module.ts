@@ -18,6 +18,9 @@ import { UserModule } from "./modules/user/user.module";
 import { UserSubmissionModule } from "./modules/user-submission/user-submission.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { ItemModule } from './modules/item/item.module';
+import { ShopModule } from './modules/shop/shop.module';
+import { UserItemModule } from './modules/user-item/user-item.module';
 
 @Module({
 	imports: [
@@ -46,6 +49,9 @@ import { AppService } from "./app.service";
 		ExerciseModule,
 		SpellBookModule,
 		UserSubmissionModule,
+		ItemModule,
+		ShopModule,
+		UserItemModule,
 	],
 	controllers: [AppController],
 	providers: [
