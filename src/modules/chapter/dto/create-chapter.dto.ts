@@ -6,20 +6,26 @@ import {
 	IsArray,
 	IsNotEmpty,
 	IsNumber,
-	IsOptional,
 	ValidateNested,
 } from "class-validator";
 
 export class CreateChapterDto {
+	@ApiProperty({
+		description: "ID of the course to which the chapter belongs",
+		example: 1,
+	})
+	@IsNotEmpty()
+	courseId: number;
+
 	@ApiProperty({
 		example: "Introduction",
 	})
 	@IsNotEmpty()
 	name: string;
 
-	@IsOptional()
+	@IsNotEmpty()
 	@ApiProperty({
-		description: "ID of the course to which the chapter belongs - optional",
+		description: "order of the chapter in the course",
 		example: 1,
 	})
 	pos: number;
