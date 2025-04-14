@@ -17,6 +17,7 @@ import { UserLessonProgress } from "src/entities/user-lessson-progress.entity";
 import { UserStreak } from "src/entities/user-streak.entity";
 import { calculateLevel, generateRandomRewards } from "src/utils/levels.util";
 
+import { RedisService } from "./../cache/cache.service";
 import { CreateUserSubmissionDto } from "./dto/create-user-submission.dto";
 
 @Injectable()
@@ -38,6 +39,7 @@ export class UserSubmissionService {
 		private lessonRepository: Repository<Lesson>,
 		@InjectRepository(UserStreak)
 		private userStreakRepository: Repository<UserStreak>,
+		private redisService: RedisService,
 	) {}
 
 	async isCourseComplete(userId: string, courseId: number) {
@@ -82,7 +84,7 @@ export class UserSubmissionService {
 		id: string,
 		createUserSubmissionDto: CreateUserSubmissionDto,
 	) {
-		const { lessonId, userAnswer, bonus = 0 } = createUserSubmissionDto;
+		const { lessonId, userAnswer } = createUserSubmissionDto;
 		const isExist = await this.userLessonProgressRepository.existsBy({
 			userId: id,
 			lessonId: lessonId,
@@ -95,13 +97,18 @@ export class UserSubmissionService {
 		if (!user) {
 			throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 		}
+
+		const itemInUsed = await this.redisService.getMap(`user:${id}:item-xp`);
+
 		if (isExist) {
 			console.log("User already submitted this lesson");
 			return await this.handleUserSubmission(
 				user,
 				lesson,
 				userAnswer,
-				bonus,
+				Object.keys(itemInUsed).length > 0
+					? parseInt(itemInUsed.bonus)
+					: undefined,
 				true,
 			);
 		}
@@ -109,7 +116,9 @@ export class UserSubmissionService {
 			user,
 			lesson,
 			userAnswer,
-			bonus,
+			Object.keys(itemInUsed).length > 0
+				? parseInt(itemInUsed.bonus)
+				: undefined,
 		);
 		if (userStats.userLessonProgress) {
 			this.handleUserStreak(user.id, true);
@@ -266,7 +275,7 @@ export class UserSubmissionService {
 		return {
 			userStats: null,
 			userLessonProgress: null,
-			isRedo,
+			isRedo: false,
 		};
 	}
 }
