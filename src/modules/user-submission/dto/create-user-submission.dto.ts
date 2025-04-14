@@ -9,8 +9,4 @@ export class CreateUserSubmissionDto {
 	@IsNotEmpty()
 	@ApiProperty({ example: "true" })
 	userAnswer: string;
-
-	@IsOptional()
-	@ApiProperty({ example: 20 })
-	bonus: number;
 }
