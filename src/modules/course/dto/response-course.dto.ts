@@ -9,6 +9,8 @@ export class LessonInfo {
 	name: string;
 	@ApiProperty({ example: "EASY" })
 	difficulty: string;
+	@ApiProperty({ example: false })
+	completed: boolean;
 }
 
 class ChapterInfo {
@@ -23,7 +25,9 @@ class ChapterInfo {
 
 	@ApiProperty({
 		type: [LessonInfo],
-		example: [{ id: 1, name: "Test lesson", difficulty: "EASY" }],
+		example: [
+			{ id: 1, name: "Test lesson", difficulty: "EASY", completed: false },
+		],
 	})
 	@Type(() => LessonInfo)
 	lessons: LessonInfo[];
@@ -70,6 +74,9 @@ export class ResponseCourseDto {
 	})
 	@Type(() => ChapterInfo)
 	chapters: ChapterInfo[];
+
+	@ApiProperty()
+	completedLessonsCount: number;
 }
 
 export class ResponseCourseDetailDto {
@@ -101,7 +108,9 @@ export class ResponseCourseDetailDto {
 				id: 1,
 				name: "1. Test chapter",
 				pos: 1,
-				lessons: [{ id: 1, name: "Test lesson", difficulty: "EASY" }],
+				lessons: [
+					{ id: 1, name: "Test lesson", difficulty: "EASY", completed: false },
+				],
 			},
 		],
 	})

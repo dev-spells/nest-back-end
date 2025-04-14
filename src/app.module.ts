@@ -21,6 +21,7 @@ import { UserSubmissionModule } from "./modules/user-submission/user-submission.
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { ItemModule } from './modules/item/item.module';
+import { ItemUnlockModule } from './modules/item-unlock/item-unlock.module';
 
 @Module({
 	imports: [
@@ -52,6 +53,7 @@ import { ItemModule } from './modules/item/item.module';
 		ShopModule,
 		ItemXpModule,
 		ItemModule,
+		ItemUnlockModule,
 	],
 	controllers: [AppController],
 	providers: [

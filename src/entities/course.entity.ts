@@ -45,4 +45,5 @@ export class Course {
 	chaptersCount?: number;
 	lessonsCount?: number;
 	chaptersList?: { id: number; name: string }[];
+	completedLessonsCount?: number;
 }

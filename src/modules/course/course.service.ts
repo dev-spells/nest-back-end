@@ -39,7 +39,7 @@ export class CourseService {
 		return await this.courseRepository.save({ ...createCourseDto });
 	}
 
-	async findAll() {
+	async findAll(userId: string) {
 		const courses = await this.courseRepository.find({
 			order: { createdAt: "ASC" },
 		});
@@ -81,6 +81,31 @@ export class CourseService {
 			]),
 		);
 
+		const completedLessonsQuery = await this.courseRepository
+			.createQueryBuilder("course")
+			.leftJoin("course.chapters", "chapter")
+			.leftJoin("chapter.lessons", "lesson")
+			.leftJoin(
+				"lesson.userLessonProgress",
+				"userLessonProgress",
+				"userLessonProgress.userId = :userId",
+				{ userId },
+			)
+			.select("course.id", "courseId")
+			.addSelect(
+				"COUNT(DISTINCT userLessonProgress.lessonId)",
+				"completedLessonsCount",
+			)
+			.where("course.id IN (:...courseIds)", { courseIds })
+			.groupBy("course.id")
+			.getRawMany();
+		const completedLessonsMap = new Map(
+			completedLessonsQuery.map(item => [
+				item.courseId,
+				parseInt(item.completedLessonsCount),
+			]),
+		);
+
 		const chapterNamesQuery = await this.courseRepository
 			.createQueryBuilder("course")
 			.innerJoin("course.chapters", "chapter")
@@ -104,12 +129,13 @@ export class CourseService {
 		for (const course of courses) {
 			course.chaptersCount = chaptersCountMap.get(course.id) || 0;
 			course.lessonsCount = lessonsCountMap.get(course.id) || 0;
+			course.completedLessonsCount = completedLessonsMap.get(course.id) || 0;
 			course.chaptersList = chaptersByCoursesMap.get(course.id) || [];
 		}
 		return courses;
 	}
 
-	async findOne(id: number) {
+	async findOne(id: number, userId: string) {
 		const course = await this.courseRepository.findOne({ where: { id } });
 		if (!course) {
 			throw new NotFoundException(COURSE_ERRORS.NOT_FOUND);
@@ -119,6 +145,12 @@ export class CourseService {
 			.createQueryBuilder("course")
 			.innerJoin("course.chapters", "chapter")
 			.leftJoin("chapter.lessons", "lesson")
+			.leftJoin(
+				"lesson.userLessonProgress",
+				"userLessonProgress",
+				"userLessonProgress.userId = :userId",
+				{ userId },
+			)
 			.select("course.id", "courseId")
 			.addSelect("chapter.id", "chapterId")
 			.addSelect("chapter.name", "chapterName")
@@ -126,6 +158,10 @@ export class CourseService {
 			.addSelect("lesson.id", "lessonId")
 			.addSelect("lesson.name", "lessonName")
 			.addSelect("lesson.difficulty", "lessonDifficulty")
+			.addSelect(
+				"CASE WHEN userLessonProgress.userId IS NOT NULL THEN true ELSE false END",
+				"lessonCompleted",
+			)
 			.where("course.id = :courseId", { courseId: id })
 			.orderBy("chapter.pos", "ASC")
 			.addOrderBy("lesson.createdAt", "ASC")
@@ -148,6 +184,7 @@ export class CourseService {
 					id: row.lessonId,
 					name: row.lessonName,
 					difficulty: row.lessonDifficulty,
+					completed: row.lessonCompleted,
 				});
 			}
 		}
