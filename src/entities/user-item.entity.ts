@@ -15,7 +15,7 @@ export class UserItem {
 	@JoinColumn({ name: "userId" })
 	user: User;
 
-	@ManyToOne(() => User, { onDelete: "CASCADE" })
+	@ManyToOne(() => Item, { onDelete: "CASCADE" })
 	@JoinColumn({ name: "itemId" })
 	item: Item;
 

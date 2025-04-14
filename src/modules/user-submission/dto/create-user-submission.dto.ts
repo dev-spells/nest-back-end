@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsOptional } from "class-validator";
 
 export class CreateUserSubmissionDto {
 	@IsNotEmpty()
@@ -9,4 +9,8 @@ export class CreateUserSubmissionDto {
 	@IsNotEmpty()
 	@ApiProperty({ example: "true" })
 	userAnswer: string;
+
+	@IsOptional()
+	@ApiProperty({ example: 20 })
+	bonus: number;
 }

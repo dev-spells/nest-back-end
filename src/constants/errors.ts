@@ -1,3 +1,5 @@
+import { Item } from "src/entities/item.entity";
+
 export const USER_ERRORS = {
 	NOT_FOUND: "User not found",
 	EMAIL_IN_USE: "Email already in use",
@@ -39,4 +41,12 @@ export const LESSON_ERRORS = {
 export const COURSE_ERRORS = {
 	NOT_FOUND: "Course not found",
 	ALREADY_EXISTS: "Course with this title already exists",
+} as const;
+
+export const ITEM_ERRORS = {
+	NOT_FOUND: "Item not found",
+	ALREADY_EXISTS: "Item with this title already exists",
+	ALREADY_OWNED: "You already own this item",
+	NOT_OWNED: "You don't own this item",
+	ALREADY_IN_USE: "Item is already in use",
 } as const;
