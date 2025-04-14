@@ -15,14 +15,20 @@ export function getBorderForLevel(level: number) {
 	return rank?.border ?? "";
 }
 
-export function generateRandomRewards(difficulty: "EASY" | "MEDIUM" | "HARD") {
+export function generateRandomRewards(
+	difficulty: "EASY" | "MEDIUM" | "HARD",
+	bonus: number = 0,
+) {
 	const { exp, gems } = DIFFICULTY_REWARDS[difficulty];
 
 	const getRandomValue = (min: number, max: number) =>
 		Math.floor(Math.random() * (max - min + 1)) + min;
 
+	const expGained = getRandomValue(exp.min, exp.max);
+	const expBonus = Math.ceil(expGained * ((bonus || 0) / 100));
 	return {
-		expGained: getRandomValue(exp.min, exp.max),
+		expGained,
+		expBonus,
 		gemsGained: getRandomValue(gems.min, gems.max),
 	};
 }

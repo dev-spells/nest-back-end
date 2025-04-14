@@ -82,7 +82,7 @@ export class UserSubmissionService {
 		id: string,
 		createUserSubmissionDto: CreateUserSubmissionDto,
 	) {
-		const { lessonId, userAnswer } = createUserSubmissionDto;
+		const { lessonId, userAnswer, bonus = 0 } = createUserSubmissionDto;
 		const isExist = await this.userLessonProgressRepository.existsBy({
 			userId: id,
 			lessonId: lessonId,
@@ -97,9 +97,20 @@ export class UserSubmissionService {
 		}
 		if (isExist) {
 			console.log("User already submitted this lesson");
-			return await this.handleUserSubmission(user, lesson, userAnswer, true);
+			return await this.handleUserSubmission(
+				user,
+				lesson,
+				userAnswer,
+				bonus,
+				true,
+			);
 		}
-		const userStats = await this.handleUserSubmission(user, lesson, userAnswer);
+		const userStats = await this.handleUserSubmission(
+			user,
+			lesson,
+			userAnswer,
+			bonus,
+		);
 		if (userStats.userLessonProgress) {
 			this.handleUserStreak(user.id, true);
 		} else {
@@ -188,6 +199,7 @@ export class UserSubmissionService {
 		user: User,
 		lesson: Lesson,
 		userAnswer: string,
+		bonus: number = 0,
 		isRedo: boolean = false,
 	) {
 		let exercise:
@@ -213,10 +225,15 @@ export class UserSubmissionService {
 		}
 
 		if (userAnswer === exercise.answer && !isRedo) {
-			const { expGained, gemsGained } = generateRandomRewards(
+			const { expGained, gemsGained, expBonus } = generateRandomRewards(
 				lesson.difficulty,
+				bonus,
 			);
-			const userStats = calculateLevel(user.currentExp, user.level, expGained);
+			const userStats = calculateLevel(
+				user.currentExp,
+				user.level,
+				expGained + expBonus,
+			);
 			await this.userRepository.update(user.id, {
 				currentExp: userStats.curExp,
 				level: userStats.curLevel,
@@ -233,6 +250,8 @@ export class UserSubmissionService {
 				userStats: {
 					...userStats,
 					gemsGained,
+					expGained,
+					expBonus,
 				},
 				userLessonProgress,
 				isRedo,

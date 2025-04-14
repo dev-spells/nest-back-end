@@ -21,6 +21,12 @@ export class UserStatsDto {
 
 	@ApiProperty()
 	gemsGained: number;
+
+	@ApiProperty()
+	expGained: number;
+
+	@ApiProperty()
+	expBonus: number;
 }
 
 export class UserLessonProgressDto {

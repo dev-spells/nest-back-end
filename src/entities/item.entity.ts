@@ -11,8 +11,8 @@ export class Item {
 	@Column("text")
 	description: string;
 
-	@Column({ type: "jsonb" })
-	stast: Record<string, any>;
+	@Column({ type: "jsonb", nullable: true })
+	stats: Record<string, any>;
 
 	@Column({ type: "varchar" })
 	imageUrl: string;
