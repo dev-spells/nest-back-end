@@ -17,6 +17,7 @@ import {
 } from "@nestjs/swagger";
 
 import { Role } from "src/constants/role.enum";
+import { User } from "src/decorators/current-user";
 import { Roles } from "src/decorators/role-route";
 
 import { CreateCourseDto } from "./dto/create-course.dto";
@@ -49,8 +50,8 @@ export class CourseController {
 		type: [ResponseCourseDto],
 	})
 	@Get()
-	findAll() {
-		return this.courseService.findAll();
+	findAll(@User() user: any) {
+		return this.courseService.findAll(user.id);
 	}
 
 	@ApiBearerAuth()
@@ -61,8 +62,8 @@ export class CourseController {
 	})
 	@ApiNotFoundResponse({ description: "Course not found" })
 	@Get(":id")
-	findOne(@Param("id") id: string) {
-		return this.courseService.findOne(+id);
+	findOne(@User() user: any, @Param("id") id: string) {
+		return this.courseService.findOne(+id, user.id);
 	}
 
 	@ApiBearerAuth()
