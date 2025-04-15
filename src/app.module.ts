@@ -10,6 +10,9 @@ import { RedisModule } from "./modules/cache/cache.module";
 import { ChapterModule } from "./modules/chapter/chapter.module";
 import { CourseModule } from "./modules/course/course.module";
 import { ExerciseModule } from "./modules/exercise/exercise.module";
+import { ItemModule } from "./modules/item/item.module";
+import { ItemProtectStreakModule } from "./modules/item-protect-streak/item-protect-streak.module";
+import { ItemUnlockModule } from "./modules/item-unlock/item-unlock.module";
 import { ItemXpModule } from "./modules/item-xp/item-xp.module";
 import { LessonModule } from "./modules/lesson/lesson.module";
 import { MailModule } from "./modules/mail/mail.module";
@@ -20,8 +23,6 @@ import { UserModule } from "./modules/user/user.module";
 import { UserSubmissionModule } from "./modules/user-submission/user-submission.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { ItemModule } from './modules/item/item.module';
-import { ItemUnlockModule } from './modules/item-unlock/item-unlock.module';
 
 @Module({
 	imports: [
@@ -54,6 +55,7 @@ import { ItemUnlockModule } from './modules/item-unlock/item-unlock.module';
 		ItemXpModule,
 		ItemModule,
 		ItemUnlockModule,
+		ItemProtectStreakModule,
 	],
 	controllers: [AppController],
 	providers: [
