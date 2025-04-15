@@ -11,8 +11,8 @@ export class CreateCourseDto {
 	title: string;
 
 	@IsString()
-	@ApiProperty()
 	@IsNotEmpty()
+	@ApiProperty()
 	@Matches(/^[a-zA-Z0-9\s]+$/, {
 		message: "Description must not contain special characters",
 	})
