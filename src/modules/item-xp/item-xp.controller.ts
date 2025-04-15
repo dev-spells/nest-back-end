@@ -35,7 +35,7 @@ export class ItemXpController {
 
 	@Roles(Role.ADMIN)
 	@ApiBearerAuth()
-	@ApiOperation({ summary: "Update item XP" })
+	@ApiOperation({ summary: "Update item XP - ADMIN" })
 	@Patch()
 	async update(@Body() updateItemXPDto: UpdateItemXPDto) {
 		return this.itemXpService.update(updateItemXPDto);
