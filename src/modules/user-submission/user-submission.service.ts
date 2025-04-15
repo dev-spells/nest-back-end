@@ -15,6 +15,10 @@ import { User } from "src/entities/user.entity";
 import { UserCourseCompletion } from "src/entities/user-course-completion";
 import { UserLessonProgress } from "src/entities/user-lessson-progress.entity";
 import { UserStreak } from "src/entities/user-streak.entity";
+import {
+	convertToMapData,
+	parseToRedisData,
+} from "src/utils/convert-redis.util";
 import { calculateLevel, generateRandomRewards } from "src/utils/levels.util";
 
 import { RedisService } from "./../cache/cache.service";
@@ -234,6 +238,7 @@ export class UserSubmissionService {
 		}
 
 		if (userAnswer === exercise.answer && !isRedo) {
+			this.updateRedis(user.id, lesson.id);
 			const { expGained, gemsGained, expBonus } = generateRandomRewards(
 				lesson.difficulty,
 				bonus,
@@ -277,5 +282,20 @@ export class UserSubmissionService {
 			userLessonProgress: null,
 			isRedo: false,
 		};
+	}
+
+	private async updateRedis(userId: string, lessonId: number) {
+		const rawData = await this.redisService.getMap(
+			`user:${userId}:item-unlock`,
+		);
+		const data = convertToMapData(rawData);
+		for (const key in data) {
+			if (data[key].includes(lessonId)) {
+				data[key] = data[key].filter(lesson => lesson !== lessonId);
+			}
+		}
+		const redisData = parseToRedisData(data);
+		console.log(redisData);
+		this.redisService.setMap(`user:${userId}:item-unlock`, redisData, 0);
 	}
 }
