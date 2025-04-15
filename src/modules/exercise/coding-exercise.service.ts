@@ -82,14 +82,14 @@ export class CodingExerciseService {
 	async updateBatchSnippets(
 		updateBatchCodingSnippetsDto: UpdateCodingSnippetDto[],
 	) {
-		const snippets = await this.codingExerciseSnippetRepository.find({
-			where: {
-				id: In(updateBatchCodingSnippetsDto.map(snippet => snippet.id)),
-			},
-		});
-		if (snippets.length !== updateBatchCodingSnippetsDto.length) {
-			throw new Error(EXERCISE_ERRORS.SNIPPET_NOT_FOUND);
-		}
+		// const snippets = await this.codingExerciseSnippetRepository.find({
+		// 	where: {
+		// 		id: In(updateBatchCodingSnippetsDto.map(snippet => snippet.id)),
+		// 	},
+		// });
+		// if (snippets.length !== updateBatchCodingSnippetsDto.length) {
+		// 	throw new NotFoundException(EXERCISE_ERRORS.SNIPPET_NOT_FOUND);
+		// }
 		return await this.codingExerciseSnippetRepository.save(
 			updateBatchCodingSnippetsDto,
 		);
