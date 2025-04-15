@@ -82,14 +82,23 @@ export class CodingExerciseService {
 	async updateBatchSnippets(
 		updateBatchCodingSnippetsDto: UpdateCodingSnippetDto[],
 	) {
-		// const snippets = await this.codingExerciseSnippetRepository.find({
-		// 	where: {
-		// 		id: In(updateBatchCodingSnippetsDto.map(snippet => snippet.id)),
-		// 	},
-		// });
-		// if (snippets.length !== updateBatchCodingSnippetsDto.length) {
-		// 	throw new NotFoundException(EXERCISE_ERRORS.SNIPPET_NOT_FOUND);
-		// }
+		const codingExerciseId = updateBatchCodingSnippetsDto[0].codingExerciseId;
+		const codingSnippets = await this.codingExerciseSnippetRepository.find({
+			where: { codingExerciseId: codingExerciseId },
+		});
+
+		const idsToDelete = codingSnippets
+			.filter(
+				snippet =>
+					!updateBatchCodingSnippetsDto.some(
+						updateSnippet => updateSnippet.id === snippet.id,
+					),
+			)
+			.map(snippet => snippet.id);
+		if (idsToDelete.length > 0) {
+			await this.codingExerciseSnippetRepository.delete(idsToDelete);
+		}
+
 		return await this.codingExerciseSnippetRepository.save(
 			updateBatchCodingSnippetsDto,
 		);
