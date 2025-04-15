@@ -7,6 +7,7 @@ import {
 	LESSON_ERRORS,
 	USER_ERRORS,
 } from "src/constants/errors";
+import { RedisKey } from "src/constants/redis-key";
 import { CodingExercise } from "src/entities/coding-exercise.entity";
 import { Lesson } from "src/entities/lesson.entity";
 import { MultipleChoiceExercise } from "src/entities/multiple-choice-exercise.entity";
@@ -286,7 +287,7 @@ export class UserSubmissionService {
 
 	private async updateRedis(userId: string, lessonId: number) {
 		const rawData = await this.redisService.getMap(
-			`user:${userId}:item-unlock`,
+			RedisKey.userItemUnlock(userId),
 		);
 		const data = convertToMapData(rawData);
 		for (const key in data) {
@@ -296,6 +297,6 @@ export class UserSubmissionService {
 		}
 		const redisData = parseToRedisData(data);
 		console.log(redisData);
-		this.redisService.setMap(`user:${userId}:item-unlock`, redisData, 0);
+		this.redisService.setMap(RedisKey.userItemUnlock(userId), redisData, 0);
 	}
 }

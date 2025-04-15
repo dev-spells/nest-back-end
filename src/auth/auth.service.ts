@@ -9,6 +9,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 
 import { TOKEN_ERRORS, USER_ERRORS } from "src/constants/errors";
+import { RedisKey } from "src/constants/redis-key";
 import { User } from "src/entities/user.entity";
 import { UserService } from "src/modules/user/user.service";
 import { hashPassword, validatePassword } from "src/utils/handle-password.util";
@@ -87,14 +88,14 @@ export class AuthService {
 		if (user.isActived)
 			throw new BadRequestException(USER_ERRORS.EMAIL_VERIFIED);
 
-		if (await this.redisService.get(`verification:${email}`)) {
+		if (await this.redisService.get(RedisKey.verifyEmail(email))) {
 			return;
 		}
 
 		const otp = this.generateOtp();
 		const hashedOtp = await hashPassword(otp);
 
-		this.redisService.set(`verification:${email}`, { hashedOtp }, 60 * 5);
+		this.redisService.set(RedisKey.verifyEmail(email), { hashedOtp }, 60 * 5);
 		this.mailService.sendUserConfirmation(user, otp);
 	}
 
@@ -106,7 +107,9 @@ export class AuthService {
 		if (user.isActived)
 			throw new BadRequestException(USER_ERRORS.EMAIL_VERIFIED);
 
-		const existingOtp = await this.redisService.get(`verification:${email}`);
+		const existingOtp = await this.redisService.get(
+			RedisKey.verifyEmail(email),
+		);
 		if (existingOtp) throw new BadRequestException(USER_ERRORS.SPAM_OTP);
 
 		return this.sendVerificationOtp(email);
@@ -115,7 +118,7 @@ export class AuthService {
 	async verifyAccount(verifyDto: VerifyOtpDto) {
 		const { email, otp } = verifyDto;
 		const data = await this.redisService.get<{ hashedOtp: string }>(
-			`verification:${email}`,
+			RedisKey.verifyEmail(email),
 		);
 
 		if (!data || !(await validatePassword(otp, data.hashedOtp)))
@@ -125,7 +128,7 @@ export class AuthService {
 		if (!user) throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 
 		await this.userService.updateUser(user.id, { isActived: true });
-		await this.redisService.del(`verification:${email}`);
+		await this.redisService.del(RedisKey.verifyEmail(email));
 
 		return {
 			message: "Email successfully verified!",
@@ -138,13 +141,17 @@ export class AuthService {
 		const user = await this.userService.findByEmail(email);
 		if (!user || user.githubAccessToken)
 			throw new NotFoundException(USER_ERRORS.NOT_FOUND);
-		if (await this.redisService.get(`forgot-password:${email}`)) {
+		if (await this.redisService.get(RedisKey.forgotPassword(email))) {
 			return { message: "Password reset OTP has been sent to your email" };
 		}
 		const otp = this.generateOtp();
 		const hashedOtp = await hashPassword(otp);
 
-		this.redisService.set(`forgot-password:${email}`, { hashedOtp }, 60 * 5);
+		this.redisService.set(
+			RedisKey.forgotPassword(email),
+			{ hashedOtp },
+			60 * 5,
+		);
 		this.mailService.sendForgotPassword(user, otp);
 
 		return { message: "Password reset OTP has been sent to your email" };
@@ -156,7 +163,9 @@ export class AuthService {
 		if (!user || user.githubAccessToken)
 			throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 
-		const existingOtp = await this.redisService.get(`forgot-password:${email}`);
+		const existingOtp = await this.redisService.get(
+			RedisKey.forgotPassword(email),
+		);
 		if (existingOtp) throw new BadRequestException(USER_ERRORS.SPAM_OTP);
 
 		return this.sendForgotPasswordOtp({ email });
@@ -165,15 +174,19 @@ export class AuthService {
 	async verifyForgotPasswordOtp(verifyDto: VerifyOtpDto) {
 		const { email, otp } = verifyDto;
 		const data = await this.redisService.get<{ hashedOtp: string }>(
-			`forgot-password:${email}`,
+			RedisKey.forgotPassword(email),
 		);
 
 		if (!data || !(await validatePassword(otp, data.hashedOtp)))
 			throw new BadRequestException(USER_ERRORS.INVALID_OTP);
 
 		const resetToken = this.generateResetToken();
-		this.redisService.set(`password-reset:${email}`, { resetToken }, 60 * 15);
-		this.redisService.del(`forgot-password:${email}`);
+		this.redisService.set(
+			RedisKey.resetPassword(email),
+			{ resetToken },
+			60 * 15,
+		);
+		this.redisService.del(RedisKey.forgotPassword(email));
 
 		return {
 			message: "OTP verified successfully. You can now reset your password.",
@@ -183,7 +196,7 @@ export class AuthService {
 
 	async resetPassword(email: string, resetToken: string, newPassword: string) {
 		const data = await this.redisService.get<{ resetToken: string }>(
-			`password-reset:${email}`,
+			RedisKey.resetPassword(email),
 		);
 
 		if (!data || data.resetToken !== resetToken)
@@ -193,7 +206,7 @@ export class AuthService {
 		if (!user) throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 
 		await this.userService.updatePassword(user.id, newPassword);
-		await this.redisService.del(`password-reset:${email}`);
+		await this.redisService.del(RedisKey.resetPassword(email));
 
 		return {
 			message: "Password updated successfully",
