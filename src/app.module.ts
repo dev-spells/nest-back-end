@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
+import { ScheduleModule } from "@nestjs/schedule";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { AuthModule } from "src/auth/auth.module";
@@ -40,6 +41,7 @@ import { AppService } from "./app.service";
 			}),
 			inject: [ConfigService],
 		}),
+		ScheduleModule.forRoot(),
 		RedisModule,
 		AuthModule,
 		UserModule,
