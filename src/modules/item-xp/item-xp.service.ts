@@ -8,6 +8,7 @@ import { Repository } from "typeorm";
 
 import { ITEM_ERRORS } from "src/constants/errors";
 import { ITEM_XP_ID } from "src/constants/item";
+import { RedisKey } from "src/constants/redis-key";
 import { Item } from "src/entities/item.entity";
 import { UserItem } from "src/entities/user-item.entity";
 
@@ -43,14 +44,14 @@ export class ItemXpService {
 			throw new NotFoundException(ITEM_ERRORS.NOT_OWNED);
 		}
 		const redisItemXP = await this.RedisService.getMap(
-			`user:${userId}:item-xp`,
+			RedisKey.userItemXP(userId),
 		);
 		if (Object.keys(redisItemXP).length > 0) {
 			throw new BadRequestException(ITEM_ERRORS.ALREADY_IN_USE);
 		}
 		const timestamp = Date.now();
 		await this.RedisService.setMap(
-			`user:${userId}:item-xp`,
+			RedisKey.userItemXP(userId),
 			{
 				item: userItem.item.name,
 				timestamp: timestamp,
@@ -72,7 +73,9 @@ export class ItemXpService {
 	}
 
 	async check(userId: string) {
-		const itemInUsed = await this.RedisService.getMap(`user:${userId}:item-xp`);
+		const itemInUsed = await this.RedisService.getMap(
+			RedisKey.userItemXP(userId),
+		);
 		if (Object.keys(itemInUsed).length > 0) {
 			return {
 				...itemInUsed,

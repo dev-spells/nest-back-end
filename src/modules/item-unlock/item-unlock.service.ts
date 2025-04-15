@@ -7,6 +7,7 @@ import {
 	ITEM_UNLOCK_CHATBOT_ID,
 	ITEM_UNLOCK_SOLUTION_ID,
 } from "src/constants/item";
+import { RedisKey } from "src/constants/redis-key";
 import { Item } from "src/entities/item.entity";
 import { UserItem } from "src/entities/user-item.entity";
 import { UserLessonProgress } from "src/entities/user-lessson-progress.entity";
@@ -36,7 +37,7 @@ export class ItemUnlockService {
 			itemId !== ITEM_UNLOCK_SOLUTION_ID &&
 			itemId !== ITEM_UNLOCK_CHATBOT_ID
 		) {
-			throw new BadRequestException("Invalid item ID");
+			throw new BadRequestException(ITEM_ERRORS.NOT_FOUND);
 		}
 		return await this.itemRepository.save({
 			id: ITEM_UNLOCK_SOLUTION_ID,
@@ -74,7 +75,7 @@ export class ItemUnlockService {
 		}
 
 		const rawData = await this.redisService.getMap(
-			`user:${userId}:item-unlock`,
+			RedisKey.userItemUnlock(userId),
 		);
 		const data = convertToMapData(rawData);
 		const key = itemId.toString();
@@ -89,7 +90,7 @@ export class ItemUnlockService {
 
 		data[key].push(lessonId);
 		const redisData = parseToRedisData(data);
-		this.redisService.setMap(`user:${userId}:item-unlock`, redisData, 0);
+		this.redisService.setMap(RedisKey.userItemUnlock(userId), redisData, 0);
 
 		this.userItemRepository.save({
 			userId: userId,
@@ -121,7 +122,7 @@ export class ItemUnlockService {
 		}
 
 		const rawData = await this.redisService.getMap(
-			`user:${userId}:item-unlock`,
+			RedisKey.userItemUnlock(userId),
 		);
 		const data = convertToMapData(rawData);
 		const key = itemId.toString();
