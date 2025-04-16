@@ -1,10 +1,17 @@
-import { Controller, Get } from "@nestjs/common";
+import { Body, Controller, Patch } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 
-import { ApiTags } from "@nestjs/swagger";
+import {
+	ApiBearerAuth,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+} from "@nestjs/swagger";
 
-import { Public } from "src/decorators/public-route";
+import { Role } from "src/constants/role.enum";
+import { Roles } from "src/decorators/role-route";
 
+import { UpdateItemProtectStreakDto } from "./dto/update-item-protect-streak.dto";
 import { ItemProtectStreakService } from "./item-protect-streak.service";
 
 @ApiTags("item-protect-streak")
@@ -19,11 +26,17 @@ export class ItemProtectStreakController {
 	})
 	async handleCron() {
 		console.log("Running cron job to protect streaks...");
+		await this.itemProtectStreakService.handleCron();
 	}
 
-	@Public()
-	@Get()
-	async getAll() {
-		return await this.itemProtectStreakService.handleCron();
+	@Roles(Role.ADMIN)
+	@ApiOperation({ summary: "Upadte item protect streak - ADMIN" })
+	@ApiOkResponse()
+	@ApiBearerAuth()
+	@Patch()
+	async update(@Body() updateItemProtectStreakDto: UpdateItemProtectStreakDto) {
+		return await this.itemProtectStreakService.update(
+			updateItemProtectStreakDto,
+		);
 	}
 }
