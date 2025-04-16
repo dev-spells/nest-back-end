@@ -1,7 +1,9 @@
-import { Controller } from "@nestjs/common";
+import { Controller, Get } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 
 import { ApiTags } from "@nestjs/swagger";
+
+import { Public } from "src/decorators/public-route";
 
 import { ItemProtectStreakService } from "./item-protect-streak.service";
 
@@ -12,8 +14,16 @@ export class ItemProtectStreakController {
 		private readonly itemProtectStreakService: ItemProtectStreakService,
 	) {}
 
-	@Cron("59 23 * * *")
+	@Cron("0 0 * * *", {
+		timeZone: "UTC",
+	})
 	async handleCron() {
 		console.log("Running cron job to protect streaks...");
+	}
+
+	@Public()
+	@Get()
+	async getAll() {
+		return await this.itemProtectStreakService.handleCron();
 	}
 }
