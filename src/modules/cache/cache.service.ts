@@ -54,4 +54,20 @@ export class RedisService {
 	async delMapField(key: string, field: string): Promise<void> {
 		await this.redisClient.hdel(key, field);
 	}
+
+	async getKeys(pattern: string) {
+		const keys: string[] = [];
+		let cursor = "0";
+
+		do {
+			const [nextCursor, result] = await this.redisClient.scan(
+				cursor,
+				"MATCH",
+				pattern,
+			);
+			cursor = nextCursor;
+			keys.push(...result);
+		} while (cursor !== "0");
+		return keys;
+	}
 }
