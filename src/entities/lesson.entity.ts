@@ -5,6 +5,7 @@ import {
 	Entity,
 	JoinColumn,
 	ManyToOne,
+	OneToMany,
 	OneToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
@@ -14,6 +15,8 @@ import { Chapter } from "./chapter.entity";
 import { CodingExercise } from "./coding-exercise.entity";
 import { MultipleChoiceExercise } from "./multiple-choice-exercise.entity";
 import { QuizExercise } from "./quiz-exercise.entity";
+import { SpellBook } from "./spellbook.entity";
+import { UserLessonProgress } from "./user-lessson-progress.entity";
 
 export enum LessonDifficulty {
 	EASY = "EASY",
@@ -80,4 +83,10 @@ export class Lesson {
 
 	@Column({ nullable: true })
 	quizExerciseId: number | null;
+
+	@OneToMany(() => UserLessonProgress, progress => progress.lesson)
+	userLessonProgress: UserLessonProgress[];
+
+	@OneToOne(() => SpellBook, spellBook => spellBook.Lesson)
+	spellBook: SpellBook;
 }
