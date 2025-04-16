@@ -11,6 +11,8 @@ import { UserStreak } from "src/entities/user-streak.entity";
 
 import { RedisService } from "../cache/cache.service";
 
+import { UpdateItemProtectStreakDto } from "./dto/update-item-protect-streak.dto";
+
 @Injectable()
 export class ItemProtectStreakService {
 	constructor(
@@ -24,6 +26,13 @@ export class ItemProtectStreakService {
 		private userStreakRepository: Repository<UserStreak>,
 		private redisService: RedisService,
 	) {}
+
+	async update(updateItemProtectStreakDto: UpdateItemProtectStreakDto) {
+		return await this.itemRepository.save({
+			id: ITEM_PROTECT_DAILY_STREAK_ID,
+			...updateItemProtectStreakDto,
+		});
+	}
 
 	async handleCron() {
 		const yesterday = new Date();
@@ -51,9 +60,9 @@ export class ItemProtectStreakService {
 		inactiveUsersIds = await this.checkUserProtectItem(inactiveUsersIds);
 		console.log("database user item filter", inactiveUsersIds);
 
-		const formatedInactiveUsersIds = inactiveUsers.map(user => {
+		const formatedInactiveUsersIds = inactiveUsersIds.map(user => {
 			return {
-				userId: user.userId,
+				userId: user,
 				curDailyStreak: 0,
 			};
 		});
