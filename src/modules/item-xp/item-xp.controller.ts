@@ -18,7 +18,7 @@ import { UseXPPotionResponseDto } from "./dto/reponse-item-xp.dto";
 import { UpdateItemXPDto } from "./dto/update-item-xp.dto";
 import { ItemXpService } from "./item-xp.service";
 
-@ApiTags("item-xp")
+@ApiTags("Item-xp")
 @Controller("item-xp")
 export class ItemXpController {
 	constructor(private readonly itemXpService: ItemXpService) {}

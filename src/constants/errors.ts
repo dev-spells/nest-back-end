@@ -49,3 +49,10 @@ export const ITEM_ERRORS = {
 	ALREADY_IN_USE: "Item is already in use",
 	ALREADY_FINISH: "User already finished this chapter",
 } as const;
+
+export const SHOP_ERRORS = {
+	NOT_FOUND: "Item not found in shop",
+	ALREADY_EXISTS: "Item already exists in shop",
+	NOT_ENOUGH_MONEY: "Not enough money to buy this item",
+	NOT_ENOUGH_ITEM: "Not enough quantity of item",
+} as const;

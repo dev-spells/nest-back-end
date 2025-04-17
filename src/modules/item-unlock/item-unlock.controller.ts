@@ -10,7 +10,7 @@ import { UseItemUnlockDto } from "./dto/create-item-unlock";
 import { UpdateItemUnlockDto } from "./dto/update-item-unlock.dto";
 import { ItemUnlockService } from "./item-unlock.service";
 
-@ApiTags("item-unlock")
+@ApiTags("Item-unlock")
 @Controller("item-unlock")
 export class ItemUnlockController {
 	constructor(private readonly itemUnlockService: ItemUnlockService) {}
