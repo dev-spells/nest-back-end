@@ -13,7 +13,7 @@ import { Role } from "./../../constants/role.enum";
 import { ItemResponse } from "./dto/respose-item.dto";
 import { ItemService } from "./item.service";
 
-@ApiTags("item")
+@ApiTags("Item")
 @Controller("item")
 export class ItemController {
 	constructor(private readonly itemService: ItemService) {}

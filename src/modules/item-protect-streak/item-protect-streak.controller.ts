@@ -14,7 +14,7 @@ import { Roles } from "src/decorators/role-route";
 import { UpdateItemProtectStreakDto } from "./dto/update-item-protect-streak.dto";
 import { ItemProtectStreakService } from "./item-protect-streak.service";
 
-@ApiTags("item-protect-streak")
+@ApiTags("Item-protect-streak")
 @Controller("item-protect-streak")
 export class ItemProtectStreakController {
 	constructor(
