@@ -1,5 +1,10 @@
-import { Expose } from "class-transformer";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+	Column,
+	Entity,
+	JoinColumn,
+	ManyToOne,
+	PrimaryGeneratedColumn,
+} from "typeorm";
 
 import { CodingExercise } from "./coding-exercise.entity";
 
@@ -14,11 +19,15 @@ export class CodingExerciseSnippet {
 	@Column({ type: "text" })
 	snippet: string;
 
-	@Column({ type: "text" })
+	@Column({ type: "text", nullable: true })
 	solutionSnippet: string;
+
+	@Column()
+	codingExerciseId: number;
 
 	@ManyToOne(() => CodingExercise, codingExercise => codingExercise.snippets, {
 		onDelete: "CASCADE",
 	})
+	@JoinColumn({ name: "codingExerciseId" })
 	codingExercise: CodingExercise;
 }

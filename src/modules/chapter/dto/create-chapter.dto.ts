@@ -6,22 +6,29 @@ import {
 	IsArray,
 	IsNotEmpty,
 	IsNumber,
-	Matches,
 	ValidateNested,
 } from "class-validator";
 
 export class CreateChapterDto {
 	@ApiProperty({
-		description:
-			'Chapter name must start with a number followed by text (e.g. "1.Introduction")',
-		example: "1.Introduction",
+		description: "ID of the course to which the chapter belongs",
+		example: 1,
 	})
 	@IsNotEmpty()
-	@Matches(/^[0-9]+\.[a-zA-Z0-9]+$/, {
-		message:
-			'Name must start with a number followed by a dot and text (e.g. "1.Introduction")',
+	courseId: number;
+
+	@ApiProperty({
+		example: "Introduction",
 	})
+	@IsNotEmpty()
 	name: string;
+
+	@IsNotEmpty()
+	@ApiProperty({
+		description: "order of the chapter in the course",
+		example: 1,
+	})
+	pos: number;
 }
 
 export class CreateBatchChaptersDto {
@@ -36,9 +43,9 @@ export class CreateBatchChaptersDto {
 	@ApiProperty({
 		description: "List of chapters to be created",
 		example: [
-			{ name: "1.Introduction" },
-			{ name: "2.Fundamentals" },
-			{ name: "3.Advanced" },
+			{ name: "Introduction" },
+			{ name: "Fundamentals" },
+			{ name: "Advanced" },
 		],
 	})
 	@IsArray()

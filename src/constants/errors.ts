@@ -33,9 +33,26 @@ export const LESSON_ERRORS = {
 	NOT_FOUND: "Lesson not found",
 	INVALID_EXERCISE: "Invalid exercise data",
 	MORE_THAN_ONE_EXERCISE: "Only one exercise type must be provided",
+	ALREADY_SUBMITTED: "User has already submitted this lesson",
 } as const;
 
 export const COURSE_ERRORS = {
 	NOT_FOUND: "Course not found",
 	ALREADY_EXISTS: "Course with this title already exists",
+} as const;
+
+export const ITEM_ERRORS = {
+	NOT_FOUND: "Item not found",
+	ALREADY_EXISTS: "Item with this title already exists",
+	ALREADY_OWNED: "You already own this item",
+	NOT_OWNED: "You don't own this item",
+	ALREADY_IN_USE: "Item is already in use",
+	ALREADY_FINISH: "User already finished this chapter",
+} as const;
+
+export const SHOP_ERRORS = {
+	NOT_FOUND: "Item not found in shop",
+	ALREADY_EXISTS: "Item already exists in shop",
+	NOT_ENOUGH_MONEY: "Not enough money to buy this item",
+	NOT_ENOUGH_ITEM: "Not enough quantity of item",
 } as const;

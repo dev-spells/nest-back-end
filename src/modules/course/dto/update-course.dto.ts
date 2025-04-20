@@ -12,9 +12,9 @@ export class UpdateCourseDto {
 
 	@IsOptional()
 	@ApiProperty({ required: false })
-	icon_url?: string;
+	iconUrl?: string;
 
 	@IsOptional()
 	@ApiProperty({ required: false })
-	is_public?: boolean;
+	isPublic?: boolean;
 }

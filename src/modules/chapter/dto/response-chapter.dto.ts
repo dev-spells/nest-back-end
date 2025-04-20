@@ -14,11 +14,13 @@ export class ResponseChapter {
 	@ApiProperty()
 	name: string;
 	@ApiProperty()
-	created_at: Date;
+	createdAt: Date;
 	@ApiProperty()
-	updated_at: Date;
+	updatedAt: Date;
 	@ApiProperty()
 	courseId: number;
+	@ApiProperty()
+	pos: number;
 	@ApiProperty({ type: [Lesson] })
 	lessons: Lesson[];
 }

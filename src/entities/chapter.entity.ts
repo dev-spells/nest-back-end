@@ -3,11 +3,13 @@ import {
 	CreateDateColumn,
 	Entity,
 	ManyToOne,
+	OneToMany,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from "typeorm";
 
 import { Course } from "./course.entity";
+import { Lesson } from "./lesson.entity";
 
 @Entity()
 export class Chapter {
@@ -17,12 +19,18 @@ export class Chapter {
 	@Column({ type: "varchar" })
 	name: string;
 
+	@Column({ type: "float", nullable: true })
+	pos: number;
+
 	@CreateDateColumn()
-	created_at: Date;
+	createdAt: Date;
 
 	@UpdateDateColumn()
-	updated_at: Date;
+	updatedAt: Date;
 
 	@ManyToOne(() => Course, course => course.chapters, { onDelete: "CASCADE" })
 	course: Course;
+
+	@OneToMany(() => Lesson, lesson => lesson.chapter)
+	lessons: Lesson[];
 }

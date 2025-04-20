@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsNotEmpty, IsString, Matches } from "class-validator";
+import { IsNotEmpty, IsString, Matches } from "class-validator";
 
 export class CreateCourseDto {
 	@IsString()
@@ -11,17 +11,17 @@ export class CreateCourseDto {
 	title: string;
 
 	@IsString()
-	@ApiProperty()
 	@IsNotEmpty()
+	@ApiProperty()
 	@Matches(/^[a-zA-Z0-9\s]+$/, {
 		message: "Description must not contain special characters",
 	})
 	description: string;
 
 	@ApiProperty({ nullable: true })
-	icon_url: string;
+	iconUrl: string;
 
 	@ApiProperty()
 	@IsNotEmpty()
-	is_public: boolean;
+	isPublic: boolean;
 }

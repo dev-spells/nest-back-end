@@ -41,12 +41,11 @@ export class SpellBookService {
 		return await this.spellBookRepository.findOneBy({ id });
 	}
 
-	async update(lessonId: number, updateSpellBookDto: UpdateSpellBookDto) {
-		const { id, name, content } = updateSpellBookDto;
+	async update(id: number, updateSpellBookDto: UpdateSpellBookDto) {
+		const { name, content } = updateSpellBookDto;
 		return await this.spellBookRepository.update(id, {
 			name,
 			content,
-			lessonId,
 		});
 	}
 

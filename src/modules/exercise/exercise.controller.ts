@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Param, Patch, Post } from "@nestjs/common";
 
 import {
 	ApiBearerAuth,
+	ApiBody,
 	ApiExcludeEndpoint,
 	ApiNotFoundResponse,
 	ApiOkResponse,
@@ -14,6 +15,7 @@ import { Roles } from "src/decorators/role-route";
 
 import {
 	UpdateCodingExerciseDto,
+	UpdateCodingSnippetDto,
 	UpdateMultipleChoiceExerciseDto,
 	UpdateQuizExerciseDto,
 } from "./dto/update-exercise.dto";
@@ -90,9 +92,27 @@ export class ExerciseController {
 	@Patch("coding-snippet/:id")
 	async updateCodingSnippet(
 		@Param("id") id: number,
-		@Body() updateCodingExerciseDto: UpdateCodingExerciseDto,
+		@Body() updateCodingSnippetDto: UpdateCodingSnippetDto,
 	) {
-		return await this.codingExerciseService.update(id, updateCodingExerciseDto);
+		return await this.codingExerciseService.updateSnippet(
+			id,
+			updateCodingSnippetDto,
+		);
+	}
+
+	@ApiOperation({ summary: "Update multiple coding snippets - ADMIN" })
+	@ApiNotFoundResponse({ description: "Exercise not found" })
+	@ApiOkResponse({ description: "Exercise updated successfully" })
+	@ApiBody({ type: [UpdateCodingSnippetDto] })
+	@ApiBearerAuth()
+	@Roles(Role.ADMIN)
+	@Patch("coding-snippet")
+	async updateBatchCodingSnippets(
+		@Body() updateBatchCodingSnippetsDto: UpdateCodingSnippetDto[],
+	) {
+		return await this.codingExerciseService.updateBatchSnippets(
+			updateBatchCodingSnippetsDto,
+		);
 	}
 
 	@ApiOperation({ summary: "Delete a coding snippet exercise - ADMIN" })

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class UpdateMultipleChoiceExerciseDto {
 	@IsOptional()
@@ -54,4 +54,8 @@ export class UpdateCodingSnippetDto {
 	@IsString()
 	@ApiProperty({ required: false })
 	fileName?: string;
+
+	@IsNotEmpty()
+	@ApiProperty({ required: false })
+	codingExerciseId?: number;
 }

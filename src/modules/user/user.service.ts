@@ -7,6 +7,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
 import { USER_ERRORS } from "src/constants/errors";
+import { UserStreak } from "src/entities/user-streak.entity";
 import { hashPassword } from "src/utils/handle-password.util";
 
 import { User, UserRole } from "../../entities/user.entity";
@@ -21,6 +22,8 @@ export class UserService {
 	constructor(
 		@InjectRepository(User)
 		private userRepository: Repository<User>,
+		@InjectRepository(UserStreak)
+		private userStreakRepository: Repository<UserStreak>,
 		private redisService: RedisService,
 	) {}
 
@@ -42,6 +45,9 @@ export class UserService {
 			gems: 0,
 			timezone: "UTC",
 			role: UserRole.USER,
+		});
+		this.userStreakRepository.save({
+			userId: user.id,
 		});
 
 		return await this.userRepository.save(user);

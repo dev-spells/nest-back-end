@@ -78,6 +78,7 @@ export class LessonService {
 			};
 		} catch (error) {
 			if (error instanceof QueryFailedError) {
+				console.log(error);
 				throw new BadRequestException(
 					"Invalid chapter ID or exercise data or spellbook data",
 				);
@@ -103,12 +104,14 @@ export class LessonService {
 				"codingExercise",
 				"quizExercise",
 				"multipleChoiceExercise",
+				"spellBook",
 			],
 			where: { id },
 			relations: {
 				codingExercise: true,
 				quizExercise: true,
 				multipleChoiceExercise: true,
+				spellBook: true,
 			},
 		});
 		if (!lesson) {
@@ -130,6 +133,7 @@ export class LessonService {
 			},
 			quizExercise: lesson?.quizExercise,
 			multipleChoiceExercise: lesson?.multipleChoiceExercise,
+			spellBook: lesson?.spellBook,
 		};
 	}
 	async update(id: number, updateLessonDto: UpdateLessonDto) {

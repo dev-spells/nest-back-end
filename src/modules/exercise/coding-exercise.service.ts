@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 
 import { EXERCISE_ERRORS } from "src/constants/errors";
 import { CodingExercise } from "src/entities/coding-exercise.entity";
@@ -25,7 +25,7 @@ export class CodingExerciseService {
 
 		const savedCodingExercise = await this.codingExerciseRepository.save({
 			language,
-			correctAnswer: answer,
+			answer,
 		});
 
 		const snippets = await this.codingExerciseSnippetRepository.save(
@@ -56,7 +56,7 @@ export class CodingExerciseService {
 			throw new NotFoundException(EXERCISE_ERRORS.NOT_FOUND);
 		}
 		return await this.codingExerciseRepository.update(id, {
-			correctAnswer: answer,
+			answer: answer,
 			language,
 		});
 	}
@@ -77,6 +77,31 @@ export class CodingExerciseService {
 			solutionSnippet,
 			fileName,
 		});
+	}
+
+	async updateBatchSnippets(
+		updateBatchCodingSnippetsDto: UpdateCodingSnippetDto[],
+	) {
+		const codingExerciseId = updateBatchCodingSnippetsDto[0].codingExerciseId;
+		const codingSnippets = await this.codingExerciseSnippetRepository.find({
+			where: { codingExerciseId: codingExerciseId },
+		});
+
+		const idsToDelete = codingSnippets
+			.filter(
+				snippet =>
+					!updateBatchCodingSnippetsDto.some(
+						updateSnippet => updateSnippet.id === snippet.id,
+					),
+			)
+			.map(snippet => snippet.id);
+		if (idsToDelete.length > 0) {
+			await this.codingExerciseSnippetRepository.delete(idsToDelete);
+		}
+
+		return await this.codingExerciseSnippetRepository.save(
+			updateBatchCodingSnippetsDto,
+		);
 	}
 
 	async deleteExercise(id: number) {
