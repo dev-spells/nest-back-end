@@ -24,6 +24,7 @@ import { UserModule } from "./modules/user/user.module";
 import { UserSubmissionModule } from "./modules/user-submission/user-submission.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
 	imports: [
@@ -58,6 +59,7 @@ import { AppService } from "./app.service";
 		ItemModule,
 		ItemUnlockModule,
 		ItemProtectStreakModule,
+		NotificationModule,
 	],
 	controllers: [AppController],
 	providers: [
