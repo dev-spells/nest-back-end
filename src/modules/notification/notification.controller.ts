@@ -43,6 +43,7 @@ export class NotificationController {
 	getAll() {
 		this.notificationService.pushToUser(
 			"13558ca3-d69e-40f9-b2f5-5462e8fc6f08",
+
 			{
 				type: "notification",
 				data: "hello world",
