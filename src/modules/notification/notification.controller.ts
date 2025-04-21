@@ -1,4 +1,11 @@
-import { Controller, Get, MessageEvent, Param, Sse } from "@nestjs/common";
+import {
+	Controller,
+	Get,
+	MessageEvent,
+	Param,
+	Post,
+	Sse,
+} from "@nestjs/common";
 import { Observable, Subscriber } from "rxjs";
 
 import { Public } from "src/decorators/public-route";
@@ -32,10 +39,10 @@ export class NotificationController {
 	}
 
 	@Public()
-	@Get()
+	@Post(":id")
 	getAll() {
 		this.notificationService.pushToUser(
-			"ed1fec91-a425-4083-aa58-03ecc1b3419c",
+			"13558ca3-d69e-40f9-b2f5-5462e8fc6f08",
 			{
 				type: "notification",
 				data: "hello world",
