@@ -1,8 +1,8 @@
-import jwt from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 
-export function extractJwtPayload(token: string) {
+export function extractJwtPayload(token: string, secret: string) {
 	try {
-		return jwt.decode(token);
+		return jwt.verify(token, secret) as { id: string; role: string };
 	} catch {
 		return null;
 	}

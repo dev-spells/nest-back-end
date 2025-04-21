@@ -6,11 +6,14 @@ import {
 	Post,
 	Query,
 	Sse,
+	UnauthorizedException,
 } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { Observable, Subscriber } from "rxjs";
 
-import { ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
+import { ApiOperation } from "@nestjs/swagger";
 
+import { TOKEN_ERRORS } from "src/constants/errors";
 import { Public } from "src/decorators/public-route";
 import { extractJwtPayload } from "src/utils/extract-access-token.util";
 
@@ -19,13 +22,20 @@ import { ObserverStore } from "./notification-observer.store";
 
 @Controller("notification")
 export class NotificationController {
-	constructor(private readonly notificationService: NotificationService) {}
+	constructor(
+		private readonly notificationService: NotificationService,
+		private readonly configService: ConfigService,
+	) {}
 
 	@ApiOperation({ summary: "Connect to sse stream notifications" })
-	@ApiBearerAuth()
-	@Sse("sse")
-	sse(@Query("token") token: string): Observable<MessageEvent> {
-		const user = extractJwtPayload(token);
+	@Public()
+	@Sse("sse/:token")
+	sse(@Param("token") token: string): Observable<MessageEvent> {
+		const secret = this.configService.get("JWT_SECRET");
+		const user = extractJwtPayload(token, secret);
+		if (!user) {
+			throw new UnauthorizedException(TOKEN_ERRORS.INVALID_ACCESS_TOKEN);
+		}
 
 		return new Observable((subscriber: Subscriber<MessageEvent>) => {
 			console.log(`User ${user.id} connected to SSE`);
