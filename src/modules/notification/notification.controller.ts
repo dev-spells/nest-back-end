@@ -1,10 +1,8 @@
 import {
 	Controller,
-	Get,
 	MessageEvent,
 	Param,
 	Post,
-	Query,
 	Sse,
 	UnauthorizedException,
 } from "@nestjs/common";
@@ -44,7 +42,14 @@ export class NotificationController {
 				data: "hello world",
 			});
 
+			const heartbeatInterval = setInterval(() => {
+				ObserverStore.push(user.id, {
+					type: "heartbeat",
+					timestamp: Date.now(),
+				});
+			}, 25000);
 			subscriber.add(() => {
+				clearInterval(heartbeatInterval);
 				ObserverStore.remove(user.id);
 				console.log(`User ${user.id} disconnected from SSE`);
 			});
