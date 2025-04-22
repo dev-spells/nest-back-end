@@ -131,6 +131,7 @@ export class ItemProtectStreakService {
 			userItems.map(userItem => userItem.userId),
 			{
 				...NOTIFY_TYPE.USE_PROTECT_DAILY_STREAK,
+				itemId: ITEM_PROTECT_DAILY_STREAK_ID,
 			},
 		);
 

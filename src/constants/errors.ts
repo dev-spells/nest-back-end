@@ -39,6 +39,7 @@ export const LESSON_ERRORS = {
 export const COURSE_ERRORS = {
 	NOT_FOUND: "Course not found",
 	ALREADY_EXISTS: "Course with this title already exists",
+	ALREADY_FINISH: "User already finished this course",
 } as const;
 
 export const ITEM_ERRORS = {

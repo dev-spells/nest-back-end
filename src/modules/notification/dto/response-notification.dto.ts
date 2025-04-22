@@ -8,19 +8,18 @@ export class CourseInfo {
 	title: string;
 
 	@ApiProperty()
-	description: string;
-
-	@ApiProperty()
 	iconUrl: string;
+}
+
+export class ItemInfo {
+	@ApiProperty()
+	id: number;
 
 	@ApiProperty()
-	isPublic: boolean;
+	name: string;
 
 	@ApiProperty()
-	createdAt: Date;
-
-	@ApiProperty()
-	updatedAt: Date;
+	imageUrl: string;
 }
 
 export class NotificationResponse {
@@ -44,4 +43,7 @@ export class NotificationResponse {
 
 	@ApiProperty({ type: () => CourseInfo, nullable: true })
 	course: CourseInfo | null;
+
+	@ApiProperty({ type: () => ItemInfo, nullable: true })
+	item: ItemInfo | null;
 }

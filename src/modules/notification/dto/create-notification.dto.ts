@@ -9,4 +9,7 @@ export class CreateNotificationDto {
 
 	@ApiProperty()
 	courseId?: number | null;
+
+	@ApiProperty()
+	itemId?: number | null;
 }

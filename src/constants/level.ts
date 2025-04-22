@@ -70,6 +70,8 @@ export const LEVELS = [
 	{ level: 60, expToLevelUp: 91500 },
 ];
 
+export const EXP_FOR_FINISH_COURSE = 4000;
+
 export const DIFFICULTY_REWARDS = {
 	EASY: { exp: { min: 100, max: 250 }, gems: { min: 1, max: 2 } },
 	MEDIUM: { exp: { min: 200, max: 350 }, gems: { min: 3, max: 6 } },

@@ -1,7 +1,10 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { runInThisContext } from "vm";
 
 import {
 	COURSE_ERRORS,
@@ -9,6 +12,7 @@ import {
 	LESSON_ERRORS,
 	USER_ERRORS,
 } from "src/constants/errors";
+import { EXP_FOR_FINISH_COURSE } from "src/constants/level";
 import { NOTIFY_TYPE } from "src/constants/notify-type";
 import { RedisKey } from "src/constants/redis-key";
 import { CodingExercise } from "src/entities/coding-exercise.entity";
@@ -87,6 +91,9 @@ export class UserSubmissionService {
 					userId,
 					courseId,
 				});
+			if (userCourseCompletion) {
+				throw new BadRequestException(COURSE_ERRORS.ALREADY_FINISH);
+			}
 			if (!userCourseCompletion) {
 				await this.userCourseCompletionRepository.insert({
 					userId,
@@ -101,9 +108,24 @@ export class UserSubmissionService {
 				courseId: courseId,
 			});
 
-			return true;
+			const userStats = calculateLevel(
+				user.currentExp,
+				user.level,
+				EXP_FOR_FINISH_COURSE,
+			);
+			await this.userRepository.update(userId, {
+				currentExp: userStats.curExp,
+				level: userStats.curLevel,
+				expToLevelUp: userStats.expToLevelUp,
+				borderUrl: userStats.rankBorder,
+				rankTitle: userStats.rankTitle,
+			});
+			return {
+				...userStats,
+				expGained: EXP_FOR_FINISH_COURSE,
+			};
 		}
-		return false;
+		return null;
 	}
 
 	async handleSubmissionLogic(

@@ -1,6 +1,7 @@
 import { Body, Controller, Param, Post } from "@nestjs/common";
 
 import {
+	ApiBadRequestResponse,
 	ApiBearerAuth,
 	ApiCreatedResponse,
 	ApiNotFoundResponse,
@@ -12,7 +13,10 @@ import {
 import { User } from "src/decorators/current-user";
 
 import { CreateUserSubmissionDto } from "./dto/create-user-submission.dto";
-import { SubmitLessonResponseDto } from "./dto/response-user-submission.dto";
+import {
+	FinishCourseReponseDto,
+	SubmitLessonResponseDto,
+} from "./dto/response-user-submission.dto";
 import { UserSubmissionService } from "./user-submission.service";
 
 @ApiTags("User Submission")
@@ -37,7 +41,11 @@ export class UserSubmissionController {
 
 	@ApiOperation({ summary: "Check if course is complete" })
 	@ApiBearerAuth()
-	@ApiOkResponse()
+	@ApiOkResponse({
+		type: FinishCourseReponseDto,
+	})
+	@ApiBadRequestResponse({ description: "User already finished course" })
+	@ApiNotFoundResponse({ description: "User/Course not found" })
 	@Post("course/:courseId")
 	async isCourseComplete(
 		@User() user: any,

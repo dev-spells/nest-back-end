@@ -5,6 +5,7 @@ import { Repository } from "typeorm";
 import { Notification } from "src/entities/notification.entity";
 
 import { CreateNotificationDto } from "./dto/create-notification.dto";
+import { NotificationResponse } from "./dto/response-notification.dto";
 import { ObserverStore } from "./notification-observer.store";
 
 @Injectable()
@@ -51,12 +52,31 @@ export class NotificationService {
 	}
 
 	async getAll(userId: string) {
-		return await this.notificationRepository.find({
+		return (await this.notificationRepository.find({
+			select: {
+				id: true,
+				userId: true,
+				type: true,
+				message: true,
+				isRead: true,
+				createdAt: true,
+				item: {
+					id: true,
+					name: true,
+					imageUrl: true,
+				},
+				course: {
+					id: true,
+					title: true,
+					iconUrl: true,
+				},
+			},
 			where: { userId: userId },
 			order: { createdAt: "DESC" },
 			relations: {
 				course: true,
+				item: true,
 			},
-		});
+		})) as NotificationResponse[];
 	}
 }

@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 
 import { Course } from "./course.entity";
+import { Item } from "./item.entity";
 import { User } from "./user.entity";
 
 @Entity()
@@ -33,6 +34,13 @@ export class Notification {
 
 	@Column({ default: false })
 	isRead: boolean;
+
+	@Column({ nullable: true })
+	itemId: number | null;
+
+	@ManyToOne(() => Item, { onDelete: "CASCADE" })
+	@JoinColumn({ name: "itemId" })
+	item: Item | null;
 
 	@Column({ nullable: true })
 	courseId: number | null;

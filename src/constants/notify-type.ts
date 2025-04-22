@@ -7,6 +7,5 @@ export const NOTIFY_TYPE = {
 		type: "finish_course",
 		message: (courseName: string) =>
 			`You have finished the course ${courseName}`,
-		
 	},
 };
