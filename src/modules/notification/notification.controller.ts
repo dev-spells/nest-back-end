@@ -1,9 +1,9 @@
 import {
 	Controller,
+	Get,
 	MessageEvent,
 	Param,
 	Post,
-	Get,
 	Sse,
 	UnauthorizedException,
 } from "@nestjs/common";
