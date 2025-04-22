@@ -13,7 +13,50 @@ export class NotificationService {
 		@InjectRepository(Notification)
 		private notificationRepository: Repository<Notification>,
 	) {}
-	pushToUser(userId: string, createNotificationDto: CreateNotificationDto) {
+	async pushToUser(
+		userId: string,
+		createNotificationDto: CreateNotificationDto,
+	) {
+		await this.notificationRepository.save({
+			userId: userId,
+			...createNotificationDto,
+		});
+
 		ObserverStore.push(userId, createNotificationDto);
+	}
+
+	async pushToUsers(
+		userIds: string[],
+		createNotificationDto: CreateNotificationDto,
+	) {
+		if (userIds.length === 0) return;
+		console.log("update to users", userIds);
+		await this.notificationRepository.save(
+			userIds.map(userId => ({
+				userId: userId,
+				...createNotificationDto,
+			})),
+		);
+
+		userIds.forEach(userId => {
+			ObserverStore.push(userId, createNotificationDto);
+		});
+	}
+
+	async markAsRead(userId: string) {
+		await this.notificationRepository.update(
+			{ userId: userId },
+			{ isRead: true },
+		);
+	}
+
+	async getAll(userId: string) {
+		return await this.notificationRepository.find({
+			where: { userId: userId },
+			order: { createdAt: "DESC" },
+			relations: {
+				course: true,
+			},
+		});
 	}
 }

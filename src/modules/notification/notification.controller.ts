@@ -3,18 +3,21 @@ import {
 	MessageEvent,
 	Param,
 	Post,
+	Get,
 	Sse,
 	UnauthorizedException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Observable, Subscriber } from "rxjs";
 
-import { ApiOperation } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOkResponse, ApiOperation } from "@nestjs/swagger";
 
 import { TOKEN_ERRORS } from "src/constants/errors";
+import { User } from "src/decorators/current-user";
 import { Public } from "src/decorators/public-route";
 import { extractJwtPayload } from "src/utils/extract-access-token.util";
 
+import { NotificationResponse } from "./dto/response-notification.dto";
 import { NotificationService } from "./notification.service";
 import { ObserverStore } from "./notification-observer.store";
 
@@ -47,7 +50,7 @@ export class NotificationController {
 					type: "heartbeat",
 					timestamp: Date.now(),
 				});
-			}, 25000);
+			}, 30000);
 			subscriber.add(() => {
 				clearInterval(heartbeatInterval);
 				ObserverStore.remove(user.id);
@@ -56,12 +59,27 @@ export class NotificationController {
 		});
 	}
 
+	@ApiOperation({ summary: "Get all notifications" })
+	@ApiBearerAuth()
+	@ApiOkResponse({ type: [NotificationResponse] })
+	@Get()
+	async getAll(@User() user: any) {
+		return await this.notificationService.getAll(user.id);
+	}
+
+	@ApiOperation({ summary: "Mask notification as read" })
+	@ApiBearerAuth()
+	@Post("read")
+	async markAsRead(@User() user: any) {
+		return await this.notificationService.markAsRead(user.id);
+	}
+
 	@Public()
 	@Post(":id")
 	push(@Param("id") id: string) {
 		this.notificationService.pushToUser(id, {
 			type: "notification",
-			data: "hello world",
+			message: "hello world",
 		});
 	}
 }

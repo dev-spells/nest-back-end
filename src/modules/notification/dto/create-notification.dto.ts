@@ -5,5 +5,8 @@ export class CreateNotificationDto {
 	type: string;
 
 	@ApiProperty()
-	data: any;
+	message: any;
+
+	@ApiProperty()
+	courseId?: number | null;
 }

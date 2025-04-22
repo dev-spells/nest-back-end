@@ -1,14 +1,18 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { runInThisContext } from "vm";
 
 import {
+	COURSE_ERRORS,
 	EXERCISE_ERRORS,
 	LESSON_ERRORS,
 	USER_ERRORS,
 } from "src/constants/errors";
+import { NOTIFY_TYPE } from "src/constants/notify-type";
 import { RedisKey } from "src/constants/redis-key";
 import { CodingExercise } from "src/entities/coding-exercise.entity";
+import { Course } from "src/entities/course.entity";
 import { Lesson } from "src/entities/lesson.entity";
 import { MultipleChoiceExercise } from "src/entities/multiple-choice-exercise.entity";
 import { QuizExercise } from "src/entities/quiz-exercise.entity";
@@ -21,6 +25,8 @@ import {
 	parseToRedisData,
 } from "src/utils/convert-redis.util";
 import { calculateLevel, generateRandomRewards } from "src/utils/levels.util";
+
+import { NotificationService } from "../notification/notification.service";
 
 import { RedisService } from "./../cache/cache.service";
 import { CreateUserSubmissionDto } from "./dto/create-user-submission.dto";
@@ -44,7 +50,10 @@ export class UserSubmissionService {
 		private lessonRepository: Repository<Lesson>,
 		@InjectRepository(UserStreak)
 		private userStreakRepository: Repository<UserStreak>,
+		@InjectRepository(Course)
+		private courseRepository: Repository<Course>,
 		private redisService: RedisService,
+		private notificationService: NotificationService,
 	) {}
 
 	async isCourseComplete(userId: string, courseId: number) {
@@ -52,7 +61,12 @@ export class UserSubmissionService {
 		if (!user) {
 			throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 		}
-
+		const course = await this.courseRepository.findOneBy({
+			id: courseId,
+		});
+		if (!course) {
+			throw new NotFoundException(COURSE_ERRORS.NOT_FOUND);
+		}
 		const numberOfLesson = await this.lessonRepository
 			.createQueryBuilder("lesson")
 			.innerJoin("lesson.chapter", "chapter")
@@ -80,6 +94,13 @@ export class UserSubmissionService {
 					certificateUrl: "www.example.com/certificate",
 				});
 			}
+
+			await this.notificationService.pushToUser(userId, {
+				type: NOTIFY_TYPE.FINISH_COURSE.type,
+				message: NOTIFY_TYPE.FINISH_COURSE.message(course.title),
+				courseId: courseId,
+			});
+
 			return true;
 		}
 		return false;
