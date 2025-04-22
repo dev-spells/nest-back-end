@@ -1,12 +1,18 @@
-import { Body, Controller, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common";
 
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import {
+	ApiBearerAuth,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+} from "@nestjs/swagger";
 
 import { Role } from "src/constants/role.enum";
 import { User } from "src/decorators/current-user";
 import { Roles } from "src/decorators/role-route";
 
 import { UseItemUnlockDto } from "./dto/create-item-unlock";
+import { ResponseCheckItemProtectDto } from "./dto/response-item-protect.dto";
 import { UpdateItemUnlockDto } from "./dto/update-item-unlock.dto";
 import { ItemUnlockService } from "./item-unlock.service";
 
@@ -46,7 +52,10 @@ export class ItemUnlockController {
 			"Check if item unlock solution and chatbot are in use. True if in use",
 	})
 	@ApiBearerAuth()
-	@Post("check/:id")
+	@ApiOkResponse({
+		type: ResponseCheckItemProtectDto,
+	})
+	@Get(":id")
 	async check(
 		@User() user: any,
 		@Param("id") itemId: string,

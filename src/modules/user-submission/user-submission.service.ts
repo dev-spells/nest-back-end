@@ -132,7 +132,7 @@ export class UserSubmissionService {
 		id: string,
 		createUserSubmissionDto: CreateUserSubmissionDto,
 	) {
-		const { lessonId, userAnswer } = createUserSubmissionDto;
+		const { lessonId, userAnswer, freeSolution } = createUserSubmissionDto;
 		const isExist = await this.userLessonProgressRepository.existsBy({
 			userId: id,
 			lessonId: lessonId,
@@ -145,15 +145,14 @@ export class UserSubmissionService {
 		if (!user) {
 			throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 		}
-
-		const itemInUsed = await this.redisService.getMap(`user:${id}:item-xp`);
-
+		const itemInUsed = await this.redisService.getMap(RedisKey.userItemXP(id));
 		if (isExist) {
 			console.log("User already submitted this lesson");
 			return await this.handleUserSubmission(
 				user,
 				lesson,
 				userAnswer,
+				freeSolution,
 				Object.keys(itemInUsed).length > 0
 					? parseInt(itemInUsed.bonus)
 					: undefined,
@@ -164,6 +163,7 @@ export class UserSubmissionService {
 			user,
 			lesson,
 			userAnswer,
+			freeSolution,
 			Object.keys(itemInUsed).length > 0
 				? parseInt(itemInUsed.bonus)
 				: undefined,
@@ -182,8 +182,8 @@ export class UserSubmissionService {
 		if (!userStreak) {
 			await this.userStreakRepository.insert({
 				userId,
-				curDailyStreak: 1,
-				maxDailyStreak: 1,
+				curDailyStreak: isCorrect ? 1 : 0,
+				maxDailyStreak: isCorrect ? 1 : 0,
 				currentCorrectStreak: isCorrect ? 1 : 0,
 				maxCorrectStreak: isCorrect ? 1 : 0,
 			});
@@ -194,28 +194,42 @@ export class UserSubmissionService {
 			where: { userId },
 			order: { createdAt: "DESC" },
 		});
-		if (!lastSubmission) {
-			await this.userStreakRepository.update(userId, {
-				curDailyStreak: 1,
-				maxDailyStreak: 1,
-				currentCorrectStreak: isCorrect ? 1 : 0,
-				maxCorrectStreak: isCorrect ? 1 : 0,
-			});
-			return;
-		}
-
-		const currentDate = new Date();
-		const currentDateStr = currentDate.toISOString().split("T")[0];
-
+		let lastDateStr;
+		let nearestDateWithLastSubmission;
+		let countNumberOfSubmissionInDay;
 		let updatedDailyStreak = userStreak.curDailyStreak;
 		let updatedMaxDailyStreak = userStreak.maxDailyStreak;
-
 		if (lastSubmission) {
-			const lastSubmissionDate = new Date(lastSubmission.createdAt);
-			const lastDateStr = lastSubmissionDate.toISOString().split("T")[0];
+			lastDateStr = lastSubmission.createdAt.toISOString().split("T")[0];
+			countNumberOfSubmissionInDay = await this.userLessonProgressRepository
+				.createQueryBuilder("ulp")
+				.where("ulp.userId = :userId", { userId })
+				.andWhere("CAST(ulp.createdAt AS DATE) = :date", { date: lastDateStr })
+				.getCount();
+		}
 
-			if (lastDateStr !== currentDateStr) {
-				const timeDiff = currentDate.getTime() - lastSubmissionDate.getTime();
+		if (lastSubmission && isCorrect && countNumberOfSubmissionInDay === 1) {
+			nearestDateWithLastSubmission = await this.userLessonProgressRepository
+				.createQueryBuilder("ulp")
+				.where("ulp.userId = :userId", { userId })
+				.andWhere("ulp.createdAt < :lastCreatedAt", {
+					lastCreatedAt: lastSubmission.createdAt,
+				})
+				.andWhere("CAST(ulp.createdAt AS DATE) <> :lastDateStr", {
+					lastDateStr,
+				})
+				.orderBy("ulp.createdAt", "DESC")
+				.getOne();
+			const nearestDateWithLastSubmissionStr =
+				nearestDateWithLastSubmission?.createdAt.toISOString().split("T")[0];
+			const lastSubmissionDate = new Date(lastSubmission.createdAt);
+			if (updatedMaxDailyStreak === 0) {
+				updatedMaxDailyStreak = 1;
+				updatedDailyStreak = 1;
+			} else if (lastDateStr !== nearestDateWithLastSubmissionStr) {
+				const timeDiff =
+					lastSubmissionDate.getTime() -
+					nearestDateWithLastSubmission?.createdAt.getTime();
 				const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
 
 				if (daysDiff === 1) {
@@ -224,22 +238,20 @@ export class UserSubmissionService {
 						updatedMaxDailyStreak,
 						updatedDailyStreak,
 					);
-				} else if (daysDiff > 1) {
+				} else if (daysDiff > 1 && !(await this.isUseProtectItem(userId))) {
 					updatedDailyStreak = 1;
 				}
 			}
-		} else {
-			updatedDailyStreak = 1;
-			updatedMaxDailyStreak = 1;
 		}
 
 		const updatedCorrectStreak = isCorrect
 			? userStreak.currentCorrectStreak + 1
 			: 0;
 
-		const updatedMaxCorrectStreak = isCorrect
-			? Math.max(userStreak.maxCorrectStreak, updatedCorrectStreak)
-			: userStreak.maxCorrectStreak;
+		const updatedMaxCorrectStreak = Math.max(
+			userStreak.maxCorrectStreak,
+			updatedCorrectStreak,
+		);
 
 		await this.userStreakRepository.update(
 			{ userId },
@@ -256,6 +268,7 @@ export class UserSubmissionService {
 		user: User,
 		lesson: Lesson,
 		userAnswer: string,
+		freeSolution,
 		bonus: number = 0,
 		isRedo: boolean = false,
 	) {
@@ -290,7 +303,7 @@ export class UserSubmissionService {
 			const userStats = calculateLevel(
 				user.currentExp,
 				user.level,
-				expGained + expBonus,
+				freeSolution ? 0 : expGained + expBonus,
 			);
 			await this.userRepository.update(user.id, {
 				currentExp: userStats.curExp,
@@ -298,7 +311,7 @@ export class UserSubmissionService {
 				expToLevelUp: userStats.expToLevelUp,
 				borderUrl: userStats.rankBorder,
 				rankTitle: userStats.rankTitle,
-				gems: user.gems + gemsGained,
+				gems: freeSolution ? user.gems : user.gems + gemsGained,
 			});
 			const userLessonProgress = await this.userLessonProgressRepository.save({
 				userId: user.id,
@@ -307,9 +320,9 @@ export class UserSubmissionService {
 			return {
 				userStats: {
 					...userStats,
-					gemsGained,
-					expGained,
-					expBonus,
+					gemsGained: freeSolution ? 0 : gemsGained,
+					expGained: freeSolution ? 0 : expGained,
+					expBonus: freeSolution ? 0 : expBonus,
 				},
 				userLessonProgress,
 				isRedo,
@@ -328,18 +341,29 @@ export class UserSubmissionService {
 		};
 	}
 
+	private async isUseProtectItem(userId: string) {
+		const data = await this.redisService.get(
+			RedisKey.userItemDailyStreak(userId),
+		);
+		if (data) {
+			return true;
+		}
+		return false;
+	}
+
 	private async updateRedis(userId: string, lessonId: number) {
 		const rawData = await this.redisService.getMap(
 			RedisKey.userItemUnlock(userId),
 		);
-		const data = convertToMapData(rawData);
-		for (const key in data) {
-			if (data[key].includes(lessonId)) {
-				data[key] = data[key].filter(lesson => lesson !== lessonId);
+		if (Object.keys(rawData).length > 0) {
+			const data = convertToMapData(rawData);
+			for (const key in data) {
+				if (data[key]?.includes(lessonId)) {
+					data[key] = data[key].filter(lesson => lesson !== lessonId);
+				}
 			}
+			const redisData = parseToRedisData(data);
+			this.redisService.setMap(RedisKey.userItemUnlock(userId), redisData, 0);
 		}
-		const redisData = parseToRedisData(data);
-		console.log(redisData);
-		this.redisService.setMap(RedisKey.userItemUnlock(userId), redisData, 0);
 	}
 }

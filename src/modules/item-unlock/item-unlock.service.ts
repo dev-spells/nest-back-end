@@ -111,6 +111,12 @@ export class ItemUnlockService {
 		) {
 			throw new BadRequestException(ITEM_ERRORS.NOT_FOUND);
 		}
+		const userItem = await this.userItemRepository.findOne({
+			where: {
+				userId: userId,
+				itemId: itemId,
+			},
+		});
 		const userLessonProgress = await this.userLessonProgressRepository.findOne({
 			where: {
 				userId: userId,
@@ -126,9 +132,11 @@ export class ItemUnlockService {
 		);
 		const data = convertToMapData(rawData);
 		const key = itemId.toString();
-		if (data[key].includes(lessonId)) {
+		if (data[key]?.includes(lessonId)) {
 			return true;
 		}
-		return false;
+		return {
+			quantity: userItem?.quantity || 0,
+		};
 	}
 }
