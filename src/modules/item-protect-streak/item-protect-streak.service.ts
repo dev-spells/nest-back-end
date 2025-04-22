@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { In, MoreThan, Repository } from "typeorm";
 
 import { ITEM_PROTECT_DAILY_STREAK_ID } from "src/constants/item";
+import { NOTIFY_TYPE } from "src/constants/notify-type";
 import { RedisKey } from "src/constants/redis-key";
 import { Item } from "src/entities/item.entity";
 import { UserItem } from "src/entities/user-item.entity";
@@ -11,6 +12,7 @@ import { UserStreak } from "src/entities/user-streak.entity";
 
 import { RedisService } from "../cache/cache.service";
 
+import { NotificationService } from "./../notification/notification.service";
 import { UpdateItemProtectStreakDto } from "./dto/update-item-protect-streak.dto";
 
 @Injectable()
@@ -25,6 +27,7 @@ export class ItemProtectStreakService {
 		@InjectRepository(UserStreak)
 		private userStreakRepository: Repository<UserStreak>,
 		private redisService: RedisService,
+		private notificationService: NotificationService,
 	) {}
 
 	async update(updateItemProtectStreakDto: UpdateItemProtectStreakDto) {
@@ -124,7 +127,12 @@ export class ItemProtectStreakService {
 			.andWhere("itemId = :itemId", { itemId: ITEM_PROTECT_DAILY_STREAK_ID })
 			.execute();
 
-		// push notification to user later
+		await this.notificationService.pushToUsers(
+			userItems.map(userItem => userItem.userId),
+			{
+				...NOTIFY_TYPE.USE_PROTECT_DAILY_STREAK,
+			},
+		);
 
 		const userItemsSet = new Set(userItems.map(userItem => userItem.userId));
 		return users.filter(user => !userItemsSet.has(user));

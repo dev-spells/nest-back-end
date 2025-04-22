@@ -7,6 +7,7 @@ import {
 	PrimaryGeneratedColumn,
 } from "typeorm";
 
+import { Course } from "./course.entity";
 import { User } from "./user.entity";
 
 @Entity()
@@ -32,4 +33,11 @@ export class Notification {
 
 	@Column({ default: false })
 	isRead: boolean;
+
+	@Column({ nullable: true })
+	courseId: number | null;
+
+	@ManyToOne(() => Course, { onDelete: "CASCADE" })
+	@JoinColumn({ name: "courseId" })
+	course: Course | null;
 }
