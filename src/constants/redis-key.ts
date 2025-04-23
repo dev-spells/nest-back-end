@@ -5,4 +5,5 @@ export const RedisKey = {
 	verifyEmail: (email: string) => `verification:${email}`,
 	forgotPassword: (email: string) => `forgot-password:${email}`,
 	resetPassword: (email: string) => `password-reset:${email}`,
+	userFreeSolution: (userId: string) => `user:${userId}:free-solution`,
 };

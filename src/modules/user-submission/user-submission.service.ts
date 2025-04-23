@@ -132,7 +132,7 @@ export class UserSubmissionService {
 		id: string,
 		createUserSubmissionDto: CreateUserSubmissionDto,
 	) {
-		const { lessonId, userAnswer, freeSolution } = createUserSubmissionDto;
+		const { lessonId, userAnswer } = createUserSubmissionDto;
 		const isExist = await this.userLessonProgressRepository.existsBy({
 			userId: id,
 			lessonId: lessonId,
@@ -152,7 +152,6 @@ export class UserSubmissionService {
 				user,
 				lesson,
 				userAnswer,
-				freeSolution,
 				Object.keys(itemInUsed).length > 0
 					? parseInt(itemInUsed.bonus)
 					: undefined,
@@ -163,7 +162,6 @@ export class UserSubmissionService {
 			user,
 			lesson,
 			userAnswer,
-			freeSolution,
 			Object.keys(itemInUsed).length > 0
 				? parseInt(itemInUsed.bonus)
 				: undefined,
@@ -268,7 +266,6 @@ export class UserSubmissionService {
 		user: User,
 		lesson: Lesson,
 		userAnswer: string,
-		freeSolution,
 		bonus: number = 0,
 		isRedo: boolean = false,
 	) {
@@ -292,6 +289,14 @@ export class UserSubmissionService {
 		}
 		if (!exercise) {
 			throw new NotFoundException(EXERCISE_ERRORS.NOT_FOUND);
+		}
+
+		let freeSolution = false;
+		const userFreeSolution: string | null = await this.redisService.get(
+			RedisKey.userFreeSolution(user.id),
+		);
+		if (userFreeSolution && JSON.parse(userFreeSolution).includes(lesson.id)) {
+			freeSolution = true;
 		}
 
 		if (userAnswer === exercise.answer && !isRedo) {
@@ -364,6 +369,22 @@ export class UserSubmissionService {
 			}
 			const redisData = parseToRedisData(data);
 			this.redisService.setMap(RedisKey.userItemUnlock(userId), redisData, 0);
+		}
+		const userFreeSolution: string | null = await this.redisService.get(
+			RedisKey.userFreeSolution(userId),
+		);
+		if (userFreeSolution && JSON.parse(userFreeSolution).includes(lessonId)) {
+			const data = JSON.parse(userFreeSolution);
+			const newData = data.filter(lesson => lesson !== lessonId);
+			if (newData.length > 0) {
+				this.redisService.set(
+					RedisKey.userFreeSolution(userId),
+					JSON.stringify(newData),
+					0,
+				);
+			} else {
+				this.redisService.del(RedisKey.userFreeSolution(userId));
+			}
 		}
 	}
 }

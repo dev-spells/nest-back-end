@@ -32,6 +32,19 @@ export class ItemUnlockController {
 		return this.itemUnlockService.update(+itemId, updateItemUnlockDto);
 	}
 
+	@ApiOperation({ summary: "Unlock free solution for the lesson" })
+	@ApiBearerAuth()
+	@Post("free-solution")
+	async freeSolution(
+		@User() user: any,
+		@Body() useItemUnlockDto: UseItemUnlockDto,
+	) {
+		return this.itemUnlockService.freeSolution(
+			user.id,
+			useItemUnlockDto.lessonId,
+		);
+	}
+
 	@ApiOperation({ summary: "Use item unlock solution and chatbot" })
 	@ApiBearerAuth()
 	@Post(":id")

@@ -45,6 +45,32 @@ export class ItemUnlockService {
 		});
 	}
 
+	async freeSolution(userId: string, lessonId: number) {
+		let lessonList: number[] = [];
+
+		const userFreeSolution: string | null = await this.redisService.get(
+			RedisKey.userFreeSolution(userId),
+		);
+		if (userFreeSolution) {
+			try {
+				lessonList = JSON.parse(userFreeSolution);
+			} catch {
+				lessonList = [];
+			}
+		}
+
+		if (!lessonList.includes(lessonId)) {
+			lessonList.push(lessonId);
+			await this.redisService.set(
+				RedisKey.userFreeSolution(userId),
+				JSON.stringify(lessonList),
+				0,
+			);
+		}
+
+		return lessonList;
+	}
+
 	async use(userId: string, itemId: number, lessonId: number) {
 		if (
 			itemId !== ITEM_UNLOCK_SOLUTION_ID &&
