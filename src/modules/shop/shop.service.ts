@@ -149,17 +149,18 @@ export class ShopService {
 		};
 	}
 	async buy(userId: string, itemId: number) {
-		const userItem = await this.userItemRepository.findOne({
+		let userItem = await this.userItemRepository.findOne({
 			where: { userId: userId, itemId: itemId },
 			relations: {
 				user: true,
 			},
 		});
 		if (!userItem) {
-			throw new NotFoundException(ITEM_ERRORS.NOT_FOUND);
-		}
-		if (userItem.quantity <= 0) {
-			throw new BadRequestException(SHOP_ERRORS.NOT_ENOUGH_ITEM);
+			userItem = await this.userItemRepository.save({
+				userId: userId,
+				itemId: itemId,
+				quantity: 0,
+			});
 		}
 		const itemInShop = await this.shopRepository.findOne({
 			where: { itemId: itemId },

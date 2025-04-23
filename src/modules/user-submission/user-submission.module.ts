@@ -11,6 +11,7 @@ import { UserCourseCompletion } from "src/entities/user-course-completion";
 import { UserLessonProgress } from "src/entities/user-lessson-progress.entity";
 import { UserStreak } from "src/entities/user-streak.entity";
 
+import { AchievementModule } from "../achievement/achievement.module";
 import { RedisModule } from "../cache/cache.module";
 import { NotificationModule } from "../notification/notification.module";
 
@@ -32,6 +33,7 @@ import { UserSubmissionService } from "./user-submission.service";
 		]),
 		RedisModule,
 		NotificationModule,
+		AchievementModule,
 	],
 	controllers: [UserSubmissionController],
 	providers: [UserSubmissionService],

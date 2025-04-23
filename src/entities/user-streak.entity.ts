@@ -18,7 +18,7 @@ export class UserStreak {
 	maxDailyStreak: number;
 
 	@Column({ type: "int", default: 0 })
-	currentCorrectStreak: number;
+	curCorrectStreak: number;
 
 	@Column({ type: "int", default: 0 })
 	maxCorrectStreak: number;

@@ -9,8 +9,4 @@ export class CreateUserSubmissionDto {
 	@IsNotEmpty()
 	@ApiProperty({ example: "true" })
 	userAnswer: string;
-
-	// @IsNotEmpty()
-	// @ApiProperty({ example: "false" })
-	// freeSolution: boolean;
 }

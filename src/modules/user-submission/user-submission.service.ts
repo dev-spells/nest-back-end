@@ -30,6 +30,7 @@ import {
 } from "src/utils/convert-redis.util";
 import { calculateLevel, generateRandomRewards } from "src/utils/levels.util";
 
+import { AchievementService } from "../achievement/achievement.service";
 import { NotificationService } from "../notification/notification.service";
 
 import { RedisService } from "./../cache/cache.service";
@@ -58,6 +59,7 @@ export class UserSubmissionService {
 		private courseRepository: Repository<Course>,
 		private redisService: RedisService,
 		private notificationService: NotificationService,
+		private achievementService: AchievementService,
 	) {}
 
 	async isCourseComplete(userId: string, courseId: number) {
@@ -166,12 +168,16 @@ export class UserSubmissionService {
 				? parseInt(itemInUsed.bonus)
 				: undefined,
 		);
-		if (userStats.userLessonProgress) {
-			this.handleUserStreak(user.id, true);
-		} else {
-			this.handleUserStreak(user.id);
-		}
+		this.handleUserStreakAndAchievement(user.id, userStats);
 		return userStats;
+	}
+
+	private async handleUserStreakAndAchievement(userId: string, userStats) {
+		await this.handleUserStreak(
+			userId,
+			userStats.userLessonProgress ? true : false,
+		);
+		this.achievementService.handleUserAchievement(userId);
 	}
 
 	private async handleUserStreak(userId: string, isCorrect: boolean = false) {
@@ -182,7 +188,7 @@ export class UserSubmissionService {
 				userId,
 				curDailyStreak: isCorrect ? 1 : 0,
 				maxDailyStreak: isCorrect ? 1 : 0,
-				currentCorrectStreak: isCorrect ? 1 : 0,
+				curCorrectStreak: isCorrect ? 1 : 0,
 				maxCorrectStreak: isCorrect ? 1 : 0,
 			});
 			return;
@@ -243,7 +249,7 @@ export class UserSubmissionService {
 		}
 
 		const updatedCorrectStreak = isCorrect
-			? userStreak.currentCorrectStreak + 1
+			? userStreak.curCorrectStreak + 1
 			: 0;
 
 		const updatedMaxCorrectStreak = Math.max(
@@ -256,7 +262,7 @@ export class UserSubmissionService {
 			{
 				curDailyStreak: updatedDailyStreak,
 				maxDailyStreak: updatedMaxDailyStreak,
-				currentCorrectStreak: updatedCorrectStreak,
+				curCorrectStreak: updatedCorrectStreak,
 				maxCorrectStreak: updatedMaxCorrectStreak,
 			},
 		);
