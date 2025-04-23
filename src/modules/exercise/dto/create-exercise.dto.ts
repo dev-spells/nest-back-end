@@ -42,7 +42,7 @@ export class CodeSnippet {
 	@ApiProperty()
 	snippet: string;
 
-	@IsNotEmpty()
+	@IsOptional()
 	@IsString()
 	@ApiProperty()
 	solutionSnippet: string;
