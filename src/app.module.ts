@@ -7,6 +7,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "src/auth/auth.module";
 import { JwtAuthGuard } from "src/auth/passport/jwt-auth.guard";
 
+import { AchievementModule } from "./modules/achievement/achievement.module";
 import { RedisModule } from "./modules/cache/cache.module";
 import { ChapterModule } from "./modules/chapter/chapter.module";
 import { CourseModule } from "./modules/course/course.module";
@@ -17,6 +18,7 @@ import { ItemUnlockModule } from "./modules/item-unlock/item-unlock.module";
 import { ItemXpModule } from "./modules/item-xp/item-xp.module";
 import { LessonModule } from "./modules/lesson/lesson.module";
 import { MailModule } from "./modules/mail/mail.module";
+import { NotificationModule } from "./modules/notification/notification.module";
 import { S3Module } from "./modules/s3/s3.module";
 import { ShopModule } from "./modules/shop/shop.module";
 import { SpellBookModule } from "./modules/spell-book/spell-book.module";
@@ -24,7 +26,6 @@ import { UserModule } from "./modules/user/user.module";
 import { UserSubmissionModule } from "./modules/user-submission/user-submission.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
 	imports: [
@@ -60,6 +61,7 @@ import { NotificationModule } from './modules/notification/notification.module';
 		ItemUnlockModule,
 		ItemProtectStreakModule,
 		NotificationModule,
+		AchievementModule,
 	],
 	controllers: [AppController],
 	providers: [

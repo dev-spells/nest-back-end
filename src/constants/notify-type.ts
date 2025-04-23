@@ -8,4 +8,16 @@ export const NOTIFY_TYPE = {
 		message: (courseName: string) =>
 			`You have finished the course ${courseName}`,
 	},
+	DAILY_STREAK: {
+		type: "daily_streak",
+		message: "You have achieved new badge for daily streak",
+	},
+	LESSON_ACHIEVEMENT: {
+		type: "lesson_achievement",
+		message: `You have achieved new badge for lesson`,
+	},
+	CORRECT_STREAK: {
+		type: "correct_streak",
+		message: "You have achieved new badge for correct streak",
+	},
 };

@@ -45,15 +45,17 @@ export class ItemUnlockController {
 		);
 	}
 
-	@ApiOperation({ summary: "Use item unlock solution and chatbot" })
+	@ApiOperation({
+		summary: "Buy and use item unlock solution and chatbot",
+	})
 	@ApiBearerAuth()
-	@Post(":id")
-	async use(
+	@Post("buy-and-use/:id")
+	async buyAndUse(
 		@User() user: any,
 		@Param("id") itemId: string,
 		@Body() useItemUnlockDto: UseItemUnlockDto,
 	) {
-		return this.itemUnlockService.use(
+		return this.itemUnlockService.buyAndUse(
 			user.id,
 			+itemId,
 			useItemUnlockDto.lessonId,
@@ -68,13 +70,28 @@ export class ItemUnlockController {
 	@ApiOkResponse({
 		type: ResponseCheckItemProtectDto,
 	})
-	@Get(":id")
+	@Post("check/:id")
 	async check(
 		@User() user: any,
 		@Param("id") itemId: string,
 		@Body() useItemUnlockDto: UseItemUnlockDto,
 	) {
 		return this.itemUnlockService.check(
+			user.id,
+			+itemId,
+			useItemUnlockDto.lessonId,
+		);
+	}
+
+	@ApiOperation({ summary: "Use item unlock solution and chatbot" })
+	@ApiBearerAuth()
+	@Post(":id")
+	async use(
+		@User() user: any,
+		@Param("id") itemId: string,
+		@Body() useItemUnlockDto: UseItemUnlockDto,
+	) {
+		return this.itemUnlockService.use(
 			user.id,
 			+itemId,
 			useItemUnlockDto.lessonId,
