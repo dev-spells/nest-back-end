@@ -28,6 +28,7 @@ import {
 	convertToMapData,
 	parseToRedisData,
 } from "src/utils/convert-redis.util";
+import { localDate } from "src/utils/convert-time.util";
 import { calculateLevel, generateRandomRewards } from "src/utils/levels.util";
 
 import { AchievementService } from "../achievement/achievement.service";
@@ -181,6 +182,7 @@ export class UserSubmissionService {
 	}
 
 	private async handleUserStreak(userId: string, isCorrect: boolean = false) {
+		console.log(userId, isCorrect);
 		const userStreak = await this.userStreakRepository.findOneBy({ userId });
 
 		if (!userStreak) {
@@ -204,7 +206,9 @@ export class UserSubmissionService {
 		let updatedDailyStreak = userStreak.curDailyStreak;
 		let updatedMaxDailyStreak = userStreak.maxDailyStreak;
 		if (lastSubmission) {
-			lastDateStr = lastSubmission.createdAt.toISOString().split("T")[0];
+			lastDateStr = localDate(lastSubmission.createdAt)
+				.toISOString()
+				.split("T")[0];
 			countNumberOfSubmissionInDay = await this.userLessonProgressRepository
 				.createQueryBuilder("ulp")
 				.where("ulp.userId = :userId", { userId })
@@ -224,8 +228,11 @@ export class UserSubmissionService {
 				})
 				.orderBy("ulp.createdAt", "DESC")
 				.getOne();
-			const nearestDateWithLastSubmissionStr =
-				nearestDateWithLastSubmission?.createdAt.toISOString().split("T")[0];
+			const nearestDateWithLastSubmissionStr = localDate(
+				nearestDateWithLastSubmission?.createdAt,
+			)
+				.toISOString()
+				.split("T")[0];
 			const lastSubmissionDate = new Date(lastSubmission.createdAt);
 			if (updatedMaxDailyStreak === 0) {
 				updatedMaxDailyStreak = 1;
@@ -235,7 +242,7 @@ export class UserSubmissionService {
 					lastSubmissionDate.getTime() -
 					nearestDateWithLastSubmission?.createdAt.getTime();
 				const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
-
+				console.log(daysDiff);
 				if (daysDiff === 1) {
 					updatedDailyStreak += 1;
 					updatedMaxDailyStreak = Math.max(
