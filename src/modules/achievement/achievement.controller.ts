@@ -33,6 +33,6 @@ export class AchievementController {
 	@ApiOkResponse({ type: [AchievementResponseDto] })
 	@Get()
 	async getAchievements(@User() user: any) {
-		return await this.achievementService.getALl(user.id);
+		return await this.achievementService.getAll(user.id);
 	}
 }

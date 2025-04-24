@@ -22,7 +22,7 @@ export class AchievementService {
 		private notificationService: NotificationService,
 	) {}
 
-	async getALl(userId: string) {
+	async getAll(userId: string) {
 		const userAchievements = await this.userAchievementRepository.find({
 			select: {
 				achievementType: true,
@@ -39,8 +39,8 @@ export class AchievementService {
 		});
 		const userStreak = await this.userStreakRepository.findOne({
 			select: {
-				curDailyStreak: true,
-				curCorrectStreak: true,
+				maxDailyStreak: true,
+				maxCorrectStreak: true,
 			},
 			where: { userId },
 		});
@@ -61,9 +61,9 @@ export class AchievementService {
 			if (key === "NUMBER_OF_LESSONS") {
 				currentProgress = userLessonCount;
 			} else if (key === "DAILY_STREAK") {
-				currentProgress = userStreak?.curDailyStreak || 0;
+				currentProgress = userStreak?.maxDailyStreak || 0;
 			} else if (key === "CORRECT_STREAK") {
-				currentProgress = userStreak?.curCorrectStreak || 0;
+				currentProgress = userStreak?.maxCorrectStreak || 0;
 			}
 
 			const userAchievement = userAchievements.find(
@@ -166,8 +166,8 @@ export class AchievementService {
 	) {
 		const userStreak = await this.userStreakRepository.findOne({
 			select: {
-				curDailyStreak: true,
-				curCorrectStreak: true,
+				maxDailyStreak: true,
+				maxCorrectStreak: true,
 			},
 			where: { userId: userID },
 		});
@@ -176,27 +176,35 @@ export class AchievementService {
 
 		let changeDailyStreakFlag = false;
 		let changeCorrectStreakFlag = false;
-		if (userStreak?.curDailyStreak) {
+		if (userStreak?.maxDailyStreak) {
 			for (let i = dailyStreakLevels.length - 1; i >= 0; i--) {
-				if (
-					userStreak.curDailyStreak >= dailyStreakLevels[i].threshold &&
-					userDailyAchievement.achievementName !== dailyStreakLevels[i].name
-				) {
-					userDailyAchievement.achievementName = dailyStreakLevels[i].name;
-					changeDailyStreakFlag = true;
-					break;
+				if (userStreak.maxDailyStreak >= dailyStreakLevels[i].threshold) {
+					if (
+						userDailyAchievement.achievementName !== dailyStreakLevels[i].name
+					) {
+						userDailyAchievement.achievementName = dailyStreakLevels[i].name;
+						changeDailyStreakFlag = true;
+						break;
+					} else {
+						break;
+					}
 				}
 			}
 		}
-		if (userStreak?.curCorrectStreak) {
+		if (userStreak?.maxCorrectStreak) {
 			for (let i = correctStreakLevels.length - 1; i >= 0; i--) {
-				if (
-					userStreak.curCorrectStreak >= correctStreakLevels[i].threshold &&
-					userCorrectAchievement.achievementName !== correctStreakLevels[i].name
-				) {
-					userCorrectAchievement.achievementName = correctStreakLevels[i].name;
-					changeCorrectStreakFlag = true;
-					break;
+				if (userStreak.maxCorrectStreak >= correctStreakLevels[i].threshold) {
+					if (
+						userCorrectAchievement.achievementName !==
+						correctStreakLevels[i].name
+					) {
+						userCorrectAchievement.achievementName =
+							correctStreakLevels[i].name;
+						changeCorrectStreakFlag = true;
+						break;
+					} else {
+						break;
+					}
 				}
 			}
 		}
@@ -233,13 +241,16 @@ export class AchievementService {
 
 		if (countUserLesson) {
 			for (let i = lessonCountLevels.length - 1; i >= 0; i--) {
-				if (
-					countUserLesson >= lessonCountLevels[i].threshold &&
-					userLessonAchievement.achievementName !== lessonCountLevels[i].name
-				) {
-					userLessonAchievement.achievementName = lessonCountLevels[i].name;
-					changeLessonCountFlag = true;
-					break;
+				if (countUserLesson >= lessonCountLevels[i].threshold) {
+					if (
+						userLessonAchievement.achievementName !== lessonCountLevels[i].name
+					) {
+						userLessonAchievement.achievementName = lessonCountLevels[i].name;
+						changeLessonCountFlag = true;
+						break;
+					} else {
+						break;
+					}
 				}
 			}
 		}
