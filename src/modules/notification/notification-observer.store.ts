@@ -5,6 +5,9 @@ export class ObserverStore {
 	private static observers: Map<string, Subscriber<MessageEvent>> = new Map();
 
 	static add(userId: string, subscriber: Subscriber<MessageEvent>) {
+		if (this.observers.has(userId)) {
+			return;
+		}
 		this.observers.set(userId, subscriber);
 	}
 
