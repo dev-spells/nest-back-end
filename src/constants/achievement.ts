@@ -11,7 +11,7 @@ export interface AchievementLevel {
 
 export const ACHIEVEMENTS = {
 	NUMBER_OF_LESSONS: {
-		type: "lesson-achievement",
+		type: "lesson_achievement",
 		levels: [
 			{ threshold: 10, name: "Lesson Novice" },
 			{ threshold: 30, name: "Lesson Explorer" },
@@ -23,7 +23,7 @@ export const ACHIEVEMENTS = {
 		],
 	},
 	DAILY_STREAK: {
-		type: "streak-achievement",
+		type: "streak_achievement",
 		levels: [
 			{ threshold: 5, name: "Streak Initiate" },
 			{ threshold: 14, name: "Streak Keeper" },
@@ -35,7 +35,7 @@ export const ACHIEVEMENTS = {
 		],
 	},
 	CORRECT_STREAK: {
-		type: "accuracy-achievement",
+		type: "accuracy_achievement",
 		levels: [
 			{ threshold: 10, name: "Accuracy Beginner" },
 			{ threshold: 30, name: "Accuracy Skilled" },
