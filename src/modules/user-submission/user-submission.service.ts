@@ -209,6 +209,7 @@ export class UserSubmissionService {
 			lastDateStr = localDate(lastSubmission.createdAt)
 				.toISOString()
 				.split("T")[0];
+			console.log("lastDatestr", lastDateStr);
 			countNumberOfSubmissionInDay = await this.userLessonProgressRepository
 				.createQueryBuilder("ulp")
 				.where("ulp.userId = :userId", { userId })
@@ -228,21 +229,21 @@ export class UserSubmissionService {
 				})
 				.orderBy("ulp.createdAt", "DESC")
 				.getOne();
-			const nearestDateWithLastSubmissionStr = localDate(
-				nearestDateWithLastSubmission?.createdAt,
-			)
-				.toISOString()
-				.split("T")[0];
-			const lastSubmissionDate = new Date(lastSubmission.createdAt);
+			const nearestDateWithLastSubmissionStr = nearestDateWithLastSubmission
+				? localDate(nearestDateWithLastSubmission?.createdAt)
+						.toISOString()
+						.split("T")[0]
+				: 0;
 			if (updatedMaxDailyStreak === 0) {
 				updatedMaxDailyStreak = 1;
 				updatedDailyStreak = 1;
 			} else if (lastDateStr !== nearestDateWithLastSubmissionStr) {
-				const timeDiff =
-					lastSubmissionDate.getTime() -
-					nearestDateWithLastSubmission?.createdAt.getTime();
+				const lastDateOnly = new Date(lastDateStr);
+				const nearestDateOnly = new Date(nearestDateWithLastSubmissionStr);
+				const timeDiff = lastDateOnly.getTime() - nearestDateOnly.getTime();
+				console.log(timeDiff);
 				const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
-				console.log(daysDiff);
+				console.log("day diff", daysDiff);
 				if (daysDiff === 1) {
 					updatedDailyStreak += 1;
 					updatedMaxDailyStreak = Math.max(

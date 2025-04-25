@@ -21,6 +21,9 @@ export class UseXPPotionResponseDto {
 		description: "Duration of the XP boost in minutes",
 	})
 	duration: number;
+
+	@ApiProperty({ description: "Quantity of the item remaining" })
+	quantity: number;
 }
 
 class StatsDto {

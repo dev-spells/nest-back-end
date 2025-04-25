@@ -85,15 +85,24 @@ export class ItemXpService {
 	}
 
 	async check(userId: string) {
+		const userItem = await this.userItemRepository.findOne({
+			where: {
+				userId: userId,
+				itemId: ITEM_XP_ID,
+			},
+		});
 		const itemInUsed = await this.RedisService.getMap(
 			RedisKey.userItemXP(userId),
 		);
 		if (Object.keys(itemInUsed).length > 0) {
 			return {
 				...itemInUsed,
+				quantity: userItem?.quantity ? userItem.quantity : 0,
 			};
 		} else {
-			return null;
+			return {
+				quantity: userItem?.quantity ? userItem.quantity : 0,
+			};
 		}
 	}
 }
