@@ -4,11 +4,18 @@ import {
 	NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import axios from "axios";
 import { Repository } from "typeorm";
 
 import { USER_ERRORS } from "src/constants/errors";
+import { RedisKey } from "src/constants/redis-key";
+import { UserAchievement } from "src/entities/user-achievement.entity";
+import { UserCourseCompletion } from "src/entities/user-course-completion";
+import { UserLessonProgress } from "src/entities/user-lessson-progress.entity";
 import { UserStreak } from "src/entities/user-streak.entity";
+import { localDate } from "src/utils/convert-time.util";
 import { hashPassword } from "src/utils/handle-password.util";
+import { sanitizeGithubUsername } from "src/utils/sanitize-github-username.util";
 
 import { User, UserRole } from "../../entities/user.entity";
 import { RedisService } from "../cache/cache.service";
@@ -24,8 +31,191 @@ export class UserService {
 		private userRepository: Repository<User>,
 		@InjectRepository(UserStreak)
 		private userStreakRepository: Repository<UserStreak>,
+		@InjectRepository(UserAchievement)
+		private userAchievementRepository: Repository<UserAchievement>,
+		@InjectRepository(UserLessonProgress)
+		private userLessonProgressRepository: Repository<UserLessonProgress>,
+		@InjectRepository(UserCourseCompletion)
+		private userCourseCompletionRepository: Repository<UserCourseCompletion>,
 		private redisService: RedisService,
 	) {}
+
+	async get(userId: string) {
+		const user = await this.userRepository.findOne({
+			where: { id: userId },
+			select: {
+				id: true,
+				username: true,
+				level: true,
+				currentExp: true,
+				expToLevelUp: true,
+				rankTitle: true,
+				gems: true,
+				avatarUrl: true,
+			},
+		});
+		if (!user) {
+			throw new NotFoundException(USER_ERRORS.NOT_FOUND);
+		}
+		user.username = sanitizeGithubUsername(user.username);
+		const userStreak = await this.userStreakRepository.findOne({
+			where: { userId: userId },
+			select: {
+				curCorrectStreak: true,
+				curDailyStreak: true,
+			},
+		});
+		return { user, userStreak };
+	}
+
+	async getDetail(userId: string) {
+		const user = await this.userRepository.findOne({
+			where: { id: userId },
+			select: {
+				id: true,
+				username: true,
+				joinedAt: true,
+				email: true,
+				level: true,
+				currentExp: true,
+				rankTitle: true,
+				gems: true,
+				avatarUrl: true,
+				description: true,
+				githubAccessToken: true,
+			},
+		});
+		if (!user) {
+			throw new NotFoundException(USER_ERRORS.NOT_FOUND);
+		}
+		user.username = sanitizeGithubUsername(user.username);
+		user.joinedAt = localDate(user.joinedAt);
+		let githubContribute;
+		if (user.githubAccessToken) {
+			githubContribute = await this.getGithubContributions(
+				userId,
+				user.githubAccessToken,
+			);
+		}
+
+		const userLessonProgress = await this.userLessonProgressRepository
+			.createQueryBuilder("progress")
+			.select("DATE(progress.createdAt)", "date")
+			.addSelect("COUNT(*)", "count")
+			.where("progress.userId = :userId", { userId })
+			.groupBy("DATE(progress.createdAt)")
+			.orderBy("DATE(progress.createdAt)", "ASC")
+			.getRawMany();
+
+		const formatedUserLessonProgress = userLessonProgress.map(row => ({
+			date: localDate(row.date),
+			count: parseInt(row.count, 10),
+		}));
+		const combinedProgressData = githubContribute
+			? githubContribute.map(github => {
+					const lesson = formatedUserLessonProgress.find(
+						lesson => lesson.date === github.date,
+					);
+
+					return {
+						date: github.date,
+						count: github.count + (lesson ? lesson.count : 0), // Add counts together
+					};
+				})
+			: formatedUserLessonProgress;
+		const userAchievement = await this.userAchievementRepository.find({
+			where: { userId },
+		});
+		if (userAchievement) {
+			userAchievement.forEach(row => {
+				row.updatedAt = localDate(row.updatedAt);
+			});
+		}
+		const userCourseCompleted = await this.userCourseCompletionRepository.find({
+			where: { userId: userId },
+		});
+		if (userCourseCompleted) {
+			userCourseCompleted.map(row => {
+				row.createdAt = localDate(row.createdAt);
+			});
+		}
+
+		return {
+			user: {
+				id: user.id,
+				username: user.username,
+				joinedAt: user.joinedAt,
+				email: user.email,
+				level: user.level,
+				currentExp: user.currentExp,
+				rankTitle: user.rankTitle,
+				gems: user.gems,
+				avatarUrl: user.avatarUrl,
+				description: user.description,
+			},
+			userCourseCompleted,
+			userAchievement,
+			userLessonProgress: combinedProgressData,
+		};
+	}
+
+	private async getGithubContributions(
+		userId: string,
+		githubAccessToken: string,
+	) {
+		const cachedData = await this.redisService.get(
+			RedisKey.userGithubProgress(userId),
+		);
+		if (cachedData) {
+			return cachedData;
+		}
+
+		const now = new Date().toISOString();
+		const response = await axios.post(
+			"https://api.github.com/graphql",
+			{
+				query: `
+			  query {
+				viewer {
+					contributionsCollection(from: "2025-01-01T00:00:00Z", to: "${now}") {
+					contributionCalendar {
+						weeks {
+						contributionDays {
+							date
+							contributionCount
+						}
+						}
+					}
+					}
+				}
+				}
+			`,
+			},
+			{
+				headers: {
+					Authorization: `Bearer ${githubAccessToken}`,
+					"Content-Type": "application/json",
+				},
+			},
+		);
+
+		const weeks =
+			response.data.data.viewer.contributionsCollection.contributionCalendar
+				.weeks;
+		const days = weeks.flatMap(week => week.contributionDays);
+
+		const formatedData = days.map(day => ({
+			date: new Date(day.date).toISOString(),
+			count: day.contributionCount,
+		}));
+		this.redisService.set(
+			RedisKey.userGithubProgress(userId),
+			formatedData,
+			60 * 60 * 2,
+		);
+
+		return formatedData;
+	}
 
 	async createUser(dto: CreateUserDto) {
 		const existingUser = await this.userRepository.findOne({

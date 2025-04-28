@@ -1,5 +1,11 @@
 import { Exclude } from "class-transformer";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+	Column,
+	CreateDateColumn,
+	Entity,
+	OneToMany,
+	PrimaryGeneratedColumn,
+} from "typeorm";
 
 import { LEVELS } from "src/constants/level";
 
@@ -14,6 +20,12 @@ export enum UserRole {
 export class User {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
+
+	@CreateDateColumn({ default: () => "CURRENT_TIMESTAMP" })
+	joinedAt: Date;
+
+	@Column({ type: "text", default: "" })
+	description: string;
 
 	@Column({ type: "varchar", unique: true })
 	username: string;

@@ -8,4 +8,5 @@ export const RedisKey = {
 	userFreeSolution: (userId: string) => `user:${userId}:free-solution`,
 	topDailySubmission: "top-daily-submission",
 	userTopLevel: "top-level",
+	userGithubProgress: (userId: string) => `user:${userId}:github-progress`,
 };

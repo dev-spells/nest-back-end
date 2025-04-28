@@ -1,76 +1,125 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class UserResultDto {
-	@ApiProperty({ example: "12341431safa123" })
-	walletAddress: string;
+export class UserStreakResponseDto {
+	@ApiProperty()
+	curDailyStreak: number;
 
-	@ApiProperty({ example: "dehype" })
+	@ApiProperty()
+	curCorrectStreak: number;
+}
+
+export class UserGeneralInfoResponseDto {
+	@ApiProperty()
+	id: string;
+
+	@ApiProperty()
 	username: string;
 
-	@ApiProperty({ example: "http://example.com/thumbnail.jpg" })
+	@ApiProperty({ nullable: true })
 	avatarUrl: string;
 
-	@ApiProperty({ example: "user" })
-	role: string;
+	@ApiProperty()
+	level: number;
+
+	@ApiProperty()
+	currentExp: number;
+
+	@ApiProperty()
+	expToLevelUp: number;
+
+	@ApiProperty()
+	rankTitle: string;
+
+	@ApiProperty()
+	gems: number;
+
+	@ApiProperty({ type: () => UserStreakResponseDto })
+	userStreak: UserStreakResponseDto;
 }
 
-export class MetaDto {
-	@ApiProperty({ example: 1 })
-	current: number;
+/* */
 
-	@ApiProperty({ example: 10 })
-	pageSize: number;
+export class UserInfoDetailResponseDto {
+	@ApiProperty()
+	id: string;
 
-	@ApiProperty({ example: 5 })
-	pages: number;
-
-	@ApiProperty({ example: 50 })
-	total: number;
-}
-
-export class GetUserReponse {
-	@ApiProperty({ type: [UserResultDto] })
-	users: UserResultDto[];
-
-	@ApiProperty({ type: MetaDto })
-	meta: MetaDto;
-}
-
-class MarketBetResponse {
-	@ApiProperty({ example: "12341431safa123" })
-	marketId: string;
-
-	@ApiProperty({ example: "Wil SoL become second BTC?" })
-	marketTitle: string;
-
-	@ApiProperty({ example: "https://example.com/image.jpg" })
-	marketCoverUrl: string;
-
-	@ApiProperty({ example: 1000 })
-	totalBet: number;
-
-	@ApiProperty({ example: 500 })
-	tokens: number;
-
-	@ApiProperty({ example: "Yes" })
-	answerKey: string;
-
-	@ApiProperty({ example: "2021-05-20T00:00:00.000Z" })
-	createTime: Date;
-}
-
-class UserInBettingHistoryReponse {
-	@ApiProperty({ example: "12341431safa123" })
-	walletAddress: string;
-
-	@ApiProperty({ example: "dehype" })
+	@ApiProperty()
 	username: string;
+
+	@ApiProperty()
+	joinedAt: string;
+
+	@ApiProperty()
+	email: string;
+
+	@ApiProperty()
+	level: number;
+
+	@ApiProperty()
+	currentExp: number;
+
+	@ApiProperty()
+	rankTitle: string;
+
+	@ApiProperty()
+	gems: number;
+
+	@ApiProperty({ nullable: true })
+	avatarUrl: string;
+
+	@ApiProperty()
+	description: string;
 }
 
-export class UserBettingHistoryResponse {
-	@ApiProperty({ type: UserInBettingHistoryReponse })
-	user: UserInBettingHistoryReponse;
+export class UserCourseCompletedDto {
+	@ApiProperty()
+	userId: string;
 
-	@ApiProperty({ type: [MarketBetResponse] })
-	bets: MarketBetResponse[];
+	@ApiProperty()
+	courseId: number;
+
+	@ApiProperty()
+	createdAt: string;
+
+	@ApiProperty()
+	certificateUrl: string;
+}
+
+export class UserAchievementDto {
+	@ApiProperty()
+	id: number;
+
+	@ApiProperty()
+	userId: string;
+
+	@ApiProperty()
+	achievementType: string;
+
+	@ApiProperty()
+	achievementName: string;
+
+	@ApiProperty()
+	updatedAt: string;
+}
+
+export class UserLessonProgressDto {
+	@ApiProperty()
+	date: string;
+
+	@ApiProperty()
+	count: number;
+}
+
+export class UserDetailResponseDto {
+	@ApiProperty({ type: () => UserInfoDetailResponseDto })
+	user: UserInfoDetailResponseDto;
+
+	@ApiProperty({ type: () => [UserCourseCompletedDto] })
+	userCourseCompleted: UserCourseCompletedDto[];
+
+	@ApiProperty({ type: () => [UserAchievementDto] })
+	userAchievement: UserAchievementDto[];
+
+	@ApiProperty({ type: () => [UserLessonProgressDto] })
+	userLessonProgress: UserLessonProgressDto[];
 }

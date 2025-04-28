@@ -1,21 +1,63 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common";
 
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import {
+	ApiBadRequestResponse,
+	ApiBearerAuth,
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+} from "@nestjs/swagger";
 
-import { Public } from "src/decorators/public-route";
+import { Role } from "src/constants/role.enum";
+import { User } from "src/decorators/current-user";
+import { Roles } from "src/decorators/role-route";
 
 import { CreateUserDto } from "./dto/create-user.dto";
+import {
+	UserDetailResponseDto,
+	UserGeneralInfoResponseDto,
+} from "./dto/response-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserService } from "./user.service";
 
 @ApiTags("Users")
-@Controller("users")
+@Controller("user")
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
-	@Public()
+	@ApiOperation({ summary: "get user general info" })
+	@ApiBearerAuth()
+	@ApiOkResponse({ type: UserGeneralInfoResponseDto })
+	@ApiNotFoundResponse({ description: "User not found" })
+	@Get()
+	async getUser(@User() user: any) {
+		return await this.userService.get(user.id);
+	}
+
+	@ApiOperation({ summary: "get user detail info" })
+	@ApiBearerAuth()
+	@ApiOkResponse({ type: UserDetailResponseDto })
+	@ApiNotFoundResponse({ description: "User not found" })
+	@Get(":id")
+	async getUserDetail(@Param("id") id: string) {
+		return await this.userService.getDetail(id);
+	}
+
 	@ApiOperation({ summary: "create new user" })
+	@ApiBearerAuth()
+	@Roles(Role.ADMIN)
 	@Post()
 	async create(@Body() createUserDto: CreateUserDto) {
 		return await this.userService.createUser(createUserDto);
+	}
+
+	@ApiOperation({ summary: "update user info" })
+	@ApiBearerAuth()
+	@ApiNotFoundResponse({ description: "User not found" })
+	@ApiBadRequestResponse({ description: "Invalid data" })
+	@Patch()
+	async update(@User() user: any, @Body() updateUserDto: UpdateUserDto) {
+		return await this.userService.updateUser(user.id, updateUserDto);
 	}
 }
