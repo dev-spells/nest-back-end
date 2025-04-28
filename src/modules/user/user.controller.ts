@@ -17,6 +17,7 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import {
 	UserDetailResponseDto,
 	UserGeneralInfoResponseDto,
+	UserStreakResponseDto,
 } from "./dto/response-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserService } from "./user.service";
@@ -26,15 +27,6 @@ import { UserService } from "./user.service";
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
-	@ApiOperation({ summary: "get user general info" })
-	@ApiBearerAuth()
-	@ApiOkResponse({ type: UserGeneralInfoResponseDto })
-	@ApiNotFoundResponse({ description: "User not found" })
-	@Get()
-	async getUser(@User() user: any) {
-		return await this.userService.get(user.id);
-	}
-
 	@ApiOperation({ summary: "get user detail info" })
 	@ApiBearerAuth()
 	@ApiOkResponse({ type: UserDetailResponseDto })
@@ -42,6 +34,23 @@ export class UserController {
 	@Get(":id")
 	async getUserDetail(@User() user: any, @Param("id") id: string) {
 		return await this.userService.getDetail(user.id, id);
+	}
+
+	@ApiOperation({ summary: "get user streak" })
+	@ApiBearerAuth()
+	@ApiOkResponse({ type: UserStreakResponseDto })
+	@Get("streak")
+	async getStreak(@User() user: any) {
+		return await this.userService.getUserStreak(user.id);
+	}
+
+	@ApiOperation({ summary: "get user general info" })
+	@ApiBearerAuth()
+	@ApiOkResponse({ type: UserGeneralInfoResponseDto })
+	@ApiNotFoundResponse({ description: "User not found" })
+	@Get()
+	async getUser(@User() user: any) {
+		return await this.userService.get(user.id);
 	}
 
 	@ApiOperation({ summary: "create new user" })

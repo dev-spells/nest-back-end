@@ -68,6 +68,17 @@ export class UserService {
 		return { user, userStreak };
 	}
 
+	async getUserStreak(userId: string) {
+		const userStreak = await this.userStreakRepository.findOne({
+			where: { userId: userId },
+			select: {
+				curCorrectStreak: true,
+				curDailyStreak: true,
+			},
+		});
+		return userStreak;
+	}
+
 	async getDetail(userId: string, profileId: string) {
 		const user = await this.userRepository.findOne({
 			where: { id: profileId },
