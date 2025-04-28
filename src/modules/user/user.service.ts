@@ -126,7 +126,7 @@ export class UserService {
 			.getRawMany();
 		const totalLessonFinished = userLessonProgress.reduce((acc, row) => {
 			return acc + row.count;
-		});
+		}, 0);
 		const formatedUserLessonProgress = userLessonProgress.map(row => ({
 			date: localDate(row.date),
 			count: parseInt(row.count, 10),
