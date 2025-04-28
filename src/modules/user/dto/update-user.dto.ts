@@ -45,4 +45,8 @@ export class UpdateUserDto {
 	@IsOptional()
 	@ApiProperty({ nullable: true })
 	githubAccessToken?: string;
+
+	@IsOptional()
+	@ApiProperty({ nullable: true })
+	description?: string;
 }
