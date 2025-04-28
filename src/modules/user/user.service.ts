@@ -175,12 +175,10 @@ export class UserService {
 				description: user.description,
 			},
 			userRank: userRank,
+			totalLesson: totalLessonFinished,
 			userCourseCompleted,
 			userAchievement,
-			userLessonProgress: {
-				...combinedProgressData,
-				totalLesson: totalLessonFinished,
-			},
+			userLessonProgress: combinedProgressData,
 		};
 	}
 

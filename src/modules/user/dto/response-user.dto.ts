@@ -114,6 +114,12 @@ export class UserDetailResponseDto {
 	@ApiProperty({ type: () => UserInfoDetailResponseDto })
 	user: UserInfoDetailResponseDto;
 
+	@ApiProperty()
+	userRank: number;
+
+	@ApiProperty()
+	totalLesson: number;
+
 	@ApiProperty({ type: () => [UserCourseCompletedDto] })
 	userCourseCompleted: UserCourseCompletedDto[];
 
