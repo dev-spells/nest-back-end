@@ -30,7 +30,7 @@ export class ItemProtectStreakController {
 	}
 
 	@Roles(Role.ADMIN)
-	@ApiOperation({ summary: "Upadte item protect streak - ADMIN" })
+	@ApiOperation({ summary: "Update item protect streak - ADMIN" })
 	@ApiOkResponse()
 	@ApiBearerAuth()
 	@Patch()
