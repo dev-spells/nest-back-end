@@ -6,4 +6,6 @@ export const RedisKey = {
 	forgotPassword: (email: string) => `forgot-password:${email}`,
 	resetPassword: (email: string) => `password-reset:${email}`,
 	userFreeSolution: (userId: string) => `user:${userId}:free-solution`,
+	topDailySubmission: "top-daily-submission",
+	userTopLevel: "top-level",
 };

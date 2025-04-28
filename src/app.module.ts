@@ -16,6 +16,7 @@ import { ItemModule } from "./modules/item/item.module";
 import { ItemProtectStreakModule } from "./modules/item-protect-streak/item-protect-streak.module";
 import { ItemUnlockModule } from "./modules/item-unlock/item-unlock.module";
 import { ItemXpModule } from "./modules/item-xp/item-xp.module";
+import { LeaderboardModule } from "./modules/leaderboard/leaderboard.module";
 import { LessonModule } from "./modules/lesson/lesson.module";
 import { MailModule } from "./modules/mail/mail.module";
 import { NotificationModule } from "./modules/notification/notification.module";
@@ -62,6 +63,7 @@ import { AppService } from "./app.service";
 		ItemProtectStreakModule,
 		NotificationModule,
 		AchievementModule,
+		LeaderboardModule,
 	],
 	controllers: [AppController],
 	providers: [
