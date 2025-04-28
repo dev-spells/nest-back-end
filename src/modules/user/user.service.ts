@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import axios from "axios";
-import { Repository } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 
 import { USER_ERRORS } from "src/constants/errors";
 import { RedisKey } from "src/constants/redis-key";
@@ -109,6 +109,13 @@ export class UserService {
 			);
 		}
 
+		const higherCount = await this.userRepository.count({
+			where: {
+				level: MoreThan(user.level),
+			},
+		});
+		const userRank = higherCount + 1;
+
 		const userLessonProgress = await this.userLessonProgressRepository
 			.createQueryBuilder("progress")
 			.select("DATE(progress.createdAt)", "date")
@@ -117,7 +124,9 @@ export class UserService {
 			.groupBy("DATE(progress.createdAt)")
 			.orderBy("DATE(progress.createdAt)", "ASC")
 			.getRawMany();
-
+		const totalLessonFinished = userLessonProgress.reduce((acc, row) => {
+			return acc + row.count;
+		});
 		const formatedUserLessonProgress = userLessonProgress.map(row => ({
 			date: localDate(row.date),
 			count: parseInt(row.count, 10),
@@ -165,9 +174,13 @@ export class UserService {
 				avatarUrl: user.avatarUrl,
 				description: user.description,
 			},
+			userRank: userRank,
 			userCourseCompleted,
 			userAchievement,
-			userLessonProgress: combinedProgressData,
+			userLessonProgress: {
+				...combinedProgressData,
+				totalLesson: totalLessonFinished,
+			},
 		};
 	}
 
