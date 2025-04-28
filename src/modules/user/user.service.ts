@@ -68,9 +68,9 @@ export class UserService {
 		return { user, userStreak };
 	}
 
-	async getDetail(userId: string) {
+	async getDetail(userId: string, profileId: string) {
 		const user = await this.userRepository.findOne({
-			where: { id: userId },
+			where: { id: profileId },
 			select: {
 				id: true,
 				username: true,
@@ -93,7 +93,7 @@ export class UserService {
 		let githubContribute;
 		if (user.githubAccessToken) {
 			githubContribute = await this.getGithubContributions(
-				userId,
+				profileId,
 				user.githubAccessToken,
 			);
 		}
@@ -102,7 +102,7 @@ export class UserService {
 			.createQueryBuilder("progress")
 			.select("DATE(progress.createdAt)", "date")
 			.addSelect("COUNT(*)", "count")
-			.where("progress.userId = :userId", { userId })
+			.where("progress.userId = :userId", { userId: profileId })
 			.groupBy("DATE(progress.createdAt)")
 			.orderBy("DATE(progress.createdAt)", "ASC")
 			.getRawMany();
@@ -124,7 +124,7 @@ export class UserService {
 				})
 			: formatedUserLessonProgress;
 		const userAchievement = await this.userAchievementRepository.find({
-			where: { userId },
+			where: { userId: profileId },
 		});
 		if (userAchievement) {
 			userAchievement.forEach(row => {
@@ -132,7 +132,7 @@ export class UserService {
 			});
 		}
 		const userCourseCompleted = await this.userCourseCompletionRepository.find({
-			where: { userId: userId },
+			where: { userId: profileId },
 		});
 		if (userCourseCompleted) {
 			userCourseCompleted.map(row => {
@@ -141,6 +141,7 @@ export class UserService {
 		}
 
 		return {
+			isOwner: userId === profileId ? true : false,
 			user: {
 				id: user.id,
 				username: user.username,

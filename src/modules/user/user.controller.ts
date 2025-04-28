@@ -40,8 +40,8 @@ export class UserController {
 	@ApiOkResponse({ type: UserDetailResponseDto })
 	@ApiNotFoundResponse({ description: "User not found" })
 	@Get(":id")
-	async getUserDetail(@Param("id") id: string) {
-		return await this.userService.getDetail(id);
+	async getUserDetail(@User() user: any, @Param("id") id: string) {
+		return await this.userService.getDetail(user.id, id);
 	}
 
 	@ApiOperation({ summary: "create new user" })
