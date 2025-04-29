@@ -128,7 +128,7 @@ export class UserService {
 			return acc + row.count;
 		}, 0);
 		const formatedUserLessonProgress = userLessonProgress.map(row => ({
-			date: localDate(row.date),
+			date: localDate(row.date).toISOString().split("T")[0],
 			count: parseInt(row.count, 10),
 		}));
 		const combinedProgressData = githubContribute
@@ -143,6 +143,22 @@ export class UserService {
 					};
 				})
 			: formatedUserLessonProgress;
+
+		const maxCount = Math.max(...combinedProgressData.map(d => d.count));
+		const normalizeLevel = (count: number) => {
+			if (count === 0) return 0;
+			if (count <= maxCount * 0.25) return 1;
+			if (count <= maxCount * 0.5) return 2;
+			if (count <= maxCount * 0.75) return 3;
+			return 4;
+		};
+
+		// Transform data for react-activity-calendar
+		const calendarData = combinedProgressData.map(({ date, count }) => ({
+			date,
+			count,
+			level: normalizeLevel(count),
+		}));
 		const userAchievement = await this.userAchievementRepository.find({
 			where: { userId: profileId },
 		});
@@ -178,7 +194,7 @@ export class UserService {
 			totalLesson: totalLessonFinished,
 			userCourseCompleted,
 			userAchievement,
-			userLessonProgress: combinedProgressData,
+			userLessonProgress: calendarData,
 		};
 	}
 
@@ -228,9 +244,10 @@ export class UserService {
 		const days = weeks.flatMap(week => week.contributionDays);
 
 		const formatedData = days.map(day => ({
-			date: new Date(day.date).toISOString(),
+			date: day.date,
 			count: day.contributionCount,
 		}));
+		console.log(formatedData);
 		this.redisService.set(
 			RedisKey.userGithubProgress(userId),
 			formatedData,
