@@ -25,7 +25,7 @@ export class ItemXpService {
 		private RedisService: RedisService,
 	) {}
 
-	async get() {
+	async get(userId: string) {
 		const itemXP = await this.itemRepository.findOne({
 			where: {
 				id: ITEM_XP_ID,
@@ -34,7 +34,20 @@ export class ItemXpService {
 		if (!itemXP) {
 			throw new NotFoundException(ITEM_ERRORS.NOT_FOUND);
 		}
-		return itemXP;
+		const userItemXP = await this.userItemRepository.findOne({
+			where: {
+				userId: userId,
+				itemId: ITEM_XP_ID,
+			},
+			select: {
+				quantity: true,
+			},
+		});
+
+		return {
+			...itemXP,
+			quantity: userItemXP?.quantity ? userItemXP.quantity : 0,
+		};
 	}
 
 	async update(updateItemXPDto: UpdateItemXPDto) {

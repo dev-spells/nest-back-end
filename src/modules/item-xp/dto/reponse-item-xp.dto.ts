@@ -49,4 +49,7 @@ export class XpPotionResponseDto {
 
 	@ApiProperty({ example: "https://example.com/images/xp-potion.png" })
 	imageUrl: string;
+
+	@ApiProperty({ example: 10 })
+	quantity: number;
 }

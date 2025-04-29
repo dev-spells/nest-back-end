@@ -31,8 +31,8 @@ export class ItemXpController {
 	@ApiOkResponse({ type: XpPotionResponseDto })
 	@ApiNotFoundResponse({ description: "Item not found" })
 	@Get()
-	async get() {
-		return this.itemXpService.get();
+	async get(@User() user: any) {
+		return this.itemXpService.get(user.id);
 	}
 
 	@ApiOperation({ summary: "Use item XP" })
