@@ -69,7 +69,7 @@ export class UserService {
 	}
 
 	async getUserStreak(userId: string) {
-		const userStreak = await this.userStreakRepository.findOne({
+		const userStreak = await this.userStreakRepository.find({
 			where: { userId: userId },
 			select: {
 				curCorrectStreak: true,
