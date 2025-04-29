@@ -309,10 +309,12 @@ export class UserSubmissionService {
 		const userFreeSolution: string | null = await this.redisService.get(
 			RedisKey.userFreeSolution(user.id),
 		);
-		if (userFreeSolution && JSON.parse(userFreeSolution).includes(lesson.id)) {
+		if (
+			userFreeSolution &&
+			JSON.parse(userFreeSolution).includes(lesson.id.toString())
+		) {
 			freeSolution = true;
 		}
-
 		if (userAnswer === exercise.answer && !isRedo) {
 			this.updateRedis(user.id, lesson.id);
 			const { expGained, gemsGained, expBonus } = generateRandomRewards(
@@ -387,9 +389,12 @@ export class UserSubmissionService {
 		const userFreeSolution: string | null = await this.redisService.get(
 			RedisKey.userFreeSolution(userId),
 		);
-		if (userFreeSolution && JSON.parse(userFreeSolution).includes(lessonId)) {
+		if (
+			userFreeSolution &&
+			JSON.parse(userFreeSolution).includes(lessonId.toString())
+		) {
 			const data = JSON.parse(userFreeSolution);
-			const newData = data.filter(lesson => lesson !== lessonId);
+			const newData = data.filter(lesson => lesson !== lessonId.toString());
 			if (newData.length > 0) {
 				this.redisService.set(
 					RedisKey.userFreeSolution(userId),
