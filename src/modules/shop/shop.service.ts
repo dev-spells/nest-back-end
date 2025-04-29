@@ -136,7 +136,7 @@ export class ShopService {
 		const updatedUserItem = await this.userItemRepository.save({
 			userId,
 			itemId,
-			quantity: userItem.quantity + 1,
+			quantity: userItem.quantity - 1,
 		});
 		const updatedUser = await this.userRepository.save({
 			id: userId,
@@ -176,7 +176,7 @@ export class ShopService {
 		const updatedUserItem = await this.userItemRepository.save({
 			userId,
 			itemId,
-			quantity: userItem.quantity - 1,
+			quantity: userItem.quantity + 1,
 		});
 		const updatedUser = await this.userRepository.save({
 			id: userId,
