@@ -216,7 +216,7 @@ export class UserService {
 				query: `
 			  query {
 				viewer {
-					contributionsCollection(from: "2025-01-01T00:00:00Z", to: "${now}") {
+					contributionsCollection(from: "2024-09-01T00:00:00Z", to: "${now}") {
 					contributionCalendar {
 						weeks {
 						contributionDays {
