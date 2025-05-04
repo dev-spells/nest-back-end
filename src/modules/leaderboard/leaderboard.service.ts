@@ -88,9 +88,6 @@ export class LeaderboardService {
 		);
 
 		if (userRank.length > 0) {
-			userRank[0].lastSubmissionTime = localDate(
-				userRank[0].lastSubmissionTime,
-			);
 			userRank[0].username = sanitizeGithubUsername(userRank[0].username);
 		}
 
