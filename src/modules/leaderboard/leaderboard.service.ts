@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { MoreThan, Repository } from "typeorm";
+import { Repository } from "typeorm";
 
 import { USER_ERRORS } from "src/constants/errors";
 import { RedisKey } from "src/constants/redis-key";
@@ -59,27 +59,36 @@ export class LeaderboardService {
 			`
 		    WITH ranked_submissions AS (
 		        SELECT
-		            ulp."userId",
+		           	ulp."userId",
+		            u.username,
+		            u."rankTitle",
+		            u."avatarUrl",
 		            COUNT(ulp."lessonId") AS "submissionCount",
 		            RANK() OVER (
 		                ORDER BY COUNT(ulp."lessonId") DESC, MAX(ulp."createdAt") ASC
 		            ) AS rank
 		        FROM user_lesson_progress ulp
+				JOIN "user" u ON u.id = ulp."userId"
 		        WHERE CAST(ulp."createdAt" AS DATE) = $1
-		        GROUP BY ulp."userId"
+		        GROUP BY ulp."userId", u.username, u."rankTitle", u."avatarUrl"
 		    )
-		    SELECT
-		        "submissionCount",
-		        "rank"
+		    SELECT * 
 		    FROM ranked_submissions WHERE "userId" = $2
 		    `,
 			[todayStr, userId],
 		);
-		// format each lastSubmissionTime of topUsers
 
 		topUsers.forEach(user => {
 			user.lastSubmissionTime = localDate(user.lastSubmissionTime);
+			user.username = sanitizeGithubUsername(user.username);
 		});
+
+		if (userRank.length > 0) {
+			userRank[0].lastSubmissionTime = localDate(
+				userRank[0].lastSubmissionTime,
+			);
+			userRank[0].username = sanitizeGithubUsername(userRank[0].username);
+		}
 
 		await this.redisService.set(
 			RedisKey.topDailySubmission,
@@ -101,23 +110,51 @@ export class LeaderboardService {
 			throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 		}
 
-		const higherCount = await this.userRepository.count({
-			where: {
-				level: MoreThan(user.level),
-			},
-		});
-		const userRank = higherCount + 1;
+		const topUsers = await this.userRepository.query(
+			`
+			WITH ranked_levels AS (
+			  SELECT
+				u.id AS "userId",
+				u.username,
+				u."rankTitle",
+				u."avatarUrl",
+				u.level,
+				RANK() OVER (
+				  ORDER BY u.level DESC
+				) AS rank
+			  FROM "user" u
+			)
+			SELECT * FROM ranked_levels
+			ORDER BY rank
+			LIMIT 15
+			`,
+		);
 
-		const topUsers = await this.userRepository.find({
-			order: { level: "DESC" },
-			take: 15,
-			select: ["id", "username", "level", "avatarUrl", "rankTitle"],
-		});
+		const userRank = await this.userRepository.query(
+			`
+			WITH ranked_levels AS (
+			  SELECT
+				u.id AS "userId",
+				u.username,
+				u."rankTitle",
+				u."avatarUrl",
+				u.level,
+				RANK() OVER (
+				  ORDER BY u.level DESC
+				) AS rank
+			  FROM "user" u
+			)
+			SELECT *
+			FROM ranked_levels WHERE "userId" = $1
+			`,
+			[userId],
+		);
 
 		// sanitize usernames
 		topUsers.forEach(user => {
 			user.username = sanitizeGithubUsername(user.username);
 		});
+		userRank[0].username = sanitizeGithubUsername(user.username);
 
 		await this.redisService.set(
 			RedisKey.userTopLevel,
@@ -126,10 +163,7 @@ export class LeaderboardService {
 		);
 
 		return {
-			userRank: {
-				rank: userRank,
-				level: user.level,
-			},
+			userRank: userRank[0] ?? null,
 			topUsers,
 		};
 	}
