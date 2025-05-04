@@ -7,6 +7,7 @@ import { RedisKey } from "src/constants/redis-key";
 import { User } from "src/entities/user.entity";
 import { UserLessonProgress } from "src/entities/user-lessson-progress.entity";
 import { localDate } from "src/utils/convert-time.util";
+import { sanitizeGithubUsername } from "src/utils/sanitize-github-username.util";
 
 import { RedisService } from "../cache/cache.service";
 
@@ -111,6 +112,11 @@ export class LeaderboardService {
 			order: { level: "DESC" },
 			take: 15,
 			select: ["id", "username", "level", "avatarUrl", "rankTitle"],
+		});
+
+		// sanitize usernames
+		topUsers.forEach(user => {
+			user.username = sanitizeGithubUsername(user.username);
 		});
 
 		await this.redisService.set(
