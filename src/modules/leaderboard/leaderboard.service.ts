@@ -22,37 +22,46 @@ export class LeaderboardService {
 	) {}
 
 	async getRankSubmissionCountDaily(userId: string) {
-		const cachedData = await this.redisService.get(RedisKey.topDailySubmission);
-		if (cachedData) return cachedData;
-
-		console.log("Fetching leaderboard from cache");
+		let leaderboardData: any = await this.redisService.get(
+			RedisKey.topDailySubmission,
+		);
 		const today = new Date();
 		const todayStr = today.toISOString().split("T")[0];
-
-		const topUsers = await this.userLessonRepository.query(
-			`
-		    WITH ranked_submissions AS (
-		        SELECT
-		            ulp."userId",
-		            COUNT(ulp."lessonId") AS "submissionCount",
-		            u.username,
-		            u."rankTitle",
-		            u."avatarUrl",
-		            MAX(ulp."createdAt") AS "lastSubmissionTime",
-		            RANK() OVER (
-		                ORDER BY COUNT(ulp."lessonId") DESC, MAX(ulp."createdAt") ASC
-		            ) AS rank
-		        FROM user_lesson_progress ulp
-		        JOIN "user" u ON u.id = ulp."userId"
-		        WHERE CAST(ulp."createdAt" AS DATE) = $1
-		        GROUP BY ulp."userId", u.username, u."rankTitle", u."avatarUrl"
-		    )
-		    SELECT * FROM ranked_submissions
-		    ORDER BY rank
-		    LIMIT 15
-		    `,
-			[todayStr],
-		);
+		if (!leaderboardData) {
+			leaderboardData = await this.userLessonRepository.query(
+				`
+				WITH ranked_submissions AS (
+					SELECT
+						ulp."userId",
+						COUNT(ulp."lessonId") AS "submissionCount",
+						u.username,
+						u."rankTitle",
+						u."avatarUrl",
+						MAX(ulp."createdAt") AS "lastSubmissionTime",
+						RANK() OVER (
+							ORDER BY COUNT(ulp."lessonId") DESC, MAX(ulp."createdAt") ASC
+						) AS rank
+					FROM user_lesson_progress ulp
+					JOIN "user" u ON u.id = ulp."userId"
+					WHERE CAST(ulp."createdAt" AS DATE) = $1
+					GROUP BY ulp."userId", u.username, u."rankTitle", u."avatarUrl"
+				)
+				SELECT * FROM ranked_submissions
+				ORDER BY rank
+				LIMIT 15
+				`,
+				[todayStr],
+			);
+			leaderboardData.forEach(user => {
+				user.lastSubmissionTime = localDate(user.lastSubmissionTime);
+				user.username = sanitizeGithubUsername(user.username);
+			});
+			await this.redisService.set(
+				RedisKey.topDailySubmission,
+				leaderboardData,
+				60 * 5,
+			);
+		}
 
 		// Current user's rank
 		const userRank = await this.userLessonRepository.query(
@@ -78,11 +87,6 @@ export class LeaderboardService {
 			[todayStr, userId],
 		);
 
-		topUsers.forEach(user => {
-			user.lastSubmissionTime = localDate(user.lastSubmissionTime);
-			user.username = sanitizeGithubUsername(user.username);
-		});
-
 		if (userRank.length > 0) {
 			userRank[0].lastSubmissionTime = localDate(
 				userRank[0].lastSubmissionTime,
@@ -90,15 +94,9 @@ export class LeaderboardService {
 			userRank[0].username = sanitizeGithubUsername(userRank[0].username);
 		}
 
-		await this.redisService.set(
-			RedisKey.topDailySubmission,
-			{ userRank: userRank[0] ?? null, topUsers },
-			60 * 5,
-		);
-
 		return {
 			userRank: userRank[0] ?? null,
-			topUsers,
+			topUsers: leaderboardData,
 		};
 	}
 
@@ -110,25 +108,38 @@ export class LeaderboardService {
 			throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 		}
 
-		const topUsers = await this.userRepository.query(
-			`
-			WITH ranked_levels AS (
-			  SELECT
-				u.id AS "userId",
-				u.username,
-				u."rankTitle",
-				u."avatarUrl",
-				u.level,
-				RANK() OVER (
-				  ORDER BY u.level DESC
-				) AS rank
-			  FROM "user" u
-			)
-			SELECT * FROM ranked_levels
-			ORDER BY rank
-			LIMIT 15
-			`,
+		let leaderboardData: any = await this.redisService.get(
+			RedisKey.userTopLevel,
 		);
+		if (!leaderboardData) {
+			leaderboardData = await this.userRepository.query(
+				`
+				WITH ranked_levels AS (
+				  SELECT
+					u.id AS "userId",
+					u.username,
+					u."rankTitle",
+					u."avatarUrl",
+					u.level,
+					RANK() OVER (
+					  ORDER BY u.level DESC
+					) AS rank
+				  FROM "user" u
+				)
+				SELECT * FROM ranked_levels
+				ORDER BY rank
+				LIMIT 15
+				`,
+			);
+			leaderboardData.forEach(user => {
+				user.username = sanitizeGithubUsername(user.username);
+			});
+			await this.redisService.set(
+				RedisKey.userTopLevel,
+				leaderboardData,
+				60 * 5,
+			);
+		}
 
 		const userRank = await this.userRepository.query(
 			`
@@ -150,21 +161,11 @@ export class LeaderboardService {
 			[userId],
 		);
 
-		// sanitize usernames
-		topUsers.forEach(user => {
-			user.username = sanitizeGithubUsername(user.username);
-		});
 		userRank[0].username = sanitizeGithubUsername(user.username);
-
-		await this.redisService.set(
-			RedisKey.userTopLevel,
-			{ userRank, topUsers },
-			60 * 5,
-		);
 
 		return {
 			userRank: userRank[0] ?? null,
-			topUsers,
+			topUsers: leaderboardData,
 		};
 	}
 }
