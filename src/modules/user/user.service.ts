@@ -124,9 +124,11 @@ export class UserService {
 			.groupBy("DATE(progress.createdAt)")
 			.orderBy("DATE(progress.createdAt)", "ASC")
 			.getRawMany();
-		const totalLessonFinished = userLessonProgress.reduce((acc, row) => {
-			return acc + row.count;
-		}, 0);
+		const totalLessonFinished = String(
+			userLessonProgress.reduce((acc, row) => {
+				return acc + parseInt(row.count, 10);
+			}, 0),
+		);
 		const formatedUserLessonProgress = userLessonProgress.map(row => ({
 			date: localDate(row.date).toISOString().split("T")[0],
 			count: parseInt(row.count, 10),
