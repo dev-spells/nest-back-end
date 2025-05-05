@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ILike, Repository } from "typeorm";
+import { Repository } from "typeorm";
 
 import { SpellBook } from "src/entities/spellbook.entity";
+import { UserLessonProgress } from "src/entities/user-lessson-progress.entity";
 
 import { CreateSpellBookDto } from "./dto/create-spell-book.dto";
 import { UpdateSpellBookDto } from "./dto/update-spell-book.dto";
@@ -10,6 +11,8 @@ import { UpdateSpellBookDto } from "./dto/update-spell-book.dto";
 @Injectable()
 export class SpellBookService {
 	constructor(
+		@InjectRepository(UserLessonProgress)
+		private userLessonProgressRepository: Repository<UserLessonProgress>,
 		@InjectRepository(SpellBook)
 		private spellBookRepository: Repository<SpellBook>,
 	) {}
@@ -24,17 +27,36 @@ export class SpellBookService {
 		return await this.spellBookRepository.save(newSpellBook);
 	}
 
-	async findAll(search?: string) {
-		// Refactor this later with user data
-		// find all the spell book with that lessonId and filter it with the search
-
-		const whereCondition = search ? { name: ILike(`%${search}%`) } : {};
-
-		return await this.spellBookRepository.find({
-			select: ["id", "name"],
-			where: whereCondition,
-			order: { id: "DESC" },
+	async findAll(userId: string, search?: string) {
+		const lessonProgress = await this.userLessonProgressRepository.find({
+			select: {
+				lesson: {
+					id: true,
+					spellBook: {
+						id: true,
+						name: true,
+					},
+				},
+			},
+			where: { userId: userId },
+			relations: {
+				lesson: {
+					spellBook: true,
+				},
+			},
 		});
+		const spellBook = lessonProgress.map(lesson => {
+			return {
+				id: lesson.lesson.spellBook.id,
+				name: lesson.lesson.spellBook.name,
+			};
+		});
+		if (search) {
+			return spellBook.filter(sb => {
+				return sb.name.toLowerCase().includes(search.toLowerCase());
+			});
+		}
+		return spellBook;
 	}
 
 	async findOne(id: number) {
