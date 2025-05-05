@@ -146,12 +146,12 @@ export class UserService {
 				})
 			: formatedUserLessonProgress;
 
-		const maxCount = Math.max(...combinedProgressData.map(d => d.count));
+		// const maxCount = Math.max(...combinedProgressData.map(d => d.count));
 		const normalizeLevel = (count: number) => {
 			if (count === 0) return 0;
-			if (count <= maxCount * 0.25) return 1;
-			if (count <= maxCount * 0.5) return 2;
-			if (count <= maxCount * 0.75) return 3;
+			if (count >= 10) return 3;
+			if (count >= 5) return 2;
+			if (count >= 1) return 1;
 			return 4;
 		};
 
