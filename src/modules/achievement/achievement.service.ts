@@ -39,6 +39,8 @@ export class AchievementService {
 		});
 		const userStreak = await this.userStreakRepository.findOne({
 			select: {
+				maxDailyStreak: true,
+				maxCorrectStreak: true,
 				curDailyStreak: true,
 				curCorrectStreak: true,
 			},
@@ -57,12 +59,16 @@ export class AchievementService {
 		const progress: any = {};
 
 		for (const [key, value] of Object.entries(ACHIEVEMENTS)) {
+			let curMaxProgress = 0;
 			let currentProgress = 0;
 			if (key === "NUMBER_OF_LESSONS") {
+				curMaxProgress = userLessonCount;
 				currentProgress = userLessonCount;
 			} else if (key === "DAILY_STREAK") {
+				curMaxProgress = userStreak?.maxDailyStreak || 0;
 				currentProgress = userStreak?.curDailyStreak || 0;
 			} else if (key === "CORRECT_STREAK") {
+				curMaxProgress = userStreak?.maxCorrectStreak || 0;
 				currentProgress = userStreak?.curCorrectStreak || 0;
 			}
 
@@ -77,7 +83,7 @@ export class AchievementService {
 			const levels = value.levels;
 			let found = false;
 			for (let i = 0; i < levels.length; i++) {
-				if (currentProgress < levels[i].threshold) {
+				if (curMaxProgress < levels[i].threshold) {
 					nextBadge = levels[i].name;
 					nextThreshold = levels[i].threshold;
 					found = true;
