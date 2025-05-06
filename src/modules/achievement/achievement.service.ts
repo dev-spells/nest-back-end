@@ -39,8 +39,8 @@ export class AchievementService {
 		});
 		const userStreak = await this.userStreakRepository.findOne({
 			select: {
-				maxDailyStreak: true,
-				maxCorrectStreak: true,
+				curDailyStreak: true,
+				curCorrectStreak: true,
 			},
 			where: { userId },
 		});
@@ -61,9 +61,9 @@ export class AchievementService {
 			if (key === "NUMBER_OF_LESSONS") {
 				currentProgress = userLessonCount;
 			} else if (key === "DAILY_STREAK") {
-				currentProgress = userStreak?.maxDailyStreak || 0;
+				currentProgress = userStreak?.curDailyStreak || 0;
 			} else if (key === "CORRECT_STREAK") {
-				currentProgress = userStreak?.maxCorrectStreak || 0;
+				currentProgress = userStreak?.curCorrectStreak || 0;
 			}
 
 			const userAchievement = userAchievements.find(
