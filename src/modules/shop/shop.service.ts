@@ -4,7 +4,7 @@ import {
 	NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
+import { Repository } from "typeorm";
 
 import { ITEM_ERRORS, SHOP_ERRORS } from "src/constants/errors";
 import {
@@ -68,24 +68,24 @@ export class ShopService {
 				item: true,
 			},
 		});
-		const itemIds = itemInShop.map(item => item.itemId);
 		const userItems = await this.userItemRepository.find({
 			select: {
 				itemId: true,
 				quantity: true,
 			},
 			where: {
-				itemId: In(itemIds),
 				userId: userId,
 			},
 		});
-		const mergedItems = itemInShop.map(item => {
-			const userItem = userItems.find(
+		const mergedItems = userItems.map(item => {
+			const userItem = itemInShop.find(
 				userItem => userItem.itemId === item.itemId,
 			);
 			return {
 				...item,
-				quantity: userItem ? userItem.quantity : 0,
+				quantity: item ? item.quantity : 0,
+				buyPrices: userItem?.buyPrices ? userItem.buyPrices : null,
+				sellPrices: userItem?.sellPrices ? userItem.sellPrices : null,
 			};
 		});
 
