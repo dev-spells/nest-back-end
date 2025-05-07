@@ -41,7 +41,10 @@ export class ShopController {
 	@ApiOkResponse({ type: [GetShopResponseDto] })
 	@Get()
 	async getAll(@User() user: any) {
-		return await this.shopService.getAll(user.id);
+		return await this.shopService.getAll(
+			user.id,
+			user.role === Role.ADMIN ? true : false,
+		);
 	}
 
 	@Roles(Role.ADMIN)

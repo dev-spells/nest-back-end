@@ -20,4 +20,8 @@ export const NOTIFY_TYPE = {
 		type: "correct_streak",
 		message: "You have achieved new badge for correct streak",
 	},
+	SERVER_NOTIFY: {
+		type: "server_notify",
+		message: message => message,
+	},
 };

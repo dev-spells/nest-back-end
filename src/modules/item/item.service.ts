@@ -12,6 +12,10 @@ export class ItemService {
 	) {}
 
 	async getAll() {
-		return await this.itemRepository.find();
+		return await this.itemRepository.find({
+			order: {
+				id: "ASC",
+			},
+		});
 	}
 }

@@ -1,4 +1,5 @@
 import {
+	Body,
 	Controller,
 	Get,
 	MessageEvent,
@@ -13,10 +14,13 @@ import { Observable, Subscriber } from "rxjs";
 import { ApiBearerAuth, ApiOkResponse, ApiOperation } from "@nestjs/swagger";
 
 import { TOKEN_ERRORS } from "src/constants/errors";
+import { Role } from "src/constants/role.enum";
 import { User } from "src/decorators/current-user";
 import { Public } from "src/decorators/public-route";
+import { Roles } from "src/decorators/role-route";
 import { extractJwtPayload } from "src/utils/extract-access-token.util";
 
+import { CreateServerNotificationDto } from "./dto/create-notification.dto";
 import { NotificationResponse } from "./dto/response-notification.dto";
 import { NotificationService } from "./notification.service";
 import { ObserverStore } from "./notification-observer.store";
@@ -72,6 +76,18 @@ export class NotificationController {
 	@Post("read")
 	async markAsRead(@User() user: any) {
 		return await this.notificationService.markAsRead(user.id);
+	}
+
+	@ApiOperation({ summary: "Push notification to all user" })
+	@ApiBearerAuth()
+	@Roles(Role.ADMIN)
+	@Post("admin-notify")
+	async pushToAll(
+		@Body() createServerNotification: CreateServerNotificationDto,
+	) {
+		return await this.notificationService.pushToAll(
+			createServerNotification.message,
+		);
 	}
 
 	@Public()

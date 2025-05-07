@@ -2,7 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
+import { NOTIFY_TYPE } from "src/constants/notify-type";
 import { Notification } from "src/entities/notification.entity";
+import { User } from "src/entities/user.entity";
 
 import { CreateNotificationDto } from "./dto/create-notification.dto";
 import { NotificationResponse } from "./dto/response-notification.dto";
@@ -13,6 +15,8 @@ export class NotificationService {
 	constructor(
 		@InjectRepository(Notification)
 		private notificationRepository: Repository<Notification>,
+		@InjectRepository(User)
+		private userRepository: Repository<User>,
 	) {}
 	async pushToUser(
 		userId: string,
@@ -42,6 +46,19 @@ export class NotificationService {
 		userIds.forEach(userId => {
 			ObserverStore.push(userId, createNotificationDto);
 		});
+	}
+
+	async pushToAll(message: string) {
+		const users = await this.userRepository.find({
+			select: { id: true },
+		});
+		return await this.pushToUsers(
+			users.map(user => user.id),
+			{
+				type: NOTIFY_TYPE.SERVER_NOTIFY.type,
+				message: message,
+			},
+		);
 	}
 
 	async markAsRead(userId: string) {

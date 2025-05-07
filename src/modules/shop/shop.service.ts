@@ -31,7 +31,28 @@ export class ShopService {
 		private userRepository: Repository<User>,
 	) {}
 
-	async getAll(userId: string) {
+	async getAll(userId: string, isAdmin: boolean = false) {
+		if (isAdmin) {
+			return await this.shopRepository.find({
+				select: {
+					itemId: true,
+					sellPrices: true,
+					buyPrices: true,
+					item: {
+						name: true,
+						imageUrl: true,
+						description: true,
+					},
+				},
+				relations: {
+					item: true,
+				},
+				order: {
+					itemId: "ASC",
+				},
+			});
+		}
+
 		const itemInShop = await this.shopRepository.find({
 			select: {
 				itemId: true,
@@ -68,7 +89,7 @@ export class ShopService {
 			};
 		});
 
-		return mergedItems;
+		return mergedItems.sort((a, b) => a.itemId - b.itemId);
 	}
 	async updatePrice(itemId: number, updateShopDto: UpdateShopDto) {
 		const itemInShop = await this.shopRepository.findOne({ where: { itemId } });

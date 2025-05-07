@@ -13,3 +13,8 @@ export class CreateNotificationDto {
 	@ApiProperty()
 	itemId?: number | null;
 }
+
+export class CreateServerNotificationDto {
+	@ApiProperty()
+	message: string;
+}
