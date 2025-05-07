@@ -39,7 +39,11 @@ export class SpellBookController {
 	})
 	@Get()
 	findAll(@User() user: any, @Query("search") search: string) {
-		return this.spellBookService.findAll(user.id, search);
+		return this.spellBookService.findAll(
+			user.id,
+			search,
+			user.role === Role.ADMIN ? true : false,
+		);
 	}
 
 	@ApiOperation({ summary: "Show details of a spell book" })

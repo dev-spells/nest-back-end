@@ -27,7 +27,16 @@ export class SpellBookService {
 		return await this.spellBookRepository.save(newSpellBook);
 	}
 
-	async findAll(userId: string, search?: string) {
+	async findAll(userId: string, search?: string, isAdmin: boolean = false) {
+		if (isAdmin) {
+			return await this.spellBookRepository.find({
+				select: {
+					id: true,
+					name: true,
+				},
+			});
+		}
+
 		const lessonProgress = await this.userLessonProgressRepository.find({
 			select: {
 				lesson: {
