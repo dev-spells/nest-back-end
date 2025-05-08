@@ -72,11 +72,20 @@ export class ShopService {
 			select: {
 				itemId: true,
 				quantity: true,
+				item: {
+					name: true,
+					imageUrl: true,
+					description: true,
+				},
 			},
 			where: {
 				userId: userId,
 			},
+			relations: {
+				item: true,
+			},
 		});
+		console.log(itemInShop);
 		let mergedItems;
 		if (userItems.length > itemInShop.length) {
 			mergedItems = userItems.map(item => {
