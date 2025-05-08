@@ -77,17 +77,31 @@ export class ShopService {
 				userId: userId,
 			},
 		});
-		const mergedItems = userItems.map(item => {
-			const userItem = itemInShop.find(
-				userItem => userItem.itemId === item.itemId,
-			);
-			return {
-				...item,
-				quantity: item ? item.quantity : 0,
-				buyPrices: userItem?.buyPrices ? userItem.buyPrices : null,
-				sellPrices: userItem?.sellPrices ? userItem.sellPrices : null,
-			};
-		});
+		let mergedItems;
+		if (userItems.length > itemInShop.length) {
+			mergedItems = userItems.map(item => {
+				const userItem = itemInShop.find(
+					userItem => userItem.itemId === item.itemId,
+				);
+				return {
+					...item,
+					...userItem,
+					quantity: item ? item.quantity : 0,
+					buyPrices: userItem?.buyPrices ? userItem.buyPrices : null,
+					sellPrices: userItem?.sellPrices ? userItem.sellPrices : null,
+				};
+			});
+		} else {
+			mergedItems = itemInShop.map(item => {
+				const userItem = userItems.find(
+					userItem => userItem.itemId === item.itemId,
+				);
+				return {
+					...item,
+					quantity: userItem ? userItem.quantity : 0,
+				};
+			});
+		}
 
 		return mergedItems.sort((a, b) => a.itemId - b.itemId);
 	}
