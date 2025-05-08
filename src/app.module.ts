@@ -10,6 +10,7 @@ import { JwtAuthGuard } from "src/auth/passport/jwt-auth.guard";
 import { AchievementModule } from "./modules/achievement/achievement.module";
 import { RedisModule } from "./modules/cache/cache.module";
 import { ChapterModule } from "./modules/chapter/chapter.module";
+import { ChatbotModule } from "./modules/chatbot/chatbot.module";
 import { CourseModule } from "./modules/course/course.module";
 import { ExerciseModule } from "./modules/exercise/exercise.module";
 import { ItemModule } from "./modules/item/item.module";
@@ -64,6 +65,7 @@ import { AppService } from "./app.service";
 		NotificationModule,
 		AchievementModule,
 		LeaderboardModule,
+		ChatbotModule,
 	],
 	controllers: [AppController],
 	providers: [
