@@ -268,7 +268,7 @@ export class UserService {
 		}
 
 		const hashedPassword = await hashPassword(dto.password);
-		const user = this.userRepository.create({
+		const user = await this.userRepository.save({
 			...dto,
 			password: hashedPassword,
 			level: 1,
@@ -282,7 +282,7 @@ export class UserService {
 			userId: user.id,
 		});
 
-		return await this.userRepository.save(user);
+		return user;
 	}
 
 	async updatePassword(id: string, newPassword: string) {
