@@ -15,17 +15,24 @@ export class ChatbotController {
 		@Body() body: { lesson: string; request: string },
 		@Res() res: Response,
 	) {
-		res.setHeader("Content-Type", "text/plain; charset=utf-8");
-		res.setHeader("X-Content-Type-Options", "nosniff");
+		res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
 		res.setHeader("Cache-Control", "no-cache");
+		res.setHeader("Connection", "keep-alive");
+		res.setHeader("X-Content-Type-Options", "nosniff");
 		res.flushHeaders();
 		const combinedInput = `Lesson: ${body.lesson}\n\nUser Request: ${body.request}`;
 		const stream = await this.chatbotService.streamContent(combinedInput);
 
-		for await (const textChunk of stream) {
-			res.write(textChunk);
+		try {
+			for await (const textChunk of stream) {
+				// Send each chunk as an SSE message
+				res.write(`data: ${textChunk.replace(/\n/g, "\ndata: ")}\n\n`);
+			}
+			res.write("event: end\ndata: [DONE]\n\n"); // Optional: signal end of stream
+		} catch (err) {
+			res.write(`event: error\ndata: ${JSON.stringify(err)}\n\n`);
+		} finally {
+			res.end();
 		}
-
-		res.end();
 	}
 }
