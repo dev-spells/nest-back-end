@@ -273,7 +273,7 @@ export class UserService {
 			password: hashedPassword,
 			level: 1,
 			currentExp: 0,
-			rankTitle: "Beginner",
+			rankTitle: "Bronze",
 			gems: 0,
 			timezone: "UTC",
 			role: UserRole.USER,
