@@ -15,7 +15,10 @@ export class ChatbotController {
 		@Body() body: { lesson: string; request: string },
 		@Res() res: Response,
 	) {
-		res.setHeader("Content-Type", "text/plain");
+		res.setHeader("Content-Type", "text/plain; charset=utf-8");
+		res.setHeader("X-Content-Type-Options", "nosniff");
+		res.setHeader("Cache-Control", "no-cache");
+		res.flushHeaders();
 		const combinedInput = `Lesson: ${body.lesson}\n\nUser Request: ${body.request}`;
 		const stream = await this.chatbotService.streamContent(combinedInput);
 
