@@ -1,4 +1,4 @@
-import { Body, Controller, Patch } from "@nestjs/common";
+import { Body, Controller, Get, Patch } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 
 import {
@@ -27,6 +27,15 @@ export class ItemProtectStreakController {
 	async handleCron() {
 		console.log("Running cron job to protect streaks...");
 		await this.itemProtectStreakService.handleCron();
+	}
+
+	@Get("check")
+	@ApiOperation({ summary: "Check user protect streak" })
+	@ApiOkResponse()
+	@ApiBearerAuth()
+	@Roles(Role.ADMIN)
+	async checkUserProtectItem() {
+		return await this.itemProtectStreakService.handleCron();
 	}
 
 	@Roles(Role.ADMIN)
