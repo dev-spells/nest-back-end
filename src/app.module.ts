@@ -28,6 +28,7 @@ import { UserModule } from "./modules/user/user.module";
 import { UserSubmissionModule } from "./modules/user-submission/user-submission.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { AnalyticModule } from './modules/analytic/analytic.module';
 
 @Module({
 	imports: [
@@ -66,6 +67,7 @@ import { AppService } from "./app.service";
 		AchievementModule,
 		LeaderboardModule,
 		ChatbotModule,
+		AnalyticModule,
 	],
 	controllers: [AppController],
 	providers: [
