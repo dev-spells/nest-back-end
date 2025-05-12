@@ -62,6 +62,9 @@ export class User {
 	@Column({ type: "int", default: 0 })
 	gems: number;
 
+	@Column({ default: 0 })
+	totalExpGainedToday: number;
+
 	@Column({ type: "varchar", length: 255, default: "UTC" })
 	timezone: string;
 

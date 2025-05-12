@@ -333,6 +333,8 @@ export class UserSubmissionService {
 				borderUrl: userStats.rankBorder,
 				rankTitle: userStats.rankTitle,
 				gems: freeSolution ? user.gems : user.gems + gemsGained,
+				totalExpGainedToday:
+					user.totalExpGainedToday + userStats.totalExpGained,
 			});
 			const userLessonProgress = await this.userLessonProgressRepository.save({
 				userId: user.id,

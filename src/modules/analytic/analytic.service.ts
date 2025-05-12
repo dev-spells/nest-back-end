@@ -5,7 +5,6 @@ import { Repository } from "typeorm";
 import { RedisKey } from "src/constants/redis-key";
 import { User } from "src/entities/user.entity";
 import { UserLessonProgress } from "src/entities/user-lessson-progress.entity";
-import { localDate } from "src/utils/convert-time.util";
 
 import { RedisService } from "../cache/cache.service";
 
@@ -52,7 +51,7 @@ export class AnalyticService {
 			.addSelect("COUNT(*)", "count")
 			.where("progress.createdAt IS NOT NULL")
 			.groupBy("date")
-			.orderBy("date", "DESC")
+			.orderBy("date", "ASC")
 			.limit(40)
 			.getRawMany();
 
@@ -70,7 +69,7 @@ export class AnalyticService {
 			.select(`TO_CHAR(user.joinedAt, '${dateFormat}')`, "date")
 			.addSelect("COUNT(*)", "count")
 			.groupBy("date")
-			.orderBy("date", "DESC")
+			.orderBy("date", "ASC")
 			.limit(40)
 			.getRawMany();
 
