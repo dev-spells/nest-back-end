@@ -9,6 +9,8 @@ import { localDate } from "src/utils/convert-time.util";
 
 import { RedisService } from "../cache/cache.service";
 
+type TimeGroup = "day" | "month" | "year";
+
 @Injectable()
 export class AnalyticService {
 	constructor(
@@ -19,18 +21,19 @@ export class AnalyticService {
 		private redisService: RedisService,
 	) {}
 
-	async getAll() {
-		let analytics = await this.redisService.get(RedisKey.analytic);
+	async getAll(groupBy: TimeGroup = "day") {
+		const cacheKey = RedisKey.analytic + groupBy;
+		let analytics = await this.redisService.get(cacheKey);
 
 		if (!analytics) {
 			analytics = {
 				totalMember: await this.getTotalMember(),
-				lessonComplete: await this.getLessonComplete(),
-				userJoin: await this.getUsersJoin(),
+				lessonComplete: await this.getLessonComplete(groupBy),
+				userJoin: await this.getUsersJoin(groupBy),
 				courseJoin: await this.getCoursesJoin(),
 			};
 
-			await this.redisService.set(RedisKey.analytic, analytics, 60 * 60 * 24);
+			await this.redisService.set(cacheKey, analytics, 60 * 60 * 24);
 		}
 
 		return analytics;
@@ -41,33 +44,39 @@ export class AnalyticService {
 		return totalMember;
 	}
 
-	private async getLessonComplete() {
+	private async getLessonComplete(groupBy: TimeGroup) {
+		const dateFormat = this.getDateFormat(groupBy);
 		const lessonComplete = await this.userLessonProgressRepository
 			.createQueryBuilder("progress")
-			.select("DATE(progress.createdAt)", "date")
+			.select(`TO_CHAR(progress.createdAt, '${dateFormat}')`, "date")
 			.addSelect("COUNT(*)", "count")
 			.where("progress.createdAt IS NOT NULL")
 			.groupBy("date")
 			.orderBy("date", "DESC")
+			.limit(40)
 			.getRawMany();
 
 		return lessonComplete.map(item => ({
-			name: localDate(item.date),
+			// name: localDate(item.date),
+			name: item.date,
 			value: parseInt(item.count),
 		}));
 	}
 
-	private async getUsersJoin() {
+	private async getUsersJoin(groupBy: TimeGroup) {
+		const dateFormat = this.getDateFormat(groupBy);
 		const usersJoin = await this.userRepository
 			.createQueryBuilder("user")
-			.select("DATE(user.joinedAt)", "date")
+			.select(`TO_CHAR(user.joinedAt, '${dateFormat}')`, "date")
 			.addSelect("COUNT(*)", "count")
 			.groupBy("date")
 			.orderBy("date", "DESC")
+			.limit(40)
 			.getRawMany();
 
 		return usersJoin.map(item => ({
-			name: localDate(item.date),
+			// name: localDate(item.date),
+			name: item.date,
 			value: parseInt(item.count),
 		}));
 	}
@@ -84,11 +93,25 @@ export class AnalyticService {
 			.groupBy("course.id")
 			.addGroupBy("course.title")
 			.orderBy("count", "DESC")
+			.limit(40)
 			.getRawMany();
 
 		return coursesJoin.map(item => ({
 			name: item.name || "Uncategorized",
 			value: parseInt(item.count),
 		}));
+	}
+
+	private getDateFormat(groupBy: TimeGroup): string {
+		switch (groupBy) {
+			case "day":
+				return "YYYY-MM-DD";
+			case "month":
+				return "YYYY-MM";
+			case "year":
+				return "YYYY";
+			default:
+				return "YYYY-MM-DD";
+		}
 	}
 }
