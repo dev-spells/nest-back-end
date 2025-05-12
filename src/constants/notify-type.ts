@@ -24,4 +24,12 @@ export const NOTIFY_TYPE = {
 		type: "server_notify",
 		message: message => message,
 	},
+	UNLOCK_WHEEL: {
+		type: "unlock_wheel",
+		message: "You have unlocked the wheel",
+	},
+	DAILY_WHEEL: {
+		type: "daily_wheel",
+		message: "Your daily wheel spin is begin, good luck!",
+	},
 };

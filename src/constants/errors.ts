@@ -57,3 +57,9 @@ export const SHOP_ERRORS = {
 	NOT_ENOUGH_MONEY: "Not enough money to buy this item",
 	NOT_ENOUGH_ITEM: "Not enough quantity of item",
 } as const;
+
+export const WHEEL_ERRORS = {
+	NOT_FOUND: "Wheel item not found",
+	ITEM_ALREADY_EXISTS: "Wheel item already exists",
+	INVALID_REWARD_TYPE: "Invalid reward type",
+} as const;
