@@ -54,15 +54,20 @@ export class SpellBookService {
 				},
 			},
 		});
-		const spellBook = lessonProgress.map(lesson => {
-			return {
-				id: lesson.lesson.spellBook.id,
-				name: lesson.lesson.spellBook.name,
-			};
-		});
+		const spellBook = lessonProgress
+			.map(lesson => {
+				if (lesson.lesson.spellBook !== null) {
+					return {
+						id: lesson.lesson.spellBook.id,
+						name: lesson.lesson.spellBook.name,
+					};
+				}
+				return null;
+			})
+			.filter((item): item is { id: number; name: string } => item !== null);
 		if (search) {
 			return spellBook.filter(sb => {
-				return sb.name.toLowerCase().includes(search.toLowerCase());
+				return sb?.name.toLowerCase().includes(search.toLowerCase());
 			});
 		}
 		return spellBook;
