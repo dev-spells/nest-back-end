@@ -10,4 +10,5 @@ export const RedisKey = {
 	userTopLevel: "top-level",
 	userGithubProgress: (userId: string) => `user:${userId}:github-progress`,
 	analytic: "analytic",
+	wheel: "wheel",
 };

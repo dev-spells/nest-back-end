@@ -7,8 +7,30 @@ import {
 	Patch,
 	Post,
 } from "@nestjs/common";
+import { Cron } from "@nestjs/schedule";
 
-import { CreateRewardWheelDto } from "./dto/create-reward-wheel.dto";
+import {
+	ApiBadRequestResponse,
+	ApiBearerAuth,
+	ApiCreatedResponse,
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+} from "@nestjs/swagger";
+
+import { Role } from "src/constants/role.enum";
+import { User } from "src/decorators/current-user";
+import { Roles } from "src/decorators/role-route";
+
+import {
+	CreateRewardWheelDto,
+	HandleRewardDto,
+} from "./dto/create-reward-wheel.dto";
+import {
+	CheckUserWheelResponseDto,
+	HandleRewardResponseDto,
+	WheelRewardDto,
+} from "./dto/response-reward-wheel.dto";
 import { UpdateRewardWheelDto } from "./dto/update-reward-wheel.dto";
 import { RewardWheelService } from "./reward-wheel.service";
 
@@ -16,31 +38,69 @@ import { RewardWheelService } from "./reward-wheel.service";
 export class RewardWheelController {
 	constructor(private readonly rewardWheelService: RewardWheelService) {}
 
-	// @Post()
-	// create(@Body() createRewardWheelDto: CreateRewardWheelDto) {
-	// 	return this.rewardWheelService.create(createRewardWheelDto);
-	// }
+	@Cron("0 0 * * *", {
+		timeZone: "UTC",
+	})
+	async handleCron() {
+		console.log("reset wheel start");
+		return this.rewardWheelService.handleCron();
+	}
 
-	// @Get()
-	// findAll() {
-	// 	return this.rewardWheelService.findAll();
-	// }
+	@Roles(Role.ADMIN)
+	@ApiOperation({ summary: "Run cron job" })
+	@ApiBearerAuth()
+	@Post("run-cron")
+	async runCron() {
+		return this.rewardWheelService.handleCron();
+	}
 
-	// @Get(":id")
-	// findOne(@Param("id") id: string) {
-	// 	return this.rewardWheelService.findOne(+id);
-	// }
+	@ApiOperation({ summary: "Check user can spin or not" })
+	@ApiBearerAuth()
+	@ApiOkResponse({ type: CheckUserWheelResponseDto })
+	@ApiNotFoundResponse()
+	@Get("check")
+	async checkUserCanSpin(@User() user: any) {
+		return await this.rewardWheelService.checkUserCanSpin(user.id);
+	}
 
-	// @Patch(":id")
-	// update(
-	// 	@Param("id") id: string,
-	// 	@Body() updateRewardWheelDto: UpdateRewardWheelDto,
-	// ) {
-	// 	return this.rewardWheelService.update(+id, updateRewardWheelDto);
-	// }
+	@ApiOperation({ summary: "Get wheel" })
+	@ApiBearerAuth()
+	@ApiOkResponse({ type: WheelRewardDto })
+	@Get()
+	async getWheel() {
+		return await this.rewardWheelService.getWheel();
+	}
 
-	// @Delete(":id")
-	// remove(@Param("id") id: string) {
-	// 	return this.rewardWheelService.remove(+id);
-	// }
+	@ApiOperation({ summary: "Handle reward" })
+	@ApiBearerAuth()
+	@ApiCreatedResponse({
+		type: HandleRewardResponseDto,
+	})
+	@ApiNotFoundResponse()
+	@ApiBadRequestResponse()
+	@Post("handle-reward")
+	async handleReward(
+		@User() user: any,
+		@Body() handleRewardDto: HandleRewardDto,
+	) {
+		return await this.rewardWheelService.handleReward(user.id, handleRewardDto);
+	}
+
+	@ApiOperation({ summary: "Create wheel item" })
+	@Roles(Role.ADMIN)
+	@ApiBearerAuth()
+	@ApiNotFoundResponse()
+	@ApiBadRequestResponse()
+	@Post()
+	async createWheelItem(@Body() createRewardWheelDto: CreateRewardWheelDto) {
+		return await this.rewardWheelService.create(createRewardWheelDto);
+	}
+
+	@ApiOperation({ summary: "Update wheel item" })
+	@ApiBearerAuth()
+	@Roles(Role.ADMIN)
+	@Patch()
+	async updateWheelItem(@Body() updateRewardWheelDto: UpdateRewardWheelDto) {
+		return await this.rewardWheelService.update(updateRewardWheelDto);
+	}
 }

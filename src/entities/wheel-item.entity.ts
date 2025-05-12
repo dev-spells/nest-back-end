@@ -4,6 +4,7 @@ import {
 	JoinColumn,
 	ManyToOne,
 	PrimaryGeneratedColumn,
+	Unique,
 } from "typeorm";
 
 import { Item } from "./item.entity";
@@ -15,6 +16,7 @@ export enum WheelRewardType {
 }
 
 @Entity()
+@Unique(["rewardType", "item", "gems", "xp", "probability"])
 export class WheelItem {
 	@PrimaryGeneratedColumn()
 	id: number;
