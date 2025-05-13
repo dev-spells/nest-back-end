@@ -82,6 +82,19 @@ export class UserService {
 	async getUserCourseCompleted(userCourseCompletedId: string) {
 		const userCourseCompleted =
 			await this.userCourseCompletionRepository.findOne({
+				select: {
+					id: true,
+					createdAt: true,
+					courses: {
+						id: true,
+						title: true,
+						createdAt: true,
+					},
+					users: {
+						id: true,
+						username: true,
+					},
+				},
 				where: { id: userCourseCompletedId },
 				relations: {
 					courses: true,
