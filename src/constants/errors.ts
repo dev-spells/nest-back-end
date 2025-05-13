@@ -9,6 +9,7 @@ export const USER_ERRORS = {
 	SPAM_OTP: "Please wait before requesting a new OTP",
 	INVALID_OLD_PASSWORD: "Old password is incorrect",
 	LOGIN_FAILED: "Username/Password incorrect",
+	USER_COURSE_COMPLETED_NOT_FOUND: "User course completed not found",
 } as const;
 
 export const PASSWORD_ERRORS = {

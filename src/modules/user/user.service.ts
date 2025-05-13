@@ -79,6 +79,20 @@ export class UserService {
 		return userStreak;
 	}
 
+	async getUserCourseCompleted(userCourseCompletedId: string) {
+		const userCourseCompleted =
+			await this.userCourseCompletionRepository.findOne({
+				where: { id: userCourseCompletedId },
+				relations: {
+					courses: true,
+				},
+			});
+		if (!userCourseCompleted) {
+			throw new NotFoundException(USER_ERRORS.USER_COURSE_COMPLETED_NOT_FOUND);
+		}
+		return userCourseCompleted;
+	}
+
 	async getDetail(userId: string, profileId: string) {
 		const user = await this.userRepository.findOne({
 			where: { id: profileId },

@@ -35,6 +35,15 @@ export class UserController {
 		return await this.userService.getUserStreak(user.id);
 	}
 
+	@ApiOperation({ summary: "get user course completed" })
+	@ApiBearerAuth()
+	@ApiOkResponse({ type: UserDetailResponseDto })
+	@ApiNotFoundResponse({ description: "User course completed not found" })
+	@Get("course-completed/:id")
+	async getUserCourseCompleted(@Param("id") id: string) {
+		return await this.userService.getUserCourseCompleted(id);
+	}
+
 	@ApiOperation({ summary: "get user detail info" })
 	@ApiBearerAuth()
 	@ApiOkResponse({ type: UserDetailResponseDto })
