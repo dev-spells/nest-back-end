@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { Item } from "src/entities/item.entity";
+import { Notification } from "src/entities/notification.entity";
 import { User } from "src/entities/user.entity";
 import { UserItem } from "src/entities/user-item.entity";
 import { WheelItem } from "src/entities/wheel-item.entity";
@@ -14,7 +15,7 @@ import { RewardWheelService } from "./reward-wheel.service";
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([WheelItem, UserItem, User, Item]),
+		TypeOrmModule.forFeature([WheelItem, UserItem, User, Item, Notification]),
 		RedisModule,
 		NotificationModule,
 	],

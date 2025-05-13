@@ -5,13 +5,14 @@ import {
 	NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { MoreThanOrEqual, Repository } from "typeorm";
 
 import { ITEM_ERRORS, USER_ERRORS, WHEEL_ERRORS } from "src/constants/errors";
 import { NOTIFY_TYPE } from "src/constants/notify-type";
 import { RedisKey } from "src/constants/redis-key";
 import { REWARD_WHEEL_THRESHOLD } from "src/constants/reward-wheel";
 import { Item } from "src/entities/item.entity";
+import { Notification } from "src/entities/notification.entity";
 import { User } from "src/entities/user.entity";
 import { UserItem } from "src/entities/user-item.entity";
 import { WheelItem, WheelRewardType } from "src/entities/wheel-item.entity";
@@ -39,6 +40,8 @@ export class RewardWheelService {
 		private itemRepository: Repository<Item>,
 		private redisService: RedisService,
 		private notificationService: NotificationService,
+		@InjectRepository(Notification)
+		private notificationRepository: Repository<Notification>,
 	) {}
 
 	async handleCron() {
@@ -71,10 +74,23 @@ export class RewardWheelService {
 			}
 		}
 		if (canSpin) {
-			this.notificationService.pushToUser(userId, {
-				type: NOTIFY_TYPE.UNLOCK_WHEEL.type,
-				message: NOTIFY_TYPE.UNLOCK_WHEEL.message,
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+
+			const existingNotification = await this.notificationRepository.findOne({
+				where: {
+					userId: userId,
+					type: NOTIFY_TYPE.UNLOCK_WHEEL.type,
+					createdAt: MoreThanOrEqual(today),
+				},
 			});
+
+			if (!existingNotification) {
+				this.notificationService.pushToUser(userId, {
+					type: NOTIFY_TYPE.UNLOCK_WHEEL.type,
+					message: NOTIFY_TYPE.UNLOCK_WHEEL.message,
+				});
+			}
 		}
 		return {
 			canSpin,
