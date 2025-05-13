@@ -89,6 +89,7 @@ export class UserService {
 						id: true,
 						title: true,
 						createdAt: true,
+						iconUrl: true,
 					},
 					users: {
 						id: true,
