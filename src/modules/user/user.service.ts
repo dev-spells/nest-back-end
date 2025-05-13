@@ -171,6 +171,9 @@ export class UserService {
 		}
 		const userCourseCompleted = await this.userCourseCompletionRepository.find({
 			where: { userId: profileId },
+			relations: {
+				courses: true,
+			},
 		});
 		if (userCourseCompleted) {
 			userCourseCompleted.map(row => {
