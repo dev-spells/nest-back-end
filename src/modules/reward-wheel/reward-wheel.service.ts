@@ -5,7 +5,6 @@ import {
 	NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import Redis from "ioredis";
 import { Repository } from "typeorm";
 
 import { ITEM_ERRORS, USER_ERRORS, WHEEL_ERRORS } from "src/constants/errors";
@@ -67,7 +66,7 @@ export class RewardWheelService {
 		);
 		if (wheelUsers) {
 			const wheelUsersArray = JSON.parse(wheelUsers);
-			if (!wheelUsersArray.includes(userId)) {
+			if (wheelUsersArray.includes(userId)) {
 				canSpin = false;
 			}
 		}
