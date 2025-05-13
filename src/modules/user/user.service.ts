@@ -85,6 +85,7 @@ export class UserService {
 				where: { id: userCourseCompletedId },
 				relations: {
 					courses: true,
+					users: true,
 				},
 			});
 		if (!userCourseCompleted) {
