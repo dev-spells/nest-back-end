@@ -86,6 +86,15 @@ export class RewardWheelController {
 		return await this.rewardWheelService.handleReward(user.id, handleRewardDto);
 	}
 
+	@ApiOperation({ summary: "Delete wheel item" })
+	@ApiBearerAuth()
+	@Roles(Role.ADMIN)
+	@ApiNotFoundResponse()
+	@Delete(":id")
+	async deleteWheelItem(@Param("id") id: string) {
+		return await this.rewardWheelService.delete(+id);
+	}
+
 	@ApiOperation({ summary: "Create wheel item" })
 	@Roles(Role.ADMIN)
 	@ApiBearerAuth()

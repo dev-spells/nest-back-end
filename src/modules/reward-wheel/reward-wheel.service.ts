@@ -170,6 +170,16 @@ export class RewardWheelService {
 		}
 	}
 
+	async delete(wheelItemId: number) {
+		const wheelItem = await this.wheelItemRepository.findOne({
+			where: { id: wheelItemId },
+		});
+		if (!wheelItem) {
+			throw new NotFoundException(WHEEL_ERRORS.NOT_FOUND);
+		}
+		return await this.wheelItemRepository.delete(wheelItemId);
+	}
+
 	async handleReward(userId: string, handleRewardDto: HandleRewardDto) {
 		let userList: string[] = [];
 
