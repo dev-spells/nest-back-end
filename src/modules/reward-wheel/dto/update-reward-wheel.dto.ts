@@ -10,7 +10,7 @@ export class UpdateRewardWheelDto {
 	})
 	@IsNumber()
 	@IsNotEmpty()
-	wheelItemId: number;
+	id: number;
 
 	@ApiProperty({
 		description: "The type of reward",

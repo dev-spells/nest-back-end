@@ -120,7 +120,7 @@ export class RewardWheelService {
 
 	async update(updateRewardWheelDto: UpdateRewardWheelDto) {
 		const wheelItem = await this.wheelItemRepository.findOne({
-			where: { id: updateRewardWheelDto.wheelItemId },
+			where: { id: updateRewardWheelDto.id },
 		});
 		if (!wheelItem) {
 			throw new NotFoundException(WHEEL_ERRORS.NOT_FOUND);
