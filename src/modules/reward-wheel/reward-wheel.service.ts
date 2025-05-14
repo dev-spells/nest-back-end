@@ -104,6 +104,9 @@ export class RewardWheelService {
 			relations: {
 				item: true,
 			},
+			order: {
+				id: "ASC",
+			},
 		});
 		return wheelItems.map(wheelItem => ({
 			id: wheelItem.id,
