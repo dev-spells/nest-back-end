@@ -11,6 +11,7 @@ import {
 
 import { Role } from "src/constants/role.enum";
 import { User } from "src/decorators/current-user";
+import { Public } from "src/decorators/public-route";
 import { Roles } from "src/decorators/role-route";
 
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -33,6 +34,15 @@ export class UserController {
 	@Get("streak")
 	async getStreak(@User() user: any) {
 		return await this.userService.getUserStreak(user.id);
+	}
+
+	@Public()
+	@ApiOperation({ summary: "get public user certificate" })
+	@Get("public-certificate/:id")
+	@ApiOkResponse({ type: UserDetailResponseDto })
+	@ApiNotFoundResponse({ description: "User course completed not found" })
+	async getPublicUserCertificate(@Param("id") id: string) {
+		return await this.userService.getUserCourseCompleted(id);
 	}
 
 	@ApiOperation({ summary: "get user course completed" })
