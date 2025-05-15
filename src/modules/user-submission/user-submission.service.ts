@@ -335,12 +335,11 @@ export class UserSubmissionService {
 				borderUrl: userStats.rankBorder,
 				rankTitle: userStats.rankTitle,
 				gems: freeSolution ? user.gems : user.gems + gemsGained,
-				totalExpGainedToday:
-					Number(user.totalExpGainedToday) > 0
-						? Number(user.totalExpGainedToday) +
-							Number(expGained) +
-							Number(expBonus)
-						: Number(expGained) + Number(expBonus),
+				totalExpGainedToday: freeSolution
+					? Number(user.totalExpGainedToday)
+					: Number(user.totalExpGainedToday) +
+						Number(expGained) +
+						Number(expBonus),
 			});
 			const userLessonProgress = await this.userLessonProgressRepository.save({
 				userId: user.id,
