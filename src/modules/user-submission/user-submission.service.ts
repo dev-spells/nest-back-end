@@ -122,9 +122,11 @@ export class UserSubmissionService {
 				expToLevelUp: userStats.expToLevelUp,
 				borderUrl: userStats.rankBorder,
 				rankTitle: userStats.rankTitle,
+				totalExpGainedToday: user.totalExpGainedToday + EXP_FOR_FINISH_COURSE,
 			});
 			return {
 				...userStats,
+				totalExpGainedToday: user.totalExpGainedToday + EXP_FOR_FINISH_COURSE,
 				expGained: EXP_FOR_FINISH_COURSE,
 			};
 		}
