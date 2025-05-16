@@ -34,6 +34,6 @@ export class WheelItem {
 	@Column({ type: "int", nullable: true })
 	xp: number;
 
-	@Column({ default: 0 })
+	@Column({ default: 0, type: "float" })
 	probability: number;
 }
