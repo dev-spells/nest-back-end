@@ -246,7 +246,10 @@ export class UserSubmissionService {
 				console.log(timeDiff);
 				const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
 				console.log("day diff", daysDiff);
-				if (daysDiff === 1) {
+				if (
+					daysDiff === 1 ||
+					(await this.redisService.get(RedisKey.userItemDailyStreak(userId)))
+				) {
 					updatedDailyStreak += 1;
 					updatedMaxDailyStreak = Math.max(
 						updatedMaxDailyStreak,
