@@ -5,7 +5,7 @@ import {
 	NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { MoreThanOrEqual, Repository } from "typeorm";
+import { In, MoreThanOrEqual, Repository } from "typeorm";
 
 import { ITEM_ERRORS, USER_ERRORS, WHEEL_ERRORS } from "src/constants/errors";
 import { NOTIFY_TYPE } from "src/constants/notify-type";
@@ -25,7 +25,10 @@ import {
 	CreateRewardWheelDto,
 	HandleRewardDto,
 } from "./dto/create-reward-wheel.dto";
-import { UpdateRewardWheelDto } from "./dto/update-reward-wheel.dto";
+import {
+	UpdateProbabilityDto,
+	UpdateRewardWheelDto,
+} from "./dto/update-reward-wheel.dto";
 
 @Injectable()
 export class RewardWheelService {
@@ -97,6 +100,18 @@ export class RewardWheelService {
 			totalExpGainedToday: user.totalExpGainedToday,
 			wheelThreshold: REWARD_WHEEL_THRESHOLD,
 		};
+	}
+
+	async updateBatchProbability(updateProbabilityDto: UpdateProbabilityDto[]) {
+		const wheelItems = await this.wheelItemRepository.find({
+			where: {
+				id: In(updateProbabilityDto.map(wheelItem => wheelItem.id)),
+			},
+		});
+		if (wheelItems.length !== updateProbabilityDto.length) {
+			throw new NotFoundException("Some item not found");
+		}
+		return await this.wheelItemRepository.save(updateProbabilityDto);
 	}
 
 	async getWheel() {

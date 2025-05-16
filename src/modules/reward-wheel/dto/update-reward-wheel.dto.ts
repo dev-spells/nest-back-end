@@ -58,3 +58,22 @@ export class UpdateRewardWheelDto {
 	@IsOptional()
 	probability?: number;
 }
+
+export class UpdateProbabilityDto {
+	@ApiProperty({
+		description: "The unique identifier of the wheel item to update",
+		example: 1,
+	})
+	@IsNumber()
+	@IsNotEmpty()
+	id: number;
+
+	@ApiProperty({
+		description: "The probability of winning this reward (0-100)",
+		required: false,
+		example: 25,
+	})
+	@IsNumber()
+	@IsOptional()
+	probability: number;
+}

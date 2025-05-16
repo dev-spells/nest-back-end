@@ -12,6 +12,7 @@ import { Cron } from "@nestjs/schedule";
 import {
 	ApiBadRequestResponse,
 	ApiBearerAuth,
+	ApiBody,
 	ApiCreatedResponse,
 	ApiNotFoundResponse,
 	ApiOkResponse,
@@ -31,7 +32,10 @@ import {
 	HandleRewardResponseDto,
 	WheelRewardDto,
 } from "./dto/response-reward-wheel.dto";
-import { UpdateRewardWheelDto } from "./dto/update-reward-wheel.dto";
+import {
+	UpdateProbabilityDto,
+	UpdateRewardWheelDto,
+} from "./dto/update-reward-wheel.dto";
 import { RewardWheelService } from "./reward-wheel.service";
 
 @Controller("reward-wheel")
@@ -103,6 +107,17 @@ export class RewardWheelController {
 	@Post()
 	async createWheelItem(@Body() createRewardWheelDto: CreateRewardWheelDto) {
 		return await this.rewardWheelService.create(createRewardWheelDto);
+	}
+
+	@Roles(Role.ADMIN)
+	@ApiOperation({ summary: "Update batch wheel items - ADMIN" })
+	@ApiBearerAuth()
+	@ApiOkResponse()
+	@ApiBody({ type: [UpdateProbabilityDto] })
+	@ApiNotFoundResponse({ description: "Wheel item not found" })
+	@Patch("batch")
+	updateBatch(@Body() updateProbabilityDto: UpdateProbabilityDto[]) {
+		return this.rewardWheelService.updateBatchProbability(updateProbabilityDto);
 	}
 
 	@ApiOperation({ summary: "Update wheel item" })

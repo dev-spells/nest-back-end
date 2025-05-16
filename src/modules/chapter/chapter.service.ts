@@ -49,7 +49,7 @@ export class ChapterService {
 		const { courseId, name, pos } = createChapterDto;
 		await this.courseService.isCourseExists(courseId);
 
-		const chapter = this.chapterRepository.create(createChapterDto);
+		// const chapter = this.chapterRepository.create(createChapterDto);
 		return this.chapterRepository.save({
 			course: { id: courseId },
 			name,
