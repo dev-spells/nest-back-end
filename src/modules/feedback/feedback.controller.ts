@@ -16,10 +16,13 @@ import {
 	ApiOkResponse,
 	ApiOperation,
 	ApiQuery,
+	ApiTags,
 } from "@nestjs/swagger";
 
+import { Role } from "src/constants/role.enum";
 import { User } from "src/decorators/current-user";
 import { Public } from "src/decorators/public-route";
+import { Roles } from "src/decorators/role-route";
 import {
 	FeedbackStatus,
 	FeedbackType,
@@ -30,6 +33,7 @@ import { GetFeedbackResponse } from "./dto/response-feedback.dto";
 import { UpdateFeedbackDto } from "./dto/update-feedback.dto";
 import { FeedbackService } from "./feedback.service";
 
+@ApiTags("Feedback")
 @Controller("feedback")
 export class FeedbackController {
 	constructor(private readonly feedbackService: FeedbackService) {}
@@ -42,6 +46,7 @@ export class FeedbackController {
 		return this.feedbackService.create(user.id, createFeedbackDto);
 	}
 
+	@Roles(Role.ADMIN)
 	@ApiOperation({ summary: "get all feedbacks" })
 	@ApiOkResponse({ type: GetFeedbackResponse })
 	@ApiBadRequestResponse({ description: "Query invalid" })
@@ -84,6 +89,7 @@ export class FeedbackController {
 		return this.feedbackService.findAll({ filter, sort });
 	}
 
+	@Roles(Role.ADMIN)
 	@ApiOperation({ summary: "update feedback" })
 	@ApiBearerAuth()
 	@ApiNotFoundResponse({ description: "Feedback not found" })
