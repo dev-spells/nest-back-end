@@ -25,7 +25,6 @@ export class WheelItem {
 	rewardType: WheelRewardType;
 
 	@ManyToOne(() => Item, { nullable: true })
-	@JoinColumn({ name: "itemId" })
 	item: Item;
 
 	@Column({ type: "int", nullable: true })

@@ -64,3 +64,7 @@ export const WHEEL_ERRORS = {
 	ITEM_ALREADY_EXISTS: "Wheel item already exists",
 	INVALID_REWARD_TYPE: "Invalid reward type",
 } as const;
+
+export const USER_FEEDBACK_ERRORS = {
+	NOT_FOUND: "User feedback not found",
+} as const;
