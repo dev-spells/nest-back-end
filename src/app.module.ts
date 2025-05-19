@@ -30,6 +30,7 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AnalyticModule } from './modules/analytic/analytic.module';
 import { RewardWheelModule } from './modules/reward-wheel/reward-wheel.module';
+import { FeedbackModule } from './modules/feedback/feedback.module';
 
 @Module({
 	imports: [
@@ -70,6 +71,7 @@ import { RewardWheelModule } from './modules/reward-wheel/reward-wheel.module';
 		ChatbotModule,
 		AnalyticModule,
 		RewardWheelModule,
+		FeedbackModule,
 	],
 	controllers: [AppController],
 	providers: [
