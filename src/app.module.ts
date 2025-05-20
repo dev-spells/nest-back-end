@@ -60,7 +60,7 @@ import { AppService } from "./app.service";
 			useFactory: (configService: ConfigService) => ({
 				type: "postgres",
 				url: configService.get<string>("DATABASE_URL"),
-				autoLoadEntities: configService.get<boolean>("AUTO_LOAD_ENTITIES"),
+				// autoLoadEntities: configService.get<boolean>("AUTO_LOAD_ENTITIES"),
 				// entities: ["dist/**/*.entity{.ts,.js}"],
 				entities: [
 					Chapter,
