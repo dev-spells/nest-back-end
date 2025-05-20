@@ -32,26 +32,26 @@ export class ShopService {
 	) {}
 
 	async getAll(userId: string, isAdmin: boolean) {
-		// if (isAdmin) {
-		// 	return await this.shopRepository.find({
-		// 		select: {
-		// 			itemId: true,
-		// 			sellPrices: true,
-		// 			buyPrices: true,
-		// 			item: {
-		// 				name: true,
-		// 				imageUrl: true,
-		// 				description: true,
-		// 			},
-		// 		},
-		// 		relations: {
-		// 			item: true,
-		// 		},
-		// 		order: {
-		// 			itemId: "ASC",
-		// 		},
-		// 	});
-		// }
+		if (isAdmin) {
+			return await this.shopRepository.find({
+				select: {
+					itemId: true,
+					sellPrices: true,
+					buyPrices: true,
+					item: {
+						name: true,
+						imageUrl: true,
+						description: true,
+					},
+				},
+				relations: {
+					item: true,
+				},
+				order: {
+					itemId: "ASC",
+				},
+			});
+		}
 
 		const itemInShop = await this.shopRepository.find({
 			select: {
@@ -86,7 +86,7 @@ export class ShopService {
 			},
 		});
 		let mergedItems;
-		if (userItems.length > itemInShop.length || !isAdmin) {
+		if (userItems.length > itemInShop.length) {
 			mergedItems = userItems.map(item => {
 				const userItem = itemInShop.find(
 					userItem => userItem.itemId === item.itemId,
