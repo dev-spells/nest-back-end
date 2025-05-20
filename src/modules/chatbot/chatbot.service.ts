@@ -1,10 +1,15 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { GoogleGenAI } from "@google/genai";
+import * as pgvector from "pgvector";
+import { DataSource } from "typeorm";
+
+import { EmbeddingContext } from "src/entities/embeded-context.entity";
 
 @Injectable()
-export class ChatbotService {
+export class ChatbotService implements OnModuleInit {
 	private readonly ai: GoogleGenAI;
+	private dataSource: DataSource;
 
 	constructor(private readonly configService: ConfigService) {
 		this.ai = new GoogleGenAI({
@@ -12,50 +17,64 @@ export class ChatbotService {
 		});
 	}
 
-	async streamContent(
-		userInput: string,
-	): Promise<AsyncGenerator<string, void, unknown>> {
-		const config = {
-			responseMimeType: "text/plain",
-			streamMode: "streaming", // Ensure streaming mode is enabled
-			systemInstruction: [
+	async onModuleInit() {
+		this.dataSource = new DataSource({
+			type: "postgres",
+			url: this.configService.get("DATABASE_URL"),
+			entities: [EmbeddingContext],
+			synchronize: false,
+		});
+		await this.dataSource.initialize();
+	}
+
+	async embedContent(body: { question: string; answer: string; type: string }) {
+		const response = await this.ai.models.embedContent({
+			model: "text-embedding-004",
+			contents: [
 				{
-					text: `You are Elder Racoon, a wise and helpful assistant. Respond to user questions with relevant information.`, // Replace with your actual system prompt
+					parts: [{ text: body.question }, { text: body.type }],
 				},
 			],
-		};
-
-		const model = "gemini-2.0-flash-lite";
-		const contents = [
-			{
-				role: "user",
-				parts: [
-					{
-						text: userInput,
-					},
-				],
+			config: {
+				outputDimensionality: 512,
 			},
-		];
-
-		const response = await this.ai.models.generateContentStream({
-			model,
-			config,
-			contents,
 		});
-
-		async function* streamChunks() {
-			try {
-				for await (const chunk of response) {
-					if (chunk.text !== undefined && chunk.text.length > 0) {
-						yield chunk.text;
-					}
-				}
-			} catch (error) {
-				console.error("Error in streamChunks:", error);
-				throw error;
-			}
+		if (response.embeddings?.[0]?.values) {
+			console.log(response.embeddings);
+			return await this.dataSource.getRepository(EmbeddingContext).save({
+				embedding: pgvector.toSql(response.embeddings[0].values),
+				context: { ...body },
+			});
 		}
+	}
 
-		return streamChunks();
+	async findSimilarContext(text: string) {
+		const response = await this.ai.models.embedContent({
+			model: "text-embedding-004",
+			contents: [
+				{
+					parts: [{ text }],
+				},
+			],
+			config: {
+				outputDimensionality: 512,
+			},
+		});
+		console.log(response.embeddings);
+		if (response.embeddings?.[0]?.values) {
+			const items = await this.dataSource
+				.getRepository(EmbeddingContext)
+				.createQueryBuilder("embeddingContext")
+				.where("embedding <-> :embedding < :threshold")
+				.orderBy("embedding <-> :embedding")
+				.setParameters({
+					embedding: pgvector.toSql(response.embeddings[0].values),
+					threshold: 0.5,
+				})
+				.limit(5)
+				.getMany();
+
+			return items;
+		}
 	}
 }
