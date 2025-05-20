@@ -31,27 +31,27 @@ export class ShopService {
 		private userRepository: Repository<User>,
 	) {}
 
-	async getAll(userId: string, isAdmin: boolean = false) {
-		if (isAdmin) {
-			return await this.shopRepository.find({
-				select: {
-					itemId: true,
-					sellPrices: true,
-					buyPrices: true,
-					item: {
-						name: true,
-						imageUrl: true,
-						description: true,
-					},
-				},
-				relations: {
-					item: true,
-				},
-				order: {
-					itemId: "ASC",
-				},
-			});
-		}
+	async getAll(userId: string) {
+		// if (isAdmin) {
+		// 	return await this.shopRepository.find({
+		// 		select: {
+		// 			itemId: true,
+		// 			sellPrices: true,
+		// 			buyPrices: true,
+		// 			item: {
+		// 				name: true,
+		// 				imageUrl: true,
+		// 				description: true,
+		// 			},
+		// 		},
+		// 		relations: {
+		// 			item: true,
+		// 		},
+		// 		order: {
+		// 			itemId: "ASC",
+		// 		},
+		// 	});
+		// }
 
 		const itemInShop = await this.shopRepository.find({
 			select: {
@@ -85,7 +85,6 @@ export class ShopService {
 				item: true,
 			},
 		});
-		console.log(itemInShop);
 		let mergedItems;
 		if (userItems.length > itemInShop.length) {
 			mergedItems = userItems.map(item => {

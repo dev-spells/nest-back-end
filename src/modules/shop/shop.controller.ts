@@ -43,7 +43,7 @@ export class ShopController {
 	async getAll(@User() user: any) {
 		return await this.shopService.getAll(
 			user.id,
-			user.role === Role.ADMIN ? true : false,
+			// user.role === Role.ADMIN ? true : false,
 		);
 	}
 
