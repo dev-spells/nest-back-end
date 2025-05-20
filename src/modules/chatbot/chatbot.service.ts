@@ -60,7 +60,6 @@ export class ChatbotService implements OnModuleInit {
 				outputDimensionality: 512,
 			},
 		});
-		console.log(response.embeddings);
 		if (response.embeddings?.[0]?.values) {
 			const items = await this.dataSource
 				.getRepository(EmbeddingContext)
@@ -69,12 +68,12 @@ export class ChatbotService implements OnModuleInit {
 				.orderBy("embedding <-> :embedding")
 				.setParameters({
 					embedding: pgvector.toSql(response.embeddings[0].values),
-					threshold: 0.5,
+					threshold: 0.7,
 				})
 				.limit(5)
 				.getMany();
 
-			return items;
+			return items.map(item => item.context);
 		}
 	}
 }

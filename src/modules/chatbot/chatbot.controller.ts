@@ -1,6 +1,11 @@
 import { Body, Controller, Post } from "@nestjs/common";
 
-import { ApiBearerAuth, ApiOperation, ApiParam } from "@nestjs/swagger";
+import {
+	ApiBearerAuth,
+	ApiBody,
+	ApiOperation,
+	ApiParam,
+} from "@nestjs/swagger";
 
 import { Public } from "src/decorators/public-route";
 
@@ -19,16 +24,20 @@ export class ChatbotController {
 		return response;
 	}
 
+	@Public()
 	@ApiOperation({ summary: "Find similar context" })
-	@ApiParam({
-		name: "text",
-		type: String,
-		description: "Text to find similar context",
+	@ApiBody({
+		schema: {
+			type: "object",
+			properties: {
+				text: { type: "string" },
+			},
+		},
 	})
 	@ApiBearerAuth()
 	@Post("find-similar")
-	async findSimilar(@Body() body: { text: string }) {
-		const response = await this.chatbotService.findSimilarContext(body.text);
+	async findSimilar(@Body("text") text: string) {
+		const response = await this.chatbotService.findSimilarContext(text);
 		return response;
 	}
 }
