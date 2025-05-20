@@ -5,7 +5,7 @@ export class EmbeddingContext {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@Column()
+	@Column({ nullable: true })
 	embedding: string;
 
 	@Column({ type: "jsonb" })
