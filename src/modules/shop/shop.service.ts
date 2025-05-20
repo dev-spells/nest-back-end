@@ -31,7 +31,7 @@ export class ShopService {
 		private userRepository: Repository<User>,
 	) {}
 
-	async getAll(userId: string) {
+	async getAll(userId: string, isAdmin: boolean) {
 		// if (isAdmin) {
 		// 	return await this.shopRepository.find({
 		// 		select: {
@@ -86,7 +86,7 @@ export class ShopService {
 			},
 		});
 		let mergedItems;
-		if (userItems.length > itemInShop.length) {
+		if (userItems.length > itemInShop.length || !isAdmin) {
 			mergedItems = userItems.map(item => {
 				const userItem = itemInShop.find(
 					userItem => userItem.itemId === item.itemId,
