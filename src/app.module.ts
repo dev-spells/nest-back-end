@@ -83,7 +83,7 @@ import { AppService } from "./app.service";
 					UserAchievement,
 					WheelItem,
 				],
-				synchronize: configService.get<boolean>("SYNCHRONIZE"),
+				synchronize: false,
 				logging: false,
 			}),
 			inject: [ConfigService],
