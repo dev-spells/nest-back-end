@@ -24,7 +24,6 @@ export class ChatbotController {
 		return response;
 	}
 
-	@Public()
 	@ApiOperation({ summary: "Find similar context" })
 	@ApiBody({
 		schema: {
