@@ -7,6 +7,25 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "src/auth/auth.module";
 import { JwtAuthGuard } from "src/auth/passport/jwt-auth.guard";
 
+import { Chapter } from "./entities/chapter.entity";
+import { CodingExercise } from "./entities/coding-exercise.entity";
+import { CodingExerciseSnippet } from "./entities/coding-exercise-snippet.entity";
+import { Course } from "./entities/course.entity";
+import { Item } from "./entities/item.entity";
+import { Lesson } from "./entities/lesson.entity";
+import { MultipleChoiceExercise } from "./entities/multiple-choice-exercise.entity";
+import { Notification } from "./entities/notification.entity";
+import { QuizExercise } from "./entities/quiz-exercise.entity";
+import { Shop } from "./entities/shop.entity";
+import { SpellBook } from "./entities/spellbook.entity";
+import { User } from "./entities/user.entity";
+import { UserAchievement } from "./entities/user-achievement.entity";
+import { UserCourseCompletion } from "./entities/user-course-completion";
+import { UserFeedback } from "./entities/user-feedback.entity";
+import { UserItem } from "./entities/user-item.entity";
+import { UserLessonProgress } from "./entities/user-lessson-progress.entity";
+import { UserStreak } from "./entities/user-streak.entity";
+import { WheelItem } from "./entities/wheel-item.entity";
 import { AchievementModule } from "./modules/achievement/achievement.module";
 import { AnalyticModule } from "./modules/analytic/analytic.module";
 import { RedisModule } from "./modules/cache/cache.module";
@@ -42,7 +61,28 @@ import { AppService } from "./app.service";
 				type: "postgres",
 				url: configService.get<string>("DATABASE_URL"),
 				autoLoadEntities: configService.get<boolean>("AUTO_LOAD_ENTITIES"),
-				entities: ["dist/**/*.entity{.ts,.js}"],
+				// entities: ["dist/**/*.entity{.ts,.js}"],
+				entities: [
+					Chapter,
+					Lesson,
+					Course,
+					MultipleChoiceExercise,
+					CodingExercise,
+					CodingExerciseSnippet,
+					QuizExercise,
+					UserLessonProgress,
+					UserStreak,
+					User,
+					Item,
+					UserItem,
+					Shop,
+					UserFeedback,
+					Notification,
+					SpellBook,
+					UserCourseCompletion,
+					UserAchievement,
+					WheelItem,
+				],
 				synchronize: configService.get<boolean>("SYNCHRONIZE"),
 				logging: false,
 			}),
