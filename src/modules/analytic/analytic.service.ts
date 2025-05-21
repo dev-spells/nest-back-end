@@ -3,7 +3,14 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
 import { RedisKey } from "src/constants/redis-key";
+import { Course } from "src/entities/course.entity";
+import { Item } from "src/entities/item.entity";
+import { Shop } from "src/entities/shop.entity";
 import { User } from "src/entities/user.entity";
+import {
+	FeedbackStatus,
+	UserFeedback,
+} from "src/entities/user-feedback.entity";
 import { UserLessonProgress } from "src/entities/user-lessson-progress.entity";
 
 import { RedisService } from "../cache/cache.service";
@@ -17,6 +24,14 @@ export class AnalyticService {
 		private userLessonProgressRepository: Repository<UserLessonProgress>,
 		@InjectRepository(User)
 		private userRepository: Repository<User>,
+		@InjectRepository(Course)
+		private courseRepository: Repository<Course>,
+		@InjectRepository(Item)
+		private itemRepository: Repository<Item>,
+		@InjectRepository(Shop)
+		private shopRepository: Repository<Shop>,
+		@InjectRepository(UserFeedback)
+		private userFeedbackRepository: Repository<UserFeedback>,
 		private redisService: RedisService,
 	) {}
 
@@ -27,7 +42,11 @@ export class AnalyticService {
 		if (!analytics) {
 			analytics = {
 				totalMember: await this.getTotalMember(),
-				lessonComplete: await this.getLessonComplete(groupBy),
+				totalCourse: await this.totalCourse(),
+				totalItem: await this.totalItem(),
+				totalItemInShop: await this.totalShop(),
+				totalOpenUserFeedback: await this.getTotalOpenUserFeedback(),
+				// lessonComplete: await this.getLessonComplete(groupBy),
 				userJoin: await this.getUsersJoin(groupBy),
 				courseJoin: await this.getCoursesJoin(),
 			};
@@ -38,29 +57,38 @@ export class AnalyticService {
 		return analytics;
 	}
 
+	private async getTotalOpenUserFeedback() {
+		const totalOpenUserFeedback = await this.userFeedbackRepository.count({
+			where: {
+				status: FeedbackStatus.OPEN,
+			},
+		});
+		return totalOpenUserFeedback;
+	}
+
 	private async getTotalMember() {
 		const totalMember = await this.userRepository.count();
 		return totalMember;
 	}
 
-	private async getLessonComplete(groupBy: TimeGroup) {
-		const dateFormat = this.getDateFormat(groupBy);
-		const lessonComplete = await this.userLessonProgressRepository
-			.createQueryBuilder("progress")
-			.select(`TO_CHAR(progress.createdAt, '${dateFormat}')`, "date")
-			.addSelect("COUNT(*)", "count")
-			.where("progress.createdAt IS NOT NULL")
-			.groupBy("date")
-			.orderBy("date", "ASC")
-			.limit(40)
-			.getRawMany();
+	// private async getLessonComplete(groupBy: TimeGroup) {
+	// 	const dateFormat = this.getDateFormat(groupBy);
+	// 	const lessonComplete = await this.userLessonProgressRepository
+	// 		.createQueryBuilder("progress")
+	// 		.select(`TO_CHAR(progress.createdAt, '${dateFormat}')`, "date")
+	// 		.addSelect("COUNT(*)", "count")
+	// 		.where("progress.createdAt IS NOT NULL")
+	// 		.groupBy("date")
+	// 		.orderBy("date", "ASC")
+	// 		.limit(40)
+	// 		.getRawMany();
 
-		return lessonComplete.map(item => ({
-			// name: localDate(item.date),
-			name: item.date,
-			value: parseInt(item.count),
-		}));
-	}
+	// 	return lessonComplete.map(item => ({
+	// 		// name: localDate(item.date),
+	// 		name: item.date,
+	// 		value: parseInt(item.count),
+	// 	}));
+	// }
 
 	private async getUsersJoin(groupBy: TimeGroup) {
 		const dateFormat = this.getDateFormat(groupBy);
@@ -99,6 +127,18 @@ export class AnalyticService {
 			name: item.name || "Uncategorized",
 			value: parseInt(item.count),
 		}));
+	}
+
+	private async totalCourse() {
+		return await this.courseRepository.count();
+	}
+
+	private async totalItem() {
+		return await this.itemRepository.count();
+	}
+
+	private async totalShop() {
+		return await this.shopRepository.count();
 	}
 
 	private getDateFormat(groupBy: TimeGroup): string {

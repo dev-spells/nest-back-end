@@ -20,8 +20,20 @@ export class AnalyticsResponseDto {
 	@ApiProperty({ example: 8 })
 	totalMember: number;
 
-	@ApiProperty({ type: [NamedValueDto] })
-	lessonComplete: NamedValueDto[];
+	@ApiProperty({ example: 10 })
+	totalCourse: number;
+
+	@ApiProperty({ example: 10 })
+	totalItem: number;
+
+	@ApiProperty({ example: 10 })
+	totalItemInShop: number;
+
+	@ApiProperty({ example: 10 })
+	totalOpenUserFeedback: number;
+
+	// @ApiProperty({ type: [NamedValueDto] })
+	// lessonComplete: NamedValueDto[];
 
 	@ApiProperty({ type: [NamedValueDto] })
 	userJoin: NamedValueDto[];
