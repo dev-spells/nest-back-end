@@ -77,6 +77,10 @@ export class ItemProtectStreakService {
 			};
 		});
 		await this.userStreakRepository.save(formatedInactiveUsersIds);
+		this.notificationService.pushToUsers(inactiveUsersIds, {
+			type: NOTIFY_TYPE.RESET_DAILY_STREAK.type,
+			message: NOTIFY_TYPE.RESET_DAILY_STREAK.message,
+		});
 	}
 
 	private async checkUserInactivedFromRedis(users: string[]) {

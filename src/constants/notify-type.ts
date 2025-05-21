@@ -3,6 +3,11 @@ export const NOTIFY_TYPE = {
 		type: "use_protect_daily_streak",
 		message: `You have used the daily streak protection item`,
 	},
+	RESET_DAILY_STREAK: {
+		type: "reset_daily_streak",
+		message:
+			"Your daily streak has been reset, try to complete lesson to build up your streak again!",
+	},
 	FINISH_COURSE: {
 		type: "finish_course",
 		message: (courseName: string) =>
