@@ -54,6 +54,7 @@ export class SpellBookService {
 				},
 			},
 		});
+		console.log(lessonProgress);
 		const spellBook = lessonProgress
 			.map(lesson => {
 				if (lesson.lesson.spellBook !== null) {
