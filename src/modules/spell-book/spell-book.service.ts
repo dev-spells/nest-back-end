@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { ILike, In, Repository } from "typeorm";
 
 import { SpellBook } from "src/entities/spellbook.entity";
 import { UserLessonProgress } from "src/entities/user-lessson-progress.entity";
@@ -33,6 +33,9 @@ export class SpellBookService {
 				select: {
 					id: true,
 					name: true,
+				},
+				where: {
+					content: ILike(`%${search}%`),
 				},
 			});
 		}
