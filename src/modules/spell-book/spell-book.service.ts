@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ILike, In, Repository } from "typeorm";
+import { ILike, Repository } from "typeorm";
 
 import { SpellBook } from "src/entities/spellbook.entity";
 import { UserLessonProgress } from "src/entities/user-lessson-progress.entity";
