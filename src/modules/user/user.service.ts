@@ -244,13 +244,16 @@ export class UserService {
 		}
 
 		const now = new Date().toISOString();
+		const sixMonthsAgo = new Date(
+			new Date().setMonth(new Date().getMonth() - 6) - 13 * 86400000,
+		).toISOString();
 		const response = await axios.post(
 			"https://api.github.com/graphql",
 			{
 				query: `
 			  query {
 				viewer {
-					contributionsCollection(from: "2024-09-01T00:00:00Z", to: "${now}") {
+					contributionsCollection(from: "${sixMonthsAgo}", to: "${now}") {
 					contributionCalendar {
 						weeks {
 						contributionDays {
