@@ -172,6 +172,8 @@ export class UserSubmissionService {
 				: undefined,
 		);
 		this.handleUserStreakAndAchievement(user.id, userStats);
+		this.redisService.del(RedisKey.topDailySubmission);
+		this.redisService.del(RedisKey.userTopLevel);
 		return userStats;
 	}
 
