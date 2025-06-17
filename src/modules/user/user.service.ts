@@ -5,9 +5,10 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import axios from "axios";
-import { MoreThan, Repository } from "typeorm";
+import { In, MoreThan, Repository } from "typeorm";
 
 import { USER_ERRORS } from "src/constants/errors";
+import { LEVELS, RANKS } from "src/constants/level";
 import { RedisKey } from "src/constants/redis-key";
 import { UserAchievement } from "src/entities/user-achievement.entity";
 import { UserCourseCompletion } from "src/entities/user-course-completion";
@@ -371,5 +372,35 @@ export class UserService {
 			where: { id: id },
 		});
 		return existingUser;
+	}
+	async prepareDemoUser() {
+		const userId = "ed1fec91-a425-4083-aa58-03ecc1b3419c";
+		const lessonIds = [257, 258, 259, 260];
+		const twoDaysAgo = new Date();
+		twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+		const twoDaysAgoLesson = 254;
+
+		await this.userRepository.update(userId, {
+			level: 10,
+			rankTitle: RANKS[0].name,
+			borderUrl: RANKS[0].border,
+			expToLevelUp: LEVELS[9].expToLevelUp,
+			currentExp: 2200,
+			totalExpGainedToday: 2300,
+		});
+		await this.userLessonProgressRepository.delete({
+			userId: userId,
+			lessonId: In(lessonIds),
+		});
+		await this.userLessonProgressRepository.save({
+			userId: userId,
+			lessonId: twoDaysAgoLesson,
+			createdAt: twoDaysAgo,
+		});
+		await this.userStreakRepository.update(userId, {
+			curDailyStreak: 1,
+		});
+		await this.redisService.del(RedisKey.userItemDailyStreak(userId));
+		await this.redisService.del(RedisKey.userItemXP(userId));
 	}
 }

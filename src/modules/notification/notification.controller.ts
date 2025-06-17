@@ -54,7 +54,7 @@ export class NotificationController {
 					type: "heartbeat",
 					timestamp: Date.now(),
 				});
-			}, 25000);
+			}, 20000);
 			subscriber.add(() => {
 				clearInterval(heartbeatInterval);
 				ObserverStore.remove(user.id);

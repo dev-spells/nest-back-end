@@ -88,4 +88,12 @@ export class UserController {
 	async update(@User() user: any, @Body() updateUserDto: UpdateUserDto) {
 		return await this.userService.updateUser(user.id, updateUserDto);
 	}
+
+	@ApiOperation({ summary: "prepare demo user" })
+	@ApiBearerAuth()
+	@Roles(Role.ADMIN)
+	@Post("prepare-demo-user")
+	async prepareDemoUser() {
+		return await this.userService.prepareDemoUser();
+	}
 }
