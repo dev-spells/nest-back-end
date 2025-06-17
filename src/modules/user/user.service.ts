@@ -376,7 +376,8 @@ export class UserService {
 	}
 	async prepareDemoUser() {
 		const userId = "ed1fec91-a425-4083-aa58-03ecc1b3419c";
-		const lessonIds = [257, 258, 259, 260];
+		const lessonIds = [257, 258, 259, 260, 224];
+		const courseId = 221;
 		const twoDaysAgo = new Date();
 		twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 		const twoDaysAgoLesson = 254;
@@ -400,6 +401,10 @@ export class UserService {
 		});
 		await this.userStreakRepository.update(userId, {
 			curDailyStreak: 1,
+		});
+		await this.userCourseCompletionRepository.delete({
+			userId: userId,
+			courseId: courseId,
 		});
 		await this.redisService.del(RedisKey.userItemDailyStreak(userId));
 		await this.redisService.del(RedisKey.userItemXP(userId));
