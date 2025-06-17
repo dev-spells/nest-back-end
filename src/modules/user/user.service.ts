@@ -5,6 +5,7 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import axios from "axios";
+import Redis from "ioredis";
 import { In, MoreThan, Repository } from "typeorm";
 
 import { USER_ERRORS } from "src/constants/errors";
@@ -23,7 +24,6 @@ import { RedisService } from "../cache/cache.service";
 
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import Redis from "ioredis";
 // import aqp from 'api-query-params';
 
 @Injectable()

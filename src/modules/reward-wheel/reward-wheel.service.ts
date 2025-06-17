@@ -88,12 +88,12 @@ export class RewardWheelService {
 				},
 			});
 
-			if (!existingNotification) {
-				this.notificationService.pushToUser(userId, {
-					type: NOTIFY_TYPE.UNLOCK_WHEEL.type,
-					message: NOTIFY_TYPE.UNLOCK_WHEEL.message,
-				});
-			}
+			// if (!existingNotification) {
+			this.notificationService.pushToUser(userId, {
+				type: NOTIFY_TYPE.UNLOCK_WHEEL.type,
+				message: NOTIFY_TYPE.UNLOCK_WHEEL.message,
+			});
+			// }
 		}
 		return {
 			canSpin,
