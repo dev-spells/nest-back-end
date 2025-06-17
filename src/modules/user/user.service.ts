@@ -5,7 +5,6 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import axios from "axios";
-import Redis from "ioredis";
 import { In, MoreThan, Repository } from "typeorm";
 
 import { USER_ERRORS } from "src/constants/errors";
@@ -378,9 +377,21 @@ export class UserService {
 		const userId = "ed1fec91-a425-4083-aa58-03ecc1b3419c";
 		const lessonIds = [257, 258, 259, 260, 224];
 		const courseId = 221;
+
 		const twoDaysAgo = new Date();
 		twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 		const twoDaysAgoLesson = 254;
+
+		await this.userLessonProgressRepository.save({
+			userId: "13558ca3-d69e-40f9-b2f5-5462e8fc6f08",
+			lessonId: 276,
+			createdAt: new Date(),
+		});
+		await this.userLessonProgressRepository.save({
+			userId: "d8404c6a-acb6-4d57-98c9-90745f8bc200",
+			lessonId: 224,
+			createdAt: new Date(),
+		});
 
 		await this.userRepository.update(userId, {
 			level: 10,
