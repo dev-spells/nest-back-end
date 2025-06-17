@@ -23,6 +23,7 @@ import { RedisService } from "../cache/cache.service";
 
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import Redis from "ioredis";
 // import aqp from 'api-query-params';
 
 @Injectable()
@@ -402,5 +403,6 @@ export class UserService {
 		});
 		await this.redisService.del(RedisKey.userItemDailyStreak(userId));
 		await this.redisService.del(RedisKey.userItemXP(userId));
+		await this.redisService.del(RedisKey.wheel);
 	}
 }
