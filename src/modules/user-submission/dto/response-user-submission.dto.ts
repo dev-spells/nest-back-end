@@ -29,6 +29,29 @@ export class UserStatsDto {
 	expBonus: number;
 }
 
+export class FinishCourseReponseDto {
+	@ApiProperty()
+	levelUp: boolean;
+
+	@ApiProperty()
+	curLevel: number;
+
+	@ApiProperty()
+	expToLevelUp: number;
+
+	@ApiProperty()
+	curExp: number;
+
+	@ApiProperty()
+	rankTitle: string;
+
+	@ApiProperty()
+	rankBorder: string;
+
+	@ApiProperty()
+	expGained: number;
+}
+
 export class UserLessonProgressDto {
 	@ApiProperty()
 	userId: string;

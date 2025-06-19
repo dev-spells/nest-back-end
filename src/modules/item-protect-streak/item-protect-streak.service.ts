@@ -1,8 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, MoreThan, Repository } from "typeorm";
 
+import { ITEM_ERRORS } from "src/constants/errors";
 import { ITEM_PROTECT_DAILY_STREAK_ID } from "src/constants/item";
+import { NOTIFY_TYPE } from "src/constants/notify-type";
 import { RedisKey } from "src/constants/redis-key";
 import { Item } from "src/entities/item.entity";
 import { UserItem } from "src/entities/user-item.entity";
@@ -11,6 +13,7 @@ import { UserStreak } from "src/entities/user-streak.entity";
 
 import { RedisService } from "../cache/cache.service";
 
+import { NotificationService } from "./../notification/notification.service";
 import { UpdateItemProtectStreakDto } from "./dto/update-item-protect-streak.dto";
 
 @Injectable()
@@ -25,6 +28,7 @@ export class ItemProtectStreakService {
 		@InjectRepository(UserStreak)
 		private userStreakRepository: Repository<UserStreak>,
 		private redisService: RedisService,
+		private notificationService: NotificationService,
 	) {}
 
 	async update(updateItemProtectStreakDto: UpdateItemProtectStreakDto) {
@@ -44,6 +48,12 @@ export class ItemProtectStreakService {
 		const inactiveUsers = await this.userLessonProgressRepository
 			.createQueryBuilder("userLessonProgress")
 			.select("DISTINCT userLessonProgress.userId")
+			.innerJoin(
+				UserStreak,
+				"userStreak",
+				"userStreak.userId = userLessonProgress.userId AND userStreak.curDailyStreak > 0",
+			)
+
 			.where(qb => {
 				const subQuery = qb
 					.subQuery()
@@ -67,6 +77,10 @@ export class ItemProtectStreakService {
 			};
 		});
 		await this.userStreakRepository.save(formatedInactiveUsersIds);
+		this.notificationService.pushToUsers(inactiveUsersIds, {
+			type: NOTIFY_TYPE.RESET_DAILY_STREAK.type,
+			message: NOTIFY_TYPE.RESET_DAILY_STREAK.message,
+		});
 	}
 
 	private async checkUserInactivedFromRedis(users: string[]) {
@@ -80,53 +94,63 @@ export class ItemProtectStreakService {
 	}
 
 	private async checkUserProtectItem(users: string[]) {
-		const userItems = await this.userItemRepository.find({
-			where: {
-				userId: In(users),
-				itemId: ITEM_PROTECT_DAILY_STREAK_ID,
-				quantity: MoreThan(0),
-			},
-			select: {
-				userId: true,
-				item: {
-					name: true,
+		return await this.userItemRepository.manager.transaction(async manager => {
+			const repo = manager.getRepository(UserItem);
+			const item = await this.itemRepository.findOne({
+				where: { id: ITEM_PROTECT_DAILY_STREAK_ID },
+				select: {
 					stats: {},
-					imageUrl: true,
 				},
-				quantity: true,
-			},
-			relations: {
-				item: true,
-			},
-		});
+			});
+			if (!item) {
+				throw new NotFoundException(ITEM_ERRORS.NOT_FOUND);
+			}
+			const userItems = await repo.find({
+				where: {
+					userId: In(users),
+					itemId: ITEM_PROTECT_DAILY_STREAK_ID,
+					quantity: MoreThan(0),
+				},
+				select: {
+					userId: true,
+					quantity: true,
+				},
+				lock: { mode: "pessimistic_write" },
+			});
 
-		if (userItems.length === 0) {
-			return users;
-		}
+			if (userItems.length === 0) {
+				return users;
+			}
 
-		await Promise.all(
-			userItems.map(userItem =>
-				this.redisService.set(
-					RedisKey.userItemDailyStreak(userItem.userId),
-					"true",
-					userItem.item.stats.duration,
+			await Promise.all(
+				userItems.map(userItem =>
+					this.redisService.set(
+						RedisKey.userItemDailyStreak(userItem.userId),
+						"true",
+						item.stats.duration,
+					),
 				),
-			),
-		);
+			);
 
-		await this.userItemRepository
-			.createQueryBuilder()
-			.update()
-			.set({ quantity: () => "quantity - 1" })
-			.where("userId IN (:...userIds)", {
-				userIds: userItems.map(item => item.userId),
-			})
-			.andWhere("itemId = :itemId", { itemId: ITEM_PROTECT_DAILY_STREAK_ID })
-			.execute();
+			await repo
+				.createQueryBuilder()
+				.update()
+				.set({ quantity: () => "quantity - 1" })
+				.where("userId IN (:...userIds)", {
+					userIds: userItems.map(item => item.userId),
+				})
+				.andWhere("itemId = :itemId", { itemId: ITEM_PROTECT_DAILY_STREAK_ID })
+				.execute();
 
-		// push notification to user later
-
-		const userItemsSet = new Set(userItems.map(userItem => userItem.userId));
-		return users.filter(user => !userItemsSet.has(user));
+			await this.notificationService.pushToUsers(
+				userItems.map(userItem => userItem.userId),
+				{
+					...NOTIFY_TYPE.USE_PROTECT_DAILY_STREAK,
+					itemId: ITEM_PROTECT_DAILY_STREAK_ID,
+				},
+			);
+			const userItemsSet = new Set(userItems.map(userItem => userItem.userId));
+			return users.filter(user => !userItemsSet.has(user));
+		});
 	}
 }

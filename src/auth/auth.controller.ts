@@ -1,4 +1,11 @@
-import { Body, Controller, Post, Request, UseGuards } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	Get,
+	Post,
+	Request,
+	UseGuards,
+} from "@nestjs/common";
 
 import {
 	ApiBadRequestResponse,
@@ -37,6 +44,12 @@ import { AuthService } from "./auth.service";
 @Controller("auth")
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
+
+	@ApiOperation({ summary: "Checking if user is authenticated" })
+	@ApiResponse({ status: 200, description: "User is authenticated" })
+	@ApiBearerAuth()
+	@Get("check-auth")
+	checkAuth() {}
 
 	@ApiOperation({ summary: "Register a new user" })
 	@ApiResponse({ status: 201, description: "User registered successfully" })

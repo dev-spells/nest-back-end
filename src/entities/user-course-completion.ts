@@ -4,7 +4,7 @@ import {
 	Entity,
 	JoinColumn,
 	ManyToOne,
-	PrimaryColumn,
+	PrimaryGeneratedColumn,
 } from "typeorm";
 
 import { Course } from "./course.entity";
@@ -12,10 +12,13 @@ import { User } from "./user.entity";
 
 @Entity()
 export class UserCourseCompletion {
-	@PrimaryColumn({ type: "uuid" })
+	@PrimaryGeneratedColumn("uuid")
+	id: string;
+
+	@Column({ type: "uuid" })
 	userId: string;
 
-	@PrimaryColumn({ type: "int" })
+	@Column({ type: "int" })
 	courseId: number;
 
 	@CreateDateColumn()

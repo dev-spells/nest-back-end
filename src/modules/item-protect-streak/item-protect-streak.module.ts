@@ -7,6 +7,7 @@ import { UserLessonProgress } from "src/entities/user-lessson-progress.entity";
 import { UserStreak } from "src/entities/user-streak.entity";
 
 import { RedisModule } from "../cache/cache.module";
+import { NotificationModule } from "../notification/notification.module";
 
 import { ItemProtectStreakController } from "./item-protect-streak.controller";
 import { ItemProtectStreakService } from "./item-protect-streak.service";
@@ -15,6 +16,7 @@ import { ItemProtectStreakService } from "./item-protect-streak.service";
 	imports: [
 		TypeOrmModule.forFeature([UserStreak, Item, UserItem, UserLessonProgress]),
 		RedisModule,
+		NotificationModule,
 	],
 	controllers: [ItemProtectStreakController],
 	providers: [ItemProtectStreakService],

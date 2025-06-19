@@ -12,5 +12,6 @@ import { ShopService } from "./shop.service";
 	imports: [TypeOrmModule.forFeature([Shop, UserItem, User])],
 	controllers: [ShopController],
 	providers: [ShopService],
+	exports: [ShopService],
 })
 export class ShopModule {}

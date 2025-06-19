@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { ILike, Repository } from "typeorm";
 
 import { SpellBook } from "src/entities/spellbook.entity";
+import { UserLessonProgress } from "src/entities/user-lessson-progress.entity";
 
 import { CreateSpellBookDto } from "./dto/create-spell-book.dto";
 import { UpdateSpellBookDto } from "./dto/update-spell-book.dto";
@@ -10,6 +11,8 @@ import { UpdateSpellBookDto } from "./dto/update-spell-book.dto";
 @Injectable()
 export class SpellBookService {
 	constructor(
+		@InjectRepository(UserLessonProgress)
+		private userLessonProgressRepository: Repository<UserLessonProgress>,
 		@InjectRepository(SpellBook)
 		private spellBookRepository: Repository<SpellBook>,
 	) {}
@@ -24,17 +27,54 @@ export class SpellBookService {
 		return await this.spellBookRepository.save(newSpellBook);
 	}
 
-	async findAll(search?: string) {
-		// Refactor this later with user data
-		// find all the spell book with that lessonId and filter it with the search
+	async findAll(userId: string, search?: string, isAdmin: boolean = false) {
+		if (isAdmin) {
+			return await this.spellBookRepository.find({
+				select: {
+					id: true,
+					name: true,
+				},
+				where: {
+					content: ILike(`%${search}%`),
+				},
+			});
+		}
 
-		const whereCondition = search ? { name: ILike(`%${search}%`) } : {};
-
-		return await this.spellBookRepository.find({
-			select: ["id", "name"],
-			where: whereCondition,
-			order: { id: "DESC" },
+		const lessonProgress = await this.userLessonProgressRepository.find({
+			select: {
+				lesson: {
+					id: true,
+					spellBook: {
+						id: true,
+						name: true,
+					},
+				},
+			},
+			where: { userId: userId },
+			relations: {
+				lesson: {
+					spellBook: true,
+				},
+			},
 		});
+		console.log(lessonProgress);
+		const spellBook = lessonProgress
+			.map(lesson => {
+				if (lesson.lesson.spellBook !== null) {
+					return {
+						id: lesson.lesson.spellBook.id,
+						name: lesson.lesson.spellBook.name,
+					};
+				}
+				return null;
+			})
+			.filter((item): item is { id: number; name: string } => item !== null);
+		if (search) {
+			return spellBook.filter(sb => {
+				return sb?.name.toLowerCase().includes(search.toLowerCase());
+			});
+		}
+		return spellBook;
 	}
 
 	async findOne(id: number) {

@@ -6,6 +6,7 @@ import { UserItem } from "src/entities/user-item.entity";
 import { UserLessonProgress } from "src/entities/user-lessson-progress.entity";
 
 import { RedisModule } from "../cache/cache.module";
+import { ShopModule } from "../shop/shop.module";
 
 import { ItemUnlockController } from "./item-unlock.controller";
 import { ItemUnlockService } from "./item-unlock.service";
@@ -14,6 +15,7 @@ import { ItemUnlockService } from "./item-unlock.service";
 	imports: [
 		TypeOrmModule.forFeature([Item, UserItem, UserLessonProgress]),
 		RedisModule,
+		ShopModule,
 	],
 	controllers: [ItemUnlockController],
 	providers: [ItemUnlockService],

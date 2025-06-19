@@ -6,6 +6,7 @@ import {
 	Param,
 	Patch,
 	Post,
+	Query,
 } from "@nestjs/common";
 
 import {
@@ -15,6 +16,7 @@ import {
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiOperation,
+	ApiQuery,
 	ApiTags,
 } from "@nestjs/swagger";
 
@@ -39,9 +41,10 @@ export class ShopController {
 	@ApiOperation({ summary: "Get all items in shop" })
 	@ApiBearerAuth()
 	@ApiOkResponse({ type: [GetShopResponseDto] })
+	@ApiQuery({ name: "isAdmin", type: Boolean, required: false })
 	@Get()
-	async getAll(@User() user: any) {
-		return await this.shopService.getAll(user.id);
+	async getAll(@User() user: any, @Query("isAdmin") isAdmin: boolean) {
+		return await this.shopService.getAll(user.id, isAdmin ? isAdmin : false);
 	}
 
 	@Roles(Role.ADMIN)

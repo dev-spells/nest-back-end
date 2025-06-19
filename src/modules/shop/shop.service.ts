@@ -4,7 +4,7 @@ import {
 	NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
+import { Repository } from "typeorm";
 
 import { ITEM_ERRORS, SHOP_ERRORS } from "src/constants/errors";
 import {
@@ -31,7 +31,28 @@ export class ShopService {
 		private userRepository: Repository<User>,
 	) {}
 
-	async getAll(userId: string) {
+	async getAll(userId: string, isAdmin: boolean) {
+		if (isAdmin) {
+			return await this.shopRepository.find({
+				select: {
+					itemId: true,
+					sellPrices: true,
+					buyPrices: true,
+					item: {
+						name: true,
+						imageUrl: true,
+						description: true,
+					},
+				},
+				relations: {
+					item: true,
+				},
+				order: {
+					itemId: "ASC",
+				},
+			});
+		}
+
 		const itemInShop = await this.shopRepository.find({
 			select: {
 				itemId: true,
@@ -47,28 +68,50 @@ export class ShopService {
 				item: true,
 			},
 		});
-		const itemIds = itemInShop.map(item => item.itemId);
 		const userItems = await this.userItemRepository.find({
 			select: {
 				itemId: true,
 				quantity: true,
+				item: {
+					name: true,
+					imageUrl: true,
+					description: true,
+				},
 			},
 			where: {
-				itemId: In(itemIds),
 				userId: userId,
 			},
+			relations: {
+				item: true,
+			},
 		});
-		const mergedItems = itemInShop.map(item => {
-			const userItem = userItems.find(
-				userItem => userItem.itemId === item.itemId,
-			);
-			return {
-				...item,
-				quantity: userItem ? userItem.quantity : 0,
-			};
-		});
+		let mergedItems;
+		if (userItems.length > itemInShop.length) {
+			mergedItems = userItems.map(item => {
+				const userItem = itemInShop.find(
+					userItem => userItem.itemId === item.itemId,
+				);
+				return {
+					...item,
+					...userItem,
+					quantity: item ? item.quantity : 0,
+					buyPrices: userItem?.buyPrices ? userItem.buyPrices : null,
+					sellPrices: userItem?.sellPrices ? userItem.sellPrices : null,
+				};
+			});
+		} else {
+			mergedItems = itemInShop.map(item => {
+				const userItem = userItems.find(
+					userItem => userItem.itemId === item.itemId,
+				);
+				return {
+					...item,
+					quantity: userItem ? userItem.quantity : 0,
+				};
+			});
+		}
 
-		return mergedItems;
+		return mergedItems.sort((a, b) => a.itemId - b.itemId);
 	}
 	async updatePrice(itemId: number, updateShopDto: UpdateShopDto) {
 		const itemInShop = await this.shopRepository.findOne({ where: { itemId } });
@@ -136,7 +179,7 @@ export class ShopService {
 		const updatedUserItem = await this.userItemRepository.save({
 			userId,
 			itemId,
-			quantity: userItem.quantity + 1,
+			quantity: userItem.quantity - 1,
 		});
 		const updatedUser = await this.userRepository.save({
 			id: userId,
@@ -149,17 +192,18 @@ export class ShopService {
 		};
 	}
 	async buy(userId: string, itemId: number) {
-		const userItem = await this.userItemRepository.findOne({
+		let userItem = await this.userItemRepository.findOne({
 			where: { userId: userId, itemId: itemId },
 			relations: {
 				user: true,
 			},
 		});
 		if (!userItem) {
-			throw new NotFoundException(ITEM_ERRORS.NOT_FOUND);
-		}
-		if (userItem.quantity <= 0) {
-			throw new BadRequestException(SHOP_ERRORS.NOT_ENOUGH_ITEM);
+			userItem = await this.userItemRepository.save({
+				userId: userId,
+				itemId: itemId,
+				quantity: 0,
+			});
 		}
 		const itemInShop = await this.shopRepository.findOne({
 			where: { itemId: itemId },
@@ -175,7 +219,7 @@ export class ShopService {
 		const updatedUserItem = await this.userItemRepository.save({
 			userId,
 			itemId,
-			quantity: userItem.quantity - 1,
+			quantity: userItem.quantity + 1,
 		});
 		const updatedUser = await this.userRepository.save({
 			id: userId,

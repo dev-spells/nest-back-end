@@ -25,6 +25,31 @@ export class ItemXpService {
 		private RedisService: RedisService,
 	) {}
 
+	async get(userId: string) {
+		const itemXP = await this.itemRepository.findOne({
+			where: {
+				id: ITEM_XP_ID,
+			},
+		});
+		if (!itemXP) {
+			throw new NotFoundException(ITEM_ERRORS.NOT_FOUND);
+		}
+		const userItemXP = await this.userItemRepository.findOne({
+			where: {
+				userId: userId,
+				itemId: ITEM_XP_ID,
+			},
+			select: {
+				quantity: true,
+			},
+		});
+
+		return {
+			...itemXP,
+			quantity: userItemXP?.quantity ? userItemXP.quantity : 0,
+		};
+	}
+
 	async update(updateItemXPDto: UpdateItemXPDto) {
 		return await this.itemRepository.save({
 			id: ITEM_XP_ID,
@@ -73,15 +98,24 @@ export class ItemXpService {
 	}
 
 	async check(userId: string) {
+		const userItem = await this.userItemRepository.findOne({
+			where: {
+				userId: userId,
+				itemId: ITEM_XP_ID,
+			},
+		});
 		const itemInUsed = await this.RedisService.getMap(
 			RedisKey.userItemXP(userId),
 		);
 		if (Object.keys(itemInUsed).length > 0) {
 			return {
 				...itemInUsed,
+				quantity: userItem?.quantity ? userItem.quantity : 0,
 			};
 		} else {
-			return null;
+			return {
+				quantity: userItem?.quantity ? userItem.quantity : 0,
+			};
 		}
 	}
 }

@@ -9,6 +9,7 @@ export const USER_ERRORS = {
 	SPAM_OTP: "Please wait before requesting a new OTP",
 	INVALID_OLD_PASSWORD: "Old password is incorrect",
 	LOGIN_FAILED: "Username/Password incorrect",
+	USER_COURSE_COMPLETED_NOT_FOUND: "User course completed not found",
 } as const;
 
 export const PASSWORD_ERRORS = {
@@ -39,6 +40,7 @@ export const LESSON_ERRORS = {
 export const COURSE_ERRORS = {
 	NOT_FOUND: "Course not found",
 	ALREADY_EXISTS: "Course with this title already exists",
+	ALREADY_FINISH: "User already finished this course",
 } as const;
 
 export const ITEM_ERRORS = {
@@ -55,4 +57,14 @@ export const SHOP_ERRORS = {
 	ALREADY_EXISTS: "Item already exists in shop",
 	NOT_ENOUGH_MONEY: "Not enough money to buy this item",
 	NOT_ENOUGH_ITEM: "Not enough quantity of item",
+} as const;
+
+export const WHEEL_ERRORS = {
+	NOT_FOUND: "Wheel item not found",
+	ITEM_ALREADY_EXISTS: "Wheel item already exists",
+	INVALID_REWARD_TYPE: "Invalid reward type",
+} as const;
+
+export const USER_FEEDBACK_ERRORS = {
+	NOT_FOUND: "User feedback not found",
 } as const;

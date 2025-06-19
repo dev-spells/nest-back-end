@@ -17,6 +17,7 @@ import {
 } from "src/utils/convert-redis.util";
 
 import { RedisService } from "../cache/cache.service";
+import { ShopService } from "../shop/shop.service";
 
 import { UpdateItemUnlockDto } from "./dto/update-item-unlock.dto";
 
@@ -30,6 +31,7 @@ export class ItemUnlockService {
 		@InjectRepository(UserLessonProgress)
 		private userLessonProgressRepository: Repository<UserLessonProgress>,
 		private redisService: RedisService,
+		private shopService: ShopService,
 	) {}
 
 	async update(itemId: number, updateItemUnlock: UpdateItemUnlockDto) {
@@ -43,6 +45,43 @@ export class ItemUnlockService {
 			id: ITEM_UNLOCK_SOLUTION_ID,
 			...updateItemUnlock,
 		});
+	}
+
+	async freeSolution(userId: string, lessonId: number) {
+		let lessonList: number[] = [];
+
+		const userFreeSolution: string | null = await this.redisService.get(
+			RedisKey.userFreeSolution(userId),
+		);
+		if (userFreeSolution) {
+			try {
+				lessonList = JSON.parse(userFreeSolution);
+			} catch {
+				lessonList = [];
+			}
+		}
+
+		if (!lessonList.includes(lessonId)) {
+			lessonList.push(lessonId);
+			await this.redisService.set(
+				RedisKey.userFreeSolution(userId),
+				JSON.stringify(lessonList),
+				0,
+			);
+		}
+
+		return lessonList;
+	}
+
+	async buyAndUse(userId: string, itemId: number, lessonId: number) {
+		if (
+			itemId !== ITEM_UNLOCK_SOLUTION_ID &&
+			itemId !== ITEM_UNLOCK_CHATBOT_ID
+		) {
+			throw new BadRequestException(ITEM_ERRORS.NOT_FOUND);
+		}
+		await this.shopService.buy(userId, itemId);
+		return await this.use(userId, itemId, lessonId);
 	}
 
 	async use(userId: string, itemId: number, lessonId: number) {
@@ -111,6 +150,18 @@ export class ItemUnlockService {
 		) {
 			throw new BadRequestException(ITEM_ERRORS.NOT_FOUND);
 		}
+		const checkFreeSolution: string | null = await this.redisService.get(
+			RedisKey.userFreeSolution(userId),
+		);
+		if (checkFreeSolution && JSON.parse(checkFreeSolution).includes(lessonId))
+			return true;
+
+		const userItem = await this.userItemRepository.findOne({
+			where: {
+				userId: userId,
+				itemId: itemId,
+			},
+		});
 		const userLessonProgress = await this.userLessonProgressRepository.findOne({
 			where: {
 				userId: userId,
@@ -126,9 +177,11 @@ export class ItemUnlockService {
 		);
 		const data = convertToMapData(rawData);
 		const key = itemId.toString();
-		if (data[key].includes(lessonId)) {
+		if (data[key]?.includes(lessonId)) {
 			return true;
 		}
-		return false;
+		return {
+			quantity: userItem?.quantity || 0,
+		};
 	}
 }

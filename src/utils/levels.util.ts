@@ -57,5 +57,6 @@ export function calculateLevel(
 		curExp: totalExp,
 		rankTitle: RankName,
 		rankBorder: Border,
+		totalExpGained: totalExp,
 	};
 }
