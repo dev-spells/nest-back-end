@@ -107,12 +107,10 @@ export class UserService {
 			throw new NotFoundException(USER_ERRORS.USER_COURSE_COMPLETED_NOT_FOUND);
 		}
 		return {
-			userCourseCompleted: {
-				...userCourseCompleted,
-				users: {
-					...userCourseCompleted.users,
-					username: sanitizeGithubUsername(userCourseCompleted.users.username),
-				},
+			...userCourseCompleted,
+			users: {
+				...userCourseCompleted.users,
+				username: sanitizeGithubUsername(userCourseCompleted.users.username),
 			},
 		};
 	}
