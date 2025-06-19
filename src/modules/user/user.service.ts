@@ -106,7 +106,15 @@ export class UserService {
 		if (!userCourseCompleted) {
 			throw new NotFoundException(USER_ERRORS.USER_COURSE_COMPLETED_NOT_FOUND);
 		}
-		return userCourseCompleted;
+		return {
+			userCourseCompleted: {
+				...userCourseCompleted,
+				users: {
+					...userCourseCompleted.users,
+					username: sanitizeGithubUsername(userCourseCompleted.users.username),
+				},
+			},
+		};
 	}
 
 	async getDetail(userId: string, profileId: string) {
