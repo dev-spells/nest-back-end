@@ -423,8 +423,10 @@ export class UserService {
 			userId: userId,
 			courseId: courseId,
 		});
-		await this.redisService.del(RedisKey.userItemDailyStreak(userId));
-		await this.redisService.del(RedisKey.userItemXP(userId));
-		await this.redisService.del(RedisKey.wheel);
+		this.redisService.del(RedisKey.userItemDailyStreak(userId));
+		this.redisService.del(RedisKey.userItemXP(userId));
+		this.redisService.del(RedisKey.wheel);
+		this.redisService.del(RedisKey.userFreeSolution(userId));
+		this.redisService.del(RedisKey.userItemUnlock(userId));
 	}
 }
