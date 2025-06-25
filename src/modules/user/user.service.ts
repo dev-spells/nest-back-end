@@ -430,6 +430,7 @@ export class UserService {
 			achievementName: ACHIEVEMENTS.CORRECT_STREAK.levels[2].name,
 		});
 		await this.userStreakRepository.save({
+			userId: userId,
 			curCorrectStreak: 98,
 			maxCorrectStreak: 98,
 		});
