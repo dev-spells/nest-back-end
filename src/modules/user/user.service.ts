@@ -21,6 +21,8 @@ import { sanitizeGithubUsername } from "src/utils/sanitize-github-username.util"
 import { User, UserRole } from "../../entities/user.entity";
 import { RedisService } from "../cache/cache.service";
 
+import { ACHIEVEMENTS, AchievementType } from "./../../constants/achievement";
+import { updateItemDto } from "./../item/dto/update-item.dto";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 // import aqp from 'api-query-params';
@@ -422,6 +424,14 @@ export class UserService {
 		await this.userCourseCompletionRepository.delete({
 			userId: userId,
 			courseId: courseId,
+		});
+		await this.userAchievementRepository.save({
+			id: 1,
+			achievementName: ACHIEVEMENTS.CORRECT_STREAK.levels[2].name,
+		});
+		await this.userStreakRepository.save({
+			curCorrectStreak: 98,
+			maxCorrectStreak: 98,
 		});
 		this.redisService.del(RedisKey.userItemDailyStreak(userId));
 		this.redisService.del(RedisKey.userItemXP(userId));
